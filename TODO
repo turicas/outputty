@@ -1,0 +1,4 @@
+- Add doc strings to outputty module, Table class and all Table methods
+- Create some way to print colors and backgrounds
+- The number of input headers should not be the same of output ones
+- Receive a function to 'process row and return' instead of returning raw-data
