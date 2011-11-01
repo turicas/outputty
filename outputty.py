@@ -29,7 +29,7 @@ class MyCSV(csv.Dialect):
 
 class Table(object):
     def __init__(self, headers=[], dash='-', pipe='|', plus='+',
-                 input_codec='utf8', output_codec='utf8'):
+                 input_codec='utf8', output_codec='utf8', from_csv=None):
         self.headers = headers
         self.dash = dash
         self.pipe = pipe
@@ -37,6 +37,8 @@ class Table(object):
         self.input_codec = input_codec
         self.output_codec = output_codec
         self.rows = []
+        if from_csv:
+            self.import_from_csv(from_csv)
 
 
     def construct_data(self):
@@ -106,9 +108,15 @@ class Table(object):
 
     def to_csv(self, filename):
         self.construct_data()
+        encoded_data = []
+        for row in self.data:
+            row_data = []
+            for info in row:
+                row_data.append(info.encode(self.output_codec))
+            encoded_data.append(row_data)
         fp = open(filename, 'w')
         writer = csv.writer(fp, dialect=MyCSV)
-        writer.writerows(self.data)
+        writer.writerows(encoded_data)
         fp.close()
 
 

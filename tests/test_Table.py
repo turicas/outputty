@@ -185,8 +185,7 @@ class TestTable(unittest.TestCase):
 ''')
         temp_fp.close()
 
-        my_table = Table()
-        my_table.import_from_csv(temp_fp.name)
+        my_table = Table(from_csv=temp_fp.name)
         self.assertEquals(str(my_table), '''
 +--------------+----------------+---------------+
 |     ham      |      spam      |      eggs     |
