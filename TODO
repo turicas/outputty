@@ -1,3 +1,4 @@
+- Create test for codecs (input_codec and output_codec)
 - Add doc strings to outputty module, Table class and all Table methods
 - Create some way to print colors and backgrounds
 - The number of input headers should not be the same of output ones
