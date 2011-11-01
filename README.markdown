@@ -99,7 +99,7 @@ __UTF-8__ by default. You can change this behaviour passing the parameters
 `input_codec` and `output_codec` to `Table`, for example:
 
     my_table = Table(headers=['First', 'Last'], input_codec='iso8859-1',
-    output_codec='utf16')
+                     output_codec='utf16')
 
 
 To Do
