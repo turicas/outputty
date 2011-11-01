@@ -28,11 +28,14 @@ class MyCSV(csv.Dialect):
 
 
 class Table(object):
-    def __init__(self, headers=[], dash='-', pipe='|', plus='+'):
+    def __init__(self, headers=[], dash='-', pipe='|', plus='+',
+                 input_codec='utf8', output_codec='utf8'):
         self.headers = headers
         self.dash = dash
         self.pipe = pipe
         self.plus = plus
+        self.input_codec = input_codec
+        self.output_codec = output_codec
         self.rows = []
 
 
@@ -44,12 +47,20 @@ class Table(object):
                 row_data = []
                 for header_name in self.headers:
                     if header_name in row:
-                        data = str(row[header_name])
+                        if not isinstance(row[header_name], (str, unicode)):
+                            data = unicode(row[header_name])
+                        else:
+                            data = row[header_name].decode(self.input_codec)
                     else:
-                        data = ''
+                        data = unicode()
                     row_data.append(data)
             else:
-                row_data = [str(x) for x in row]
+                row_data = []
+                for info in row:
+                    if not isinstance(info, (str, unicode)):
+                        row_data.append(unicode(info))
+                    else:
+                        row_data.append(info.decode(self.input_codec))
             result.append(row_data)
         self.data = result
 
@@ -81,7 +92,7 @@ class Table(object):
         if self.rows:
             result.append(split_line)
         
-        return '\n'.join(result)
+        return '\n'.join([x.encode(self.output_codec) for x in result])
     
 
     def import_from_csv(self, filename):
