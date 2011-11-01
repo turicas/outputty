@@ -3,6 +3,8 @@
   * Encode at Table.to_csv
   * Encode at Table.to_text_file
   * Encode at Table.__str__
+- Create a command-line tool (called outputty) so some users don't need to
+  create a Python script to use the software (from CSV/stdin to stdout/CSV/TXT)
 - Add doc strings to outputty module, Table class and all Table methods
 - Create __unicode__?
 - Create some way to print colors and backgrounds
