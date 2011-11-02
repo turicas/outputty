@@ -222,7 +222,7 @@ class TestTable(unittest.TestCase):
         os.remove(temp_fp.name)
 
 
-    def test_character_count_should_use_unicode(self):
+    def test_character_count_in_row_data_should_use_unicode(self):
         my_table = Table(headers=['First name', 'Last name'])
         my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
         my_table.rows.append(['Tatiana', 'Al-Chueyr'])
@@ -235,4 +235,18 @@ class TestTable(unittest.TestCase):
 |    Tatiana | Al-Chueyr |
 |     Flávio |   Amieiro |
 +------------+-----------+
+        '''.strip())
+
+
+    def test_character_count_in_headers_unicode(self):
+        my_table = Table(headers=['ÁÀÃÂÇ', 'ÇÉÈẼÊ'])
+        my_table.rows.append(('spam', 'eggs'))
+        my_table.rows.append(('eggs', 'spam'))
+        self.assertEqual(str(my_table), '''
++-------+-------+
+| ÁÀÃÂÇ | ÇÉÈẼÊ |
++-------+-------+
+|  spam |  eggs |
+|  eggs |  spam |
++-------+-------+
         '''.strip())

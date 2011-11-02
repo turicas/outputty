@@ -29,13 +29,13 @@ class MyCSV(csv.Dialect):
 
 class Table(object):
     def __init__(self, headers=[], dash='-', pipe='|', plus='+',
-                 input_codec='utf8', output_codec='utf8', from_csv=None):
+                 input_encoding='utf8', output_encoding='utf8', from_csv=None):
         self.headers = headers
         self.dash = dash
         self.pipe = pipe
         self.plus = plus
-        self.input_codec = input_codec
-        self.output_codec = output_codec
+        self.input_encoding = input_encoding
+        self.output_encoding = output_encoding
         self.rows = []
         if from_csv:
             self.import_from_csv(from_csv)
@@ -43,7 +43,7 @@ class Table(object):
 
     def construct_data(self):
         result = []
-        result.append(self.headers)
+        result.append([x.decode(self.input_encoding) for x in self.headers])
         for row in self.rows:
             if isinstance(row, dict):
                 row_data = []
@@ -52,7 +52,7 @@ class Table(object):
                         if not isinstance(row[header_name], (str, unicode)):
                             data = unicode(row[header_name])
                         else:
-                            data = row[header_name].decode(self.input_codec)
+                            data = row[header_name].decode(self.input_encoding)
                     else:
                         data = unicode()
                     row_data.append(data)
@@ -62,7 +62,7 @@ class Table(object):
                     if not isinstance(info, (str, unicode)):
                         row_data.append(unicode(info))
                     else:
-                        row_data.append(info.decode(self.input_codec))
+                        row_data.append(info.decode(self.input_encoding))
             result.append(row_data)
         self.data = result
 
@@ -73,9 +73,10 @@ class Table(object):
         for column in zip(*self.data):
             max_sizes[column[0]] = max([len(x) for x in column])
 
-        dashes = [self.dash * (max_sizes[x] + 2) for x in self.headers]
+        unicode_headers = [x.decode(self.input_encoding) for x in self.headers]
+        dashes = [self.dash * (max_sizes[x] + 2) for x in unicode_headers]
         split_line = self.plus + self.plus.join(dashes) + self.plus
-        headers_centralized = [x.center(max_sizes[x]) for x in self.headers]
+        headers_centralized = [x.center(max_sizes[x]) for x in unicode_headers]
         space_pipe_space = ' %s ' % self.pipe
         header_line = self.pipe + ' ' + \
                       space_pipe_space.join(headers_centralized) + ' ' + \
@@ -85,7 +86,7 @@ class Table(object):
         for row in self.data[1:]:
             row_data = []
             for i, info in enumerate(row):
-                data = info.rjust(max_sizes[self.headers[i]])
+                data = info.rjust(max_sizes[unicode_headers[i]])
                 row_data.append(data)
             line = self.pipe + ' ' + space_pipe_space.join(row_data) + ' ' + \
                    self.pipe
@@ -94,7 +95,7 @@ class Table(object):
         if self.rows:
             result.append(split_line)
         
-        return '\n'.join([x.encode(self.output_codec) for x in result])
+        return '\n'.join([x.encode(self.output_encoding) for x in result])
     
 
     def import_from_csv(self, filename):
@@ -112,7 +113,7 @@ class Table(object):
         for row in self.data:
             row_data = []
             for info in row:
-                row_data.append(info.encode(self.output_codec))
+                row_data.append(info.encode(self.output_encoding))
             encoded_data.append(row_data)
         fp = open(filename, 'w')
         writer = csv.writer(fp, dialect=MyCSV)

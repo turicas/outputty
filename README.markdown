@@ -96,10 +96,10 @@ Every element inside a row will be transformed to
 
 Input strings will be decoded using __UTF-8__ and output will be encoded using
 __UTF-8__ by default. You can change this behaviour passing the parameters
-`input_codec` and `output_codec` to `Table`, for example:
+`input_encoding` and `output_encoding` to `Table`, for example:
 
-    my_table = Table(headers=['First', 'Last'], input_codec='iso8859-1',
-                     output_codec='utf16')
+    my_table = Table(headers=['First', 'Last'], input_encoding='iso8859-1',
+                     output_encoding='utf16')
 
 
 To Do
