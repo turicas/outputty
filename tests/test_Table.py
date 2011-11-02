@@ -238,7 +238,7 @@ class TestTable(unittest.TestCase):
         '''.strip())
 
 
-    def test_character_count_in_headers_unicode(self):
+    def test_character_count_in_headers_should_be_unicode(self):
         my_table = Table(headers=['ÁÀÃÂÇ', 'ÇÉÈẼÊ'])
         my_table.rows.append(('spam', 'eggs'))
         my_table.rows.append(('eggs', 'spam'))
@@ -253,8 +253,8 @@ class TestTable(unittest.TestCase):
 
 
     def test_input_character_encoding_in_headers(self):
-        my_table = Table(headers=['Álvaro'.decode('utf8').encode('iso8859-1')],
-                         input_encoding='iso8859-1')
+        my_table = Table(headers=['Álvaro'.decode('utf8').encode('iso-8859-1')],
+                         input_encoding='iso-8859-1')
         self.assertEqual(str(my_table), '''
 +--------+
 | Álvaro |
@@ -264,9 +264,24 @@ class TestTable(unittest.TestCase):
 
     def test_ouput_character_encoding_in_headers(self):
         my_table = Table(headers=['Álvaro'],
-                         output_encoding='iso8859-1')
+                         output_encoding='iso-8859-1')
         self.assertEqual(str(my_table), '''
 +--------+
 | Álvaro |
 +--------+
         '''.strip().decode('utf8').encode('iso-8859-1'))
+
+
+    def test_output_character_encoding_in_function_to_csv(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
+                         output_encoding='iso-8859-1', input_encoding='utf16')
+        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+        my_table.to_csv(temp_fp.name)
+
+        fp = open(temp_fp.name)
+        file_contents = fp.read()
+        fp.close()
+        output =  '"Álvaro"\n"Píton"\n'.decode('utf8').encode('iso-8859-1')
+        self.assertEqual(file_contents, output)

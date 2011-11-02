@@ -1,5 +1,4 @@
 - Create test for encodings ({in,out}put_encoding) in these cases:
-  * Table.to_csv
   * Table.to_text_file
   * Table.__str__
   * Table(from_csv=...)
