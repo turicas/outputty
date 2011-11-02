@@ -67,7 +67,7 @@ class Table(object):
         self.data = result
 
     
-    def __str__(self):
+    def __unicode__(self):
         self.construct_data()
         max_sizes = {}
         for column in zip(*self.data):
@@ -94,8 +94,11 @@ class Table(object):
 
         if self.rows:
             result.append(split_line)
-        
-        return '\n'.join([x for x in result]).encode(self.output_encoding)
+        return '\n'.join([x for x in result])
+
+
+    def __str__(self):
+        return self.__unicode__().encode(self.output_encoding)
     
 
     def import_from_csv(self, filename):

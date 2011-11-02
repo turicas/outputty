@@ -1,4 +1,3 @@
-- Create __unicode__?
 - Create a command-line tool (called outputty) so some users don't need to
   create a Python script to use the software (from CSV/stdin to stdout/CSV/TXT)
 - Add doc strings to outputty module, Table class and all Table methods

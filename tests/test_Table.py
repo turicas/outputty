@@ -332,3 +332,17 @@ class TestTable(unittest.TestCase):
 +--------+
         '''.strip().decode('utf8').encode('utf16')
         self.assertEqual(str(my_table), output)
+
+
+    def test___unicode__should_return_unicode_no_matter_the_input_encoding(self):
+        my_table = Table(headers=['ÁÀÃÂÇ', 'ÇÉÈẼÊ'])
+        my_table.rows.append(('spam', 'eggs'))
+        my_table.rows.append(('eggs', 'spam'))
+        self.assertEqual(unicode(my_table), '''
++-------+-------+
+| ÁÀÃÂÇ | ÇÉÈẼÊ |
++-------+-------+
+|  spam |  eggs |
+|  eggs |  spam |
++-------+-------+
+        '''.strip().decode('utf8'))
