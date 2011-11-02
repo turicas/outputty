@@ -1,8 +1,7 @@
-- Create test for codecs (input_codec and output_codec):
-  * Headers should be included in conversions
-  * Encode at Table.to_csv
-  * Encode at Table.to_text_file
-  * Encode at Table.__str__
+- Create test for encodings ({in,out}put_encoding) in these cases:
+  * Table.to_csv
+  * Table.to_text_file
+  * Table.__str__
 - Create a command-line tool (called outputty) so some users don't need to
   create a Python script to use the software (from CSV/stdin to stdout/CSV/TXT)
 - Add doc strings to outputty module, Table class and all Table methods
