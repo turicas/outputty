@@ -4,21 +4,19 @@ outputty
 With `outputty` you can show the data of your Python software in text mode
 (terminal, CSV or TXT) in a easy and beautiful way.
 
+By now we have only the class `Table` (in future we'll add progress bar,
+histogram and more).
+
 
 Installation
 ------------
 
-For now, just copy the file `outputty.py` in some path you can use it with
-`import outputty`. We'll add it to PyPI soon.
+Just copy the file `outputty.py` in some path you can do `import outputty`
+(sorry for that - it'll be available in PyPI soon).
 
 
 Examples
 --------
-
-By now we have only the class `Table` (in future we'll add progress bar,
-histogram and more). We don't have docstrings yet, sorry. If you want to see
-more examples, just open `tests/test_Table.py` in your favorite code editor.
-:-)
 
 ### Example 1
 
@@ -88,18 +86,27 @@ The code:
     +----+---------+-------------------------+
 
 
-Type Of Data
-------------
+> If you want to see more examples, see `tests/test_Table.py`.
 
-Every element inside a row will be transformed to
-`unicode` -- you can use integers, float etc.
+
+Type Of Data and Encodings
+--------------------------
+
+`outputty` will try to convert every element inside a row to `unicode`. In
+strings it'll use `string.decode(input_encoding)`, where `input_encoding` is
+specified in `Table.__init__`. For other types (integer, float etc.) it'll use
+`unicode(element)`.
 
 Input strings will be decoded using __UTF-8__ and output will be encoded using
 __UTF-8__ by default. You can change this behaviour passing the parameters
 `input_encoding` and `output_encoding` to `Table`, for example:
 
-    my_table = Table(headers=['First', 'Last'], input_encoding='iso8859-1',
+    my_table = Table(headers=['First', 'Last'], input_encoding='iso-8859-1',
                      output_encoding='utf16')
+
+You can also get the table string decoded, in unicode:
+
+    table_in_unicode = unicode(my_table)
 
 
 To Do
