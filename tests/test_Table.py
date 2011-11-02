@@ -114,19 +114,30 @@ class TestTable(unittest.TestCase):
  ===== ====== ====== ''')
 
 
-    def test_table_should_accept_rows_as_dict_or_list_or_tuple(self):
+    def test_table_should_accept_rows_as_dict_list_tuple_int_or_float(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
-        my_table.rows.append([1, 2, 3])
+        my_table.rows.append([1, 42, 3])
+        my_table.rows.append([3.14, 2.71, 0.0])
         my_table.rows.append(('spam', 'eggs', 'ham'))
         self.assertEqual(str(my_table), '''
 +------+------+------+
 | ham  | spam | eggs |
 +------+------+------+
 | eggs |  ham | spam |
-|    1 |    2 |    3 |
+|    1 |   42 |    3 |
+| 3.14 | 2.71 |  0.0 |
 | spam | eggs |  ham |
 +------+------+------+
+        '''.strip())
+
+
+    def test_table_should_accept_headers_as_dict_list_tuple_int_or_float(self):
+        my_table = Table(headers=[42, 3.14, (4, 2), [3, 14], {'answer': 42}])
+        self.assertEqual(str(my_table), '''
++----+------+--------+---------+----------------+
+| 42 | 3.14 | (4, 2) | [3, 14] | {'answer': 42} |
++----+------+--------+---------+----------------+
         '''.strip())
 
 

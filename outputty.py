@@ -38,28 +38,26 @@ class Table(object):
         self.output_encoding = output_encoding
         self.rows = []
         if from_csv:
-            self.import_from_csv(from_csv)
+            self._import_from_csv(from_csv)
 
 
     def _convert_to_unicode(self, element):
-        if not isinstance(element, (str, unicode)):
-            return unicode(element)
-        else:
+        if isinstance(element, (str, unicode)):
             return element.decode(self.input_encoding)
+        else:
+            return unicode(element)
 
 
     def _organize_data(self):
         result = []
-        result.append([x.decode(self.input_encoding) for x in self.headers])
+        result.append([self._convert_to_unicode(x) for x in self.headers])
         for row in self.rows:
             if isinstance(row, dict):
                 row_data = []
                 for header_name in self.headers:
-                    if header_name in row:
-                        data = self._convert_to_unicode(row[header_name])
-                    else:
-                        data = unicode()
-                    row_data.append(data)
+                    if header_name not in row:
+                        row[header_name] = ''
+                    row_data.append(self._convert_to_unicode(row[header_name]))
             else:
                 row_data = [self._convert_to_unicode(info) for info in row]
             result.append(row_data)
@@ -67,33 +65,33 @@ class Table(object):
 
 
     def _define_maximum_column_sizes(self):
-        self.max_sizes = {}
+        self.max_size = {}
         for column in zip(*self.data):
-            self.max_sizes[column[0]] = max([len(x) for x in column])
-    
+            self.max_size[column[0]] = max([len(x) for x in column])
+
+
+    def _make_line_from_row_data(self, row_data):
+        return '%s %s %s' % (self.pipe, (' %s ' % self.pipe).join(row_data),
+                             self.pipe)
+
+
     def __unicode__(self):
         self._organize_data()
         self._define_maximum_column_sizes()
+        unicode_headers, rows = self.data[0], self.data[1:]
 
-        unicode_headers = self.data[0]
-        dashes = [self.dash * (self.max_sizes[x] + 2) for x in unicode_headers]
+        dashes = [self.dash * (self.max_size[x] + 2) for x in unicode_headers]
+        centered_headers = [x.center(self.max_size[x]) for x in unicode_headers]
         split_line = self.plus + self.plus.join(dashes) + self.plus
-        headers_centralized = [x.center(self.max_sizes[x]) \
-                               for x in unicode_headers]
-        space_pipe_space = ' %s ' % self.pipe
-        header_line = self.pipe + ' ' + \
-                      space_pipe_space.join(headers_centralized) + ' ' + \
-                      self.pipe
+        header_line = self._make_line_from_row_data(centered_headers)
 
         result = [split_line, header_line, split_line]
-        for row in self.data[1:]:
+        for row in rows:
             row_data = []
             for i, info in enumerate(row):
-                data = info.rjust(self.max_sizes[unicode_headers[i]])
+                data = info.rjust(self.max_size[unicode_headers[i]])
                 row_data.append(data)
-            result.append('%s %s %s' % (self.pipe,
-                                        space_pipe_space.join(row_data),
-                                        self.pipe))
+            result.append(self._make_line_from_row_data(row_data))
         if self.rows:
             result.append(split_line)
         return '\n'.join(result)
@@ -103,13 +101,13 @@ class Table(object):
         return self.__unicode__().encode(self.output_encoding)
     
 
-    def import_from_csv(self, filename):
+    def _import_from_csv(self, filename):
+        self.csv_filename = filename
         fp = open(filename, 'r')
         reader = csv.reader(fp)
         data = list(reader) #reader is an iterator
         fp.close()
-        self.headers = data[0]
-        self.rows = data[1:]
+        self.headers, self.rows = data[0], data[1:]
 
 
     def to_csv(self, filename):
