@@ -285,3 +285,24 @@ class TestTable(unittest.TestCase):
         fp.close()
         output =  '"Álvaro"\n"Píton"\n'.decode('utf8').encode('iso-8859-1')
         self.assertEqual(file_contents, output)
+
+
+    def test_output_character_encoding_in_function_to_text_file(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
+                         output_encoding='iso-8859-1', input_encoding='utf16')
+        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+        my_table.to_text_file(temp_fp.name)
+
+        fp = open(temp_fp.name)
+        file_contents = fp.read()
+        fp.close()
+        output =  '''
++--------+
+| Álvaro |
++--------+
+|  Píton |
++--------+
+        '''.strip().decode('utf8').encode('iso-8859-1')
+        self.assertEqual(file_contents, output)

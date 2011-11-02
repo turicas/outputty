@@ -1,5 +1,4 @@
 - Create test for encodings ({in,out}put_encoding) in these cases:
-  * Table.to_text_file
   * Table.__str__
   * Table(from_csv=...)
 - Create a command-line tool (called outputty) so some users don't need to
