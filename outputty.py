@@ -41,7 +41,14 @@ class Table(object):
             self.import_from_csv(from_csv)
 
 
-    def construct_data(self):
+    def _convert_to_unicode(self, element):
+        if not isinstance(element, (str, unicode)):
+            return unicode(element)
+        else:
+            return element.decode(self.input_encoding)
+
+
+    def _organize_data(self):
         result = []
         result.append([x.decode(self.input_encoding) for x in self.headers])
         for row in self.rows:
@@ -49,34 +56,30 @@ class Table(object):
                 row_data = []
                 for header_name in self.headers:
                     if header_name in row:
-                        if not isinstance(row[header_name], (str, unicode)):
-                            data = unicode(row[header_name])
-                        else:
-                            data = row[header_name].decode(self.input_encoding)
+                        data = self._convert_to_unicode(row[header_name])
                     else:
                         data = unicode()
                     row_data.append(data)
             else:
-                row_data = []
-                for info in row:
-                    if not isinstance(info, (str, unicode)):
-                        row_data.append(unicode(info))
-                    else:
-                        row_data.append(info.decode(self.input_encoding))
+                row_data = [self._convert_to_unicode(info) for info in row]
             result.append(row_data)
         self.data = result
 
+
+    def _define_maximum_column_sizes(self):
+        self.max_sizes = {}
+        for column in zip(*self.data):
+            self.max_sizes[column[0]] = max([len(x) for x in column])
     
     def __unicode__(self):
-        self.construct_data()
-        max_sizes = {}
-        for column in zip(*self.data):
-            max_sizes[column[0]] = max([len(x) for x in column])
+        self._organize_data()
+        self._define_maximum_column_sizes()
 
-        unicode_headers = [x.decode(self.input_encoding) for x in self.headers]
-        dashes = [self.dash * (max_sizes[x] + 2) for x in unicode_headers]
+        unicode_headers = self.data[0]
+        dashes = [self.dash * (self.max_sizes[x] + 2) for x in unicode_headers]
         split_line = self.plus + self.plus.join(dashes) + self.plus
-        headers_centralized = [x.center(max_sizes[x]) for x in unicode_headers]
+        headers_centralized = [x.center(self.max_sizes[x]) \
+                               for x in unicode_headers]
         space_pipe_space = ' %s ' % self.pipe
         header_line = self.pipe + ' ' + \
                       space_pipe_space.join(headers_centralized) + ' ' + \
@@ -86,15 +89,14 @@ class Table(object):
         for row in self.data[1:]:
             row_data = []
             for i, info in enumerate(row):
-                data = info.rjust(max_sizes[unicode_headers[i]])
+                data = info.rjust(self.max_sizes[unicode_headers[i]])
                 row_data.append(data)
-            line = self.pipe + ' ' + space_pipe_space.join(row_data) + ' ' + \
-                   self.pipe
-            result.append(line)
-
+            result.append('%s %s %s' % (self.pipe,
+                                        space_pipe_space.join(row_data),
+                                        self.pipe))
         if self.rows:
             result.append(split_line)
-        return '\n'.join([x for x in result])
+        return '\n'.join(result)
 
 
     def __str__(self):
@@ -104,20 +106,16 @@ class Table(object):
     def import_from_csv(self, filename):
         fp = open(filename, 'r')
         reader = csv.reader(fp)
-        data = [row for row in reader]
+        data = list(reader) #reader is an iterator
         fp.close()
         self.headers = data[0]
         self.rows = data[1:]
 
 
     def to_csv(self, filename):
-        self.construct_data()
-        encoded_data = []
-        for row in self.data:
-            row_data = []
-            for info in row:
-                row_data.append(info.encode(self.output_encoding))
-            encoded_data.append(row_data)
+        self._organize_data()
+        encoded_data = [[info.encode(self.output_encoding) for info in row] \
+                        for row in self.data]
         fp = open(filename, 'w')
         writer = csv.writer(fp, dialect=MyCSV)
         writer.writerows(encoded_data)
@@ -125,8 +123,7 @@ class Table(object):
 
 
     def to_text_file(self, filename):
-        self.construct_data()
+        self._organize_data()
         fp = open(filename, 'w')
-        fp.write(str(self))
+        fp.write(self.__str__())
         fp.close()
-
