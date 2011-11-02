@@ -252,7 +252,7 @@ class TestTable(unittest.TestCase):
         '''.strip())
 
 
-    def test_input_character_encoding_input_in_headers(self):
+    def test_input_character_encoding_in_headers(self):
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('iso8859-1')],
                          input_encoding='iso8859-1')
         self.assertEqual(str(my_table), '''
@@ -262,7 +262,7 @@ class TestTable(unittest.TestCase):
         '''.strip())
 
 
-    def test_ouput_character_encoding_input_in_headers(self):
+    def test_ouput_character_encoding_in_headers(self):
         my_table = Table(headers=['Álvaro'],
                          output_encoding='iso8859-1')
         self.assertEqual(str(my_table), '''
