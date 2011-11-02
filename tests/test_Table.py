@@ -314,3 +314,21 @@ class TestTable(unittest.TestCase):
 +--------+
         '''.strip().decode('utf8').encode('iso-8859-1')
         self.assertEqual(str(my_table), output)
+
+
+    def test_input_and_output_character_encoding_in_parameter_from_csv(self):
+        data = '"Álvaro"\n"Píton"'
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data.decode('utf8').encode('iso-8859-1'))
+        temp_fp.close()
+        my_table = Table(from_csv=temp_fp.name, input_encoding='iso-8859-1',
+                         output_encoding='utf16')
+        os.remove(temp_fp.name)
+        output = '''
++--------+
+| Álvaro |
++--------+
+|  Píton |
++--------+
+        '''.strip().decode('utf8').encode('utf16')
+        self.assertEqual(str(my_table), output)

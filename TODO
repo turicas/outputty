@@ -1,9 +1,7 @@
-- Create test for encodings ({in,out}put_encoding) in these cases:
-  * Table(from_csv=...)
+- Create __unicode__?
 - Create a command-line tool (called outputty) so some users don't need to
   create a Python script to use the software (from CSV/stdin to stdout/CSV/TXT)
 - Add doc strings to outputty module, Table class and all Table methods
-- Create __unicode__?
 - Create some way to print colors and backgrounds
 - The number of input headers should not be the same of output ones
 - Receive a function to 'process row and return' instead of returning raw-data

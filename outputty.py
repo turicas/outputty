@@ -95,13 +95,13 @@ class Table(object):
         if self.rows:
             result.append(split_line)
         
-        return '\n'.join([x.encode(self.output_encoding) for x in result])
+        return '\n'.join([x for x in result]).encode(self.output_encoding)
     
 
     def import_from_csv(self, filename):
         fp = open(filename, 'r')
         reader = csv.reader(fp)
-        data = [x for x in reader]
+        data = [row for row in reader]
         fp.close()
         self.headers = data[0]
         self.rows = data[1:]
