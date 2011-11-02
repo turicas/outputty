@@ -171,6 +171,7 @@ class TestTable(unittest.TestCase):
         fp = open(temp_fp.name)
         contents = fp.read()
         fp.close()
+        os.remove(temp_fp.name)
 
         self.assertEquals(contents, '''"ham","spam","eggs"
 "ham spam ham","spam eggs spam","eggs ham eggs"
@@ -186,6 +187,7 @@ class TestTable(unittest.TestCase):
         temp_fp.close()
 
         my_table = Table(from_csv=temp_fp.name)
+        os.remove(temp_fp.name)
         self.assertEquals(str(my_table), '''
 +--------------+----------------+---------------+
 |     ham      |      spam      |      eggs     |
@@ -194,7 +196,6 @@ class TestTable(unittest.TestCase):
 |     ham spam |      eggs spam |     eggs eggs |
 +--------------+----------------+---------------+
 '''.strip())
-        os.remove(temp_fp.name)
 
 
     def test_should_save_data_into_text_file(self):
@@ -210,6 +211,7 @@ class TestTable(unittest.TestCase):
         fp = open(temp_fp.name, 'r')
         contents = fp.read()
         fp.close()
+        os.remove(temp_fp.name)
         self.assertEqual(contents, '''
 +-----+------+------+
 | ham | spam | eggs |
@@ -219,7 +221,6 @@ class TestTable(unittest.TestCase):
 |  11 |   22 |   33 |
 +-----+------+------+
         '''.strip())
-        os.remove(temp_fp.name)
 
 
     def test_character_count_in_row_data_should_use_unicode(self):
@@ -252,19 +253,9 @@ class TestTable(unittest.TestCase):
         '''.strip())
 
 
-    def test_input_character_encoding_in_headers(self):
-        my_table = Table(headers=['Álvaro'.decode('utf8').encode('iso-8859-1')],
-                         input_encoding='iso-8859-1')
-        self.assertEqual(str(my_table), '''
-+--------+
-| Álvaro |
-+--------+
-        '''.strip())
-
-
-    def test_ouput_character_encoding_in_headers(self):
-        my_table = Table(headers=['Álvaro'],
-                         output_encoding='iso-8859-1')
+    def test_input_and_ouput_character_encoding_in_headers(self):
+        my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
+                         input_encoding='utf16', output_encoding='iso-8859-1')
         self.assertEqual(str(my_table), '''
 +--------+
 | Álvaro |
@@ -272,32 +263,34 @@ class TestTable(unittest.TestCase):
         '''.strip().decode('utf8').encode('iso-8859-1'))
 
 
-    def test_output_character_encoding_in_function_to_csv(self):
+    def test_input_and_output_character_encoding_in_method_to_csv(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
-                         output_encoding='iso-8859-1', input_encoding='utf16')
+                         input_encoding='utf16', output_encoding='iso-8859-1')
         my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
         my_table.to_csv(temp_fp.name)
 
         fp = open(temp_fp.name)
         file_contents = fp.read()
         fp.close()
+        os.remove(temp_fp.name)
         output =  '"Álvaro"\n"Píton"\n'.decode('utf8').encode('iso-8859-1')
         self.assertEqual(file_contents, output)
 
 
-    def test_output_character_encoding_in_function_to_text_file(self):
+    def test_input_and_output_character_encoding_in_method_to_text_file(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
-                         output_encoding='iso-8859-1', input_encoding='utf16')
+                         input_encoding='utf16', output_encoding='iso-8859-1')
         my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
         my_table.to_text_file(temp_fp.name)
 
         fp = open(temp_fp.name)
         file_contents = fp.read()
         fp.close()
+        os.remove(temp_fp.name)
         output =  '''
 +--------+
 | Álvaro |
@@ -306,3 +299,18 @@ class TestTable(unittest.TestCase):
 +--------+
         '''.strip().decode('utf8').encode('iso-8859-1')
         self.assertEqual(file_contents, output)
+
+
+    def test_output_character_encoding_in_method___str__(self):
+        my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
+                         input_encoding='utf16', output_encoding='iso-8859-1')
+        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+
+        output =  '''
++--------+
+| Álvaro |
++--------+
+|  Píton |
++--------+
+        '''.strip().decode('utf8').encode('iso-8859-1')
+        self.assertEqual(str(my_table), output)
