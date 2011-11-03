@@ -39,7 +39,6 @@ class TestTable(unittest.TestCase):
 +--------+
         '''.strip())
 
-
     def test_table_with_many_headers_without_data(self):
         my_table = Table(headers=['spam', 'ham'])
         self.assertEqual(str(my_table), '''
@@ -54,7 +53,6 @@ class TestTable(unittest.TestCase):
 +-----+------+------+
         '''.strip())
 
-
     def test_table_with_many_headers_and_one_row_same_size(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append({'ham': 123, 'spam': 4567, 'eggs': 8910})
@@ -65,7 +63,6 @@ class TestTable(unittest.TestCase):
 | 123 | 4567 | 8910 |
 +-----+------+------+
         '''.strip())
-
 
     def test_table_with_many_headers_and_rows_same_size(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
@@ -82,7 +79,6 @@ class TestTable(unittest.TestCase):
 +-----+------+------+
         '''.strip())
 
-
     def test_table_with_many_headers_and_rows_missing_some_columns(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append({'spam': 4567, 'eggs': 8910})
@@ -98,21 +94,19 @@ class TestTable(unittest.TestCase):
 +-----+------+------+
         '''.strip())
 
-
     def test_table_with_changed_separators(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], dash='=', pipe='-',
                          plus=' ')
         my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
         my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
         my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
-        self.assertEqual(str(my_table), ''' ===== ====== ====== 
+        self.assertEqual(str(my_table), ''' ===== ====== ======
 - ham - spam - eggs -
- ===== ====== ====== 
+ ===== ====== ======
 -     -      -      -
 -   1 -    2 -    3 -
 -  11 -   22 -   33 -
  ===== ====== ====== ''')
-
 
     def test_table_should_accept_rows_as_dict_list_tuple_int_or_float(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
@@ -131,7 +125,6 @@ class TestTable(unittest.TestCase):
 +------+------+------+
         '''.strip())
 
-
     def test_table_should_accept_headers_as_dict_list_tuple_int_or_float(self):
         my_table = Table(headers=[42, 3.14, (4, 2), [3, 14], {'answer': 42}])
         self.assertEqual(str(my_table), '''
@@ -139,7 +132,6 @@ class TestTable(unittest.TestCase):
 | 42 | 3.14 | (4, 2) | [3, 14] | {'answer': 42} |
 +----+------+--------+---------+----------------+
         '''.strip())
-
 
     def test_table_with_many_headers_and_rows_right_aligned(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
@@ -156,7 +148,6 @@ class TestTable(unittest.TestCase):
 +-----+------+------+
         '''.strip())
 
-
     def test_table_with_headers_little_than_rows(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
@@ -168,7 +159,6 @@ class TestTable(unittest.TestCase):
 | ham spam ham | spam eggs spam | eggs ham eggs |
 +--------------+----------------+---------------+
         '''.strip())
-
 
     def test_output_to_csv_should_create_the_file_correctly_with_headers(self):
         temp_fp = tempfile.NamedTemporaryFile()
@@ -188,7 +178,6 @@ class TestTable(unittest.TestCase):
 "ham spam ham","spam eggs spam","eggs ham eggs"
 ''')
 
-
     def test_should_import_data_from_csv(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.write('''"ham","spam","eggs"
@@ -207,7 +196,6 @@ class TestTable(unittest.TestCase):
 |     ham spam |      eggs spam |     eggs eggs |
 +--------------+----------------+---------------+
 '''.strip())
-
 
     def test_should_save_data_into_text_file(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
@@ -233,7 +221,6 @@ class TestTable(unittest.TestCase):
 +-----+------+------+
         '''.strip())
 
-
     def test_character_count_in_row_data_should_use_unicode(self):
         my_table = Table(headers=['First name', 'Last name'])
         my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
@@ -249,7 +236,6 @@ class TestTable(unittest.TestCase):
 +------------+-----------+
         '''.strip())
 
-
     def test_character_count_in_headers_should_be_unicode(self):
         my_table = Table(headers=['ÁÀÃÂÇ', 'ÇÉÈẼÊ'])
         my_table.rows.append(('spam', 'eggs'))
@@ -263,7 +249,6 @@ class TestTable(unittest.TestCase):
 +-------+-------+
         '''.strip())
 
-
     def test_input_and_ouput_character_encoding_in_headers(self):
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
@@ -272,7 +257,6 @@ class TestTable(unittest.TestCase):
 | Álvaro |
 +--------+
         '''.strip().decode('utf8').encode('iso-8859-1'))
-
 
     def test_input_and_output_character_encoding_in_method_to_csv(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
@@ -286,9 +270,8 @@ class TestTable(unittest.TestCase):
         file_contents = fp.read()
         fp.close()
         os.remove(temp_fp.name)
-        output =  '"Álvaro"\n"Píton"\n'.decode('utf8').encode('iso-8859-1')
+        output = '"Álvaro"\n"Píton"\n'.decode('utf8').encode('iso-8859-1')
         self.assertEqual(file_contents, output)
-
 
     def test_input_and_output_character_encoding_in_method_to_text_file(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
@@ -302,7 +285,7 @@ class TestTable(unittest.TestCase):
         file_contents = fp.read()
         fp.close()
         os.remove(temp_fp.name)
-        output =  '''
+        output = '''
 +--------+
 | Álvaro |
 +--------+
@@ -311,13 +294,12 @@ class TestTable(unittest.TestCase):
         '''.strip().decode('utf8').encode('iso-8859-1')
         self.assertEqual(file_contents, output)
 
-
     def test_output_character_encoding_in_method___str__(self):
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
         my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
 
-        output =  '''
+        output = '''
 +--------+
 | Álvaro |
 +--------+
@@ -325,7 +307,6 @@ class TestTable(unittest.TestCase):
 +--------+
         '''.strip().decode('utf8').encode('iso-8859-1')
         self.assertEqual(str(my_table), output)
-
 
     def test_input_and_output_character_encoding_in_parameter_from_csv(self):
         data = '"Álvaro"\n"Píton"'
@@ -343,7 +324,6 @@ class TestTable(unittest.TestCase):
 +--------+
         '''.strip().decode('utf8').encode('utf16')
         self.assertEqual(str(my_table), output)
-
 
     def test___unicode__should_return_unicode_no_matter_the_input_encoding(self):
         my_table = Table(headers=['ÁÀÃÂÇ', 'ÇÉÈẼÊ'])

@@ -40,13 +40,11 @@ class Table(object):
         if from_csv:
             self._import_from_csv(from_csv)
 
-
     def _convert_to_unicode(self, element):
         if isinstance(element, (str, unicode)):
             return element.decode(self.input_encoding)
         else:
             return unicode(element)
-
 
     def _organize_data(self):
         result = []
@@ -63,17 +61,14 @@ class Table(object):
             result.append(row_data)
         self.data = result
 
-
     def _define_maximum_column_sizes(self):
         self.max_size = {}
         for column in zip(*self.data):
             self.max_size[column[0]] = max([len(x) for x in column])
 
-
     def _make_line_from_row_data(self, row_data):
         return '%s %s %s' % (self.pipe, (' %s ' % self.pipe).join(row_data),
                              self.pipe)
-
 
     def __unicode__(self):
         self._organize_data()
@@ -96,19 +91,16 @@ class Table(object):
             result.append(split_line)
         return '\n'.join(result)
 
-
     def __str__(self):
         return self.__unicode__().encode(self.output_encoding)
-    
 
     def _import_from_csv(self, filename):
         self.csv_filename = filename
         fp = open(filename, 'r')
         reader = csv.reader(fp)
-        data = list(reader) #reader is an iterator
+        data = list(reader)  # reader is an iterator
         fp.close()
         self.headers, self.rows = data[0], data[1:]
-
 
     def to_csv(self, filename):
         self._organize_data()
@@ -118,7 +110,6 @@ class Table(object):
         writer = csv.writer(fp, dialect=MyCSV)
         writer.writerows(encoded_data)
         fp.close()
-
 
     def to_text_file(self, filename):
         self._organize_data()
