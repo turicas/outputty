@@ -1,0 +1,55 @@
+Wish List
+=========
+
+This list is not a promise. :-) We need to think about each proposed feature
+and how it'll be be implemented to have the better user experience using the
+library. Just a brainstorm. The ideas are divided in the categories below:
+
+
+CLI
+---
+
+- __[really-needed]__ Create a command-line tool (called `outputty`) so some
+  users don't need to create a Python script to use the software. This
+  command-line interface should be able to get data from stdin or CSV and
+  export data to stdout, CSV or TXT. __It won't be interactive__.
+
+
+API
+---
+
+- __[really-needed]__ Add doc strings to `outputty` module, `Table` class and
+  all `Table`'s methods.
+- Create some way to print colors and backgrounds. See the article [ANSI escape
+  code](http://en.wikipedia.org/wiki/ANSI_escape_code) on Wikipedia.
+
+
+Processing Input Data
+---------------------
+
+- The number of input headers should not be the same of output ones.
+- Receive a function to 'process row and return' instead of returning raw-data.
+- Add `ordering='ascending|descending'` parameter to `Table`.
+- Add `order_by='<header_name>'` parameter to `Table`.
+
+
+Data Exchange Formats
+---------------------
+
+- `from_mysql='username:password@host/database/table'`?
+- `Table.to_html`?
+- `Table.to_latex`?
+
+
+Table Templates
+---------------
+
+- Add support to `\r\n` or any other line feed instead of only `\n`.
+- Should be able to change the space character (like `pipe`, `plus` etc.).
+- Change the name of special characters (`pipe`, `plus` and `dash`) to
+  something more intuitive.
+- Create some kind of 'templates' with pre-defined `pipe`, `plus`, `dash` etc.
+  See [sqlite's .mode column](http://www.sqlite.org/sqlite.html).
+- The `dash` inside the line that split the table into header and data should
+  be different from the "normal `dash`". All these "characters" should be
+  generalised.

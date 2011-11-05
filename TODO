@@ -1,8 +1,0 @@
-- Add support to \r\n oy any other line feed instead of only \n
-- Should be able to change the space character
-- Create a command-line tool (called outputty) so some users don't need to
-  create a Python script to use the software (from CSV/stdin to stdout/CSV/TXT)
-- Add doc strings to outputty module, Table class and all Table methods
-- Create some way to print colors and backgrounds
-- The number of input headers should not be the same of output ones
-- Receive a function to 'process row and return' instead of returning raw-data

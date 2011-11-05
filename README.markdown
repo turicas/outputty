@@ -109,9 +109,13 @@ You can also get the table string decoded, in unicode:
     table_in_unicode = unicode(my_table)
 
 
-To Do
------
+New Features
+------------
 
-There are a lot of features to add. If you want to contribute, please see the
-`TODO` file -- I'll put there the list of next features. You can use the
-GitHub's issue tracking too.
+Yes, there are a lot of features to add (it's just the begining). If do you
+want to contribute, please see our
+[WISHLIST.markdown](https://github.com/turicas/outputty/blog/master/WISHLIST.markdown)
+file.
+
+You can also use the [Github Issue Tracking
+System](https://github.com/turicas/outputty/issues) - it's up to you.
