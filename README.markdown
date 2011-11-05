@@ -114,7 +114,7 @@ New Features
 
 Yes, there are a lot of features to add (it's just the begining). If do you
 want to contribute, please see our
-[WISHLIST.markdown](https://github.com/turicas/outputty/blog/master/WISHLIST.markdown)
+[WISHLIST.markdown](https://github.com/turicas/outputty/blob/master/WISHLIST.markdown)
 file.
 
 You can also use the [Github Issue Tracking
