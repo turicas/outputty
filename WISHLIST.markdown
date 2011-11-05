@@ -43,10 +43,12 @@ Processing Input Data
 - Receive a function to 'process row and return' instead of returning raw-data.
 - Add `ordering='ascending|descending'` parameter to `Table`.
 - Add `order_by='<header_name>'` parameter to `Table`.
+- Encode and decode strings with the default system encoding instead of
+  __UTF-8__?
 
 
-Data Exchange Formats
----------------------
+Data Exchange
+-------------
 
 - `from_mysql='username:password@host/database/table'`?
 - `Table.to_html`?
