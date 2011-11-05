@@ -86,27 +86,36 @@ The code:
     +----+---------+-------------------------+
 
 
-> If you want to see more examples, see `tests/test_Table.py`.
+> If do you want to see more examples, see the file
+> [tests/test_Table.py](https://github.com/turicas/outputty/blob/master/tests/test_Table.py).
 
 
-Type Of Data and Encodings
---------------------------
+Type Of Data
+------------
 
 `outputty` will try to convert every element inside a row to `unicode`. In
 strings it'll use `string.decode(input_encoding)`, where `input_encoding` is
 specified in `Table.__init__`. For other types (integer, float etc.) it'll use
 `unicode(element)`.
 
-Input strings will be decoded using __UTF-8__ and output will be encoded using
-__UTF-8__ by default. You can change this behaviour passing the parameters
+
+Character Encodings
+-------------------
+
+Received strings are decoded using __UTF-8__ and output is encoded also using
+__UTF-8__ by default. You can change this behaviour with the parameters
 `input_encoding` and `output_encoding` to `Table`, for example:
 
-    my_table = Table(headers=['First', 'Last'], input_encoding='iso-8859-1',
+    my_table = Table(headers=['Column 1', 'Column 2'], input_encoding='iso-8859-1',
                      output_encoding='utf16')
 
 You can also get the table string decoded, in unicode:
 
     table_in_unicode = unicode(my_table)
+
+> See [Standard Encodings in
+> Python](http://docs.python.org/library/codecs.html#standard-encodings) to get a
+> complete list of the supported encodings.
 
 
 New Features
