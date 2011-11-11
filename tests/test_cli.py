@@ -43,7 +43,7 @@ class TestOutputtyCli(unittest.TestCase):
         self.assertIn('usage', process.out)
         self.assertIn('optional arguments', process.out)
 
-    def test_outputty_without_parameters_should_return_help(self):
+    def test_outputty_with_table_should_receive_data_from_stdin(self):
         process = sh('../outputty --table', finalize=False)
         process.stdin.write('a\n')
         process.stdin.close()
