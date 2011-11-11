@@ -18,6 +18,7 @@
 import subprocess
 import shlex
 import unittest
+from textwrap import dedent
 
 
 def sh(command, finalize=True):
@@ -41,3 +42,15 @@ class TestOutputtyCli(unittest.TestCase):
         self.assertIn(help_string, process.out)
         self.assertIn('usage', process.out)
         self.assertIn('optional arguments', process.out)
+
+    def test_outputty_without_parameters_should_return_help(self):
+        process = sh('../outputty --table', finalize=False)
+        process.stdin.write('a\n')
+        process.stdin.close()
+        process.wait()
+        output = process.stdout.read()
+        self.assertEquals(output, dedent('''
+        +---+
+        | a |
+        +---+
+        ''').strip() + '\n')

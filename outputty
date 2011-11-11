@@ -16,8 +16,19 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
+import sys
+from outputty import Table
+
 
 parser = argparse.ArgumentParser(description='Show data in terminal in a '
 'beautiful way, with Python')
+parser.add_argument('--table', dest='table', help='Create a table',
+        action='store_true')
 
-parser.print_help()
+args = parser.parse_args()
+if not args.table:
+    parser.print_help()
+else:
+    reading = sys.stdin.read().strip()
+    table = Table(headers=[reading])
+    print table
