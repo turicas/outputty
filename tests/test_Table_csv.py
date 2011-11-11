@@ -15,12 +15,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from textwrap import dedent
-
 import unittest
 import tempfile
 import os
 import sys
+from cStringIO import StringIO
+from textwrap import dedent
 
 sys.path.insert(0, '..')
 from outputty import Table
@@ -46,6 +46,25 @@ class TestTableCsv(unittest.TestCase):
         "ham spam ham","spam eggs spam","eggs ham eggs"
         '''))
 
+    def test_Table_should_accept_file_object_in_from_csv_method(self):
+        csv_fake = StringIO()
+        csv_fake.write(dedent('''\
+        "ham","spam","eggs"
+        "ham spam ham","spam eggs spam","eggs ham eggs"
+        "ham spam","eggs spam","eggs eggs"
+        '''))
+        csv_fake.seek(0)
+        my_table = Table(from_csv=csv_fake)
+        self.assertEquals(str(my_table), dedent('''
+        +--------------+----------------+---------------+
+        |     ham      |      spam      |      eggs     |
+        +--------------+----------------+---------------+
+        | ham spam ham | spam eggs spam | eggs ham eggs |
+        |     ham spam |      eggs spam |     eggs eggs |
+        +--------------+----------------+---------------+
+        ''').strip())
+
+
     def test_should_import_data_from_csv(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.write(dedent('''\
@@ -65,6 +84,29 @@ class TestTableCsv(unittest.TestCase):
         |     ham spam |      eggs spam |     eggs eggs |
         +--------------+----------------+---------------+
         ''').strip())
+
+    def test_should_import_data_from_csv_with_only_one_line(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(dedent('''\
+        "ham","spam","eggs"
+        '''))
+        temp_fp.close()
+
+        my_table = Table(from_csv=temp_fp.name)
+        os.remove(temp_fp.name)
+        self.assertEquals(str(my_table), dedent('''
+        +-----+------+------+
+        | ham | spam | eggs |
+        +-----+------+------+
+        ''').strip())
+
+    def test_should_import_nothing_from_empty_csv_without_exceptions(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+
+        my_table = Table(from_csv=temp_fp.name)
+        os.remove(temp_fp.name)
+        self.assertEquals(str(my_table), '')
 
     def test_input_and_output_character_encoding_in_method_to_csv(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
