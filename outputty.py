@@ -73,6 +73,8 @@ class Table(object):
 
     def __unicode__(self):
         self._organize_data()
+        if len(self.data) == 1 and not self.data[0]:
+            return unicode()
         self._define_maximum_column_sizes()
         unicode_headers, rows = self.data[0], self.data[1:]
 
@@ -106,7 +108,11 @@ class Table(object):
         data = list(reader)  # reader is an iterator
         if self.csv_filename:
             fp.close()
-        self.headers, self.rows = data[0], data[1:]
+        self.headers = []
+        self.rows = []
+        if data:
+            headers = data[0]
+            self.headers, self.rows = data[0], data[1:]
 
     def to_csv(self, filename):
         self._organize_data()

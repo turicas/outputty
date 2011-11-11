@@ -85,6 +85,29 @@ class TestTableCsv(unittest.TestCase):
         +--------------+----------------+---------------+
         ''').strip())
 
+    def test_should_import_data_from_csv_with_only_one_line(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(dedent('''\
+        "ham","spam","eggs"
+        '''))
+        temp_fp.close()
+
+        my_table = Table(from_csv=temp_fp.name)
+        os.remove(temp_fp.name)
+        self.assertEquals(str(my_table), dedent('''
+        +-----+------+------+
+        | ham | spam | eggs |
+        +-----+------+------+
+        ''').strip())
+
+    def test_should_import_nothing_from_empty_csv_without_exceptions(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+
+        my_table = Table(from_csv=temp_fp.name)
+        os.remove(temp_fp.name)
+        self.assertEquals(str(my_table), '')
+
     def test_input_and_output_character_encoding_in_method_to_csv(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
