@@ -15,4 +15,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-print 'Show data in terminal in a beautiful way, with Python'
+import argparse
+
+parser = argparse.ArgumentParser(description='Show data in terminal in a '
+'beautiful way, with Python')
+
+parser.print_help()

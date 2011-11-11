@@ -30,7 +30,14 @@ def sh(command, finalize=True):
     return process
 
 class TestOutputtyCli(unittest.TestCase):
+    def test_outputty_command_should_run(self):
+        process = sh('../outputty')
+        self.assertEquals(process.returncode, 0)
+        self.assertEquals(process.err, '')
+
     def test_outputty_without_parameters_should_return_help(self):
         process = sh('../outputty')
         help_string = 'Show data in terminal in a beautiful way, with Python'
         self.assertIn(help_string, process.out)
+        self.assertIn('usage', process.out)
+        self.assertIn('optional arguments', process.out)
