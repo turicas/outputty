@@ -36,6 +36,7 @@ class Table(object):
         self.plus = plus
         self.input_encoding = input_encoding
         self.output_encoding = output_encoding
+        self.csv_filename = None
         self.rows = []
         if from_csv:
             self._import_from_csv(from_csv)
@@ -94,12 +95,17 @@ class Table(object):
     def __str__(self):
         return self.__unicode__().encode(self.output_encoding)
 
-    def _import_from_csv(self, filename):
-        self.csv_filename = filename
-        fp = open(filename, 'r')
+    def _import_from_csv(self, file_name_or_pointer):
+        if isinstance(file_name_or_pointer, (str, unicode)):
+            self.csv_filename = file_name_or_pointer
+            fp = open(file_name_or_pointer, 'r')
+        else:
+            fp = file_name_or_pointer
+        self.fp = fp
         reader = csv.reader(fp)
         data = list(reader)  # reader is an iterator
-        fp.close()
+        if self.csv_filename:
+            fp.close()
         self.headers, self.rows = data[0], data[1:]
 
     def to_csv(self, filename):
