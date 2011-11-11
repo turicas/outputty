@@ -18,8 +18,6 @@
 from textwrap import dedent
 
 import unittest
-import tempfile
-import os
 import sys
 
 sys.path.insert(0, '..')
@@ -163,69 +161,6 @@ class TestTable(unittest.TestCase):
         +--------------+----------------+---------------+
         ''').strip())
 
-    def test_output_to_csv_should_create_the_file_correctly_with_headers(self):
-        temp_fp = tempfile.NamedTemporaryFile()
-        temp_fp.close()
-
-        my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
-                              'eggs': 'eggs ham eggs'})
-        my_table.to_csv(temp_fp.name)
-
-        fp = open(temp_fp.name)
-        contents = fp.read()
-        fp.close()
-        os.remove(temp_fp.name)
-
-        self.assertEquals(contents, dedent('''\
-        "ham","spam","eggs"
-        "ham spam ham","spam eggs spam","eggs ham eggs"
-        '''))
-
-    def test_should_import_data_from_csv(self):
-        temp_fp = tempfile.NamedTemporaryFile(delete=False)
-        temp_fp.write(dedent('''\
-        "ham","spam","eggs"
-        "ham spam ham","spam eggs spam","eggs ham eggs"
-        "ham spam","eggs spam","eggs eggs"
-        '''))
-        temp_fp.close()
-
-        my_table = Table(from_csv=temp_fp.name)
-        os.remove(temp_fp.name)
-        self.assertEquals(str(my_table), dedent('''
-        +--------------+----------------+---------------+
-        |     ham      |      spam      |      eggs     |
-        +--------------+----------------+---------------+
-        | ham spam ham | spam eggs spam | eggs ham eggs |
-        |     ham spam |      eggs spam |     eggs eggs |
-        +--------------+----------------+---------------+
-        ''').strip())
-
-    def test_should_save_data_into_text_file(self):
-        temp_fp = tempfile.NamedTemporaryFile(delete=False)
-        temp_fp.close()
-
-        my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
-        my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
-        my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
-
-        my_table.to_text_file(temp_fp.name)
-        fp = open(temp_fp.name, 'r')
-        contents = fp.read()
-        fp.close()
-        os.remove(temp_fp.name)
-        self.assertEqual(contents, dedent('''
-        +-----+------+------+
-        | ham | spam | eggs |
-        +-----+------+------+
-        |     |      |      |
-        |   1 |    2 |    3 |
-        |  11 |   22 |   33 |
-        +-----+------+------+
-        ''').strip())
-
     def test_character_count_in_row_data_should_use_unicode(self):
         my_table = Table(headers=['First name', 'Last name'])
         my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
@@ -263,42 +198,6 @@ class TestTable(unittest.TestCase):
         +--------+
         ''').strip().decode('utf8').encode('iso-8859-1'))
 
-    def test_input_and_output_character_encoding_in_method_to_csv(self):
-        temp_fp = tempfile.NamedTemporaryFile(delete=False)
-        temp_fp.close()
-        my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
-                         input_encoding='utf16', output_encoding='iso-8859-1')
-        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
-        my_table.to_csv(temp_fp.name)
-
-        fp = open(temp_fp.name)
-        file_contents = fp.read()
-        fp.close()
-        os.remove(temp_fp.name)
-        output = '"Álvaro"\n"Píton"\n'.decode('utf8').encode('iso-8859-1')
-        self.assertEqual(file_contents, output)
-
-    def test_input_and_output_character_encoding_in_method_to_text_file(self):
-        temp_fp = tempfile.NamedTemporaryFile(delete=False)
-        temp_fp.close()
-        my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
-                         input_encoding='utf16', output_encoding='iso-8859-1')
-        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
-        my_table.to_text_file(temp_fp.name)
-
-        fp = open(temp_fp.name)
-        file_contents = fp.read()
-        fp.close()
-        os.remove(temp_fp.name)
-        output = dedent('''
-        +--------+
-        | Álvaro |
-        +--------+
-        |  Píton |
-        +--------+
-        ''').strip().decode('utf8').encode('iso-8859-1')
-        self.assertEqual(file_contents, output)
-
     def test_output_character_encoding_in_method___str__(self):
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
@@ -311,23 +210,6 @@ class TestTable(unittest.TestCase):
         |  Píton |
         +--------+
         ''').strip().decode('utf8').encode('iso-8859-1')
-        self.assertEqual(str(my_table), output)
-
-    def test_input_and_output_character_encoding_in_parameter_from_csv(self):
-        data = '"Álvaro"\n"Píton"'
-        temp_fp = tempfile.NamedTemporaryFile(delete=False)
-        temp_fp.write(data.decode('utf8').encode('iso-8859-1'))
-        temp_fp.close()
-        my_table = Table(from_csv=temp_fp.name, input_encoding='iso-8859-1',
-                         output_encoding='utf16')
-        os.remove(temp_fp.name)
-        output = dedent('''
-        +--------+
-        | Álvaro |
-        +--------+
-        |  Píton |
-        +--------+
-        ''').strip().decode('utf8').encode('utf16')
         self.assertEqual(str(my_table), output)
 
     def test___unicode__should_return_unicode_no_matter_the_input_encoding(self):
