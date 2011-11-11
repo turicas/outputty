@@ -54,3 +54,17 @@ class TestOutputtyCli(unittest.TestCase):
         | a |
         +---+
         ''').strip() + '\n')
+
+    def test_outputty_should_pretty_print_table_from_csv_data_in_stdin(self):
+        process = sh('../outputty --table', finalize=False)
+        process.stdin.write('a,b\n1,2\n')
+        process.stdin.close()
+        process.wait()
+        output = process.stdout.read()
+        self.assertEquals(output, dedent('''
+        +---+---+
+        | a | b |
+        +---+---+
+        | 1 | 2 |
+        +---+---+
+        ''').strip() + '\n')

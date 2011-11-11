@@ -18,6 +18,7 @@
 import argparse
 import sys
 from outputty import Table
+from cStringIO import StringIO
 
 
 parser = argparse.ArgumentParser(description='Show data in terminal in a '
@@ -29,6 +30,5 @@ args = parser.parse_args()
 if not args.table:
     parser.print_help()
 else:
-    reading = sys.stdin.read().strip()
-    table = Table(headers=[reading])
+    table = Table(from_csv=sys.stdin)
     print table
