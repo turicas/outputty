@@ -128,3 +128,10 @@ file.
 
 You can also use the [Github Issue Tracking
 System](https://github.com/turicas/outputty/issues) - it's up to you.
+
+Related Software
+----------------
+
+- [fabulous](http://lobstertech.com/fabulous.html)
+- [tablib](https://github.com/kennethreitz/tablib)
+- [clint](https://github.com/kennethreitz/clint)
