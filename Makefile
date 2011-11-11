@@ -1,6 +1,6 @@
 test:	
 	@clear
-	nosetests --with-coverage tests/*.py
+	nosetests --with-coverage tests/test_*.py
 
 
 .PHONY: test
