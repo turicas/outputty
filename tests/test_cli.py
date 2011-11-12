@@ -18,8 +18,12 @@
 import subprocess
 import shlex
 import unittest
+import os
 from textwrap import dedent
 
+
+TESTS_PATH = os.path.dirname(__file__)
+OUTPUTTY_EXECUTABLE = os.path.join(TESTS_PATH, '../outputty')
 
 def sh(command, finalize=True):
     process = subprocess.Popen(shlex.split(command), stderr=subprocess.PIPE,
@@ -30,25 +34,28 @@ def sh(command, finalize=True):
         process.err = process.stderr.read()
     return process
 
+def execute(arguments='', stdin=''):
+    process = sh(OUTPUTTY_EXECUTABLE + ' ' + arguments, finalize=False)
+    process.stdin.write(stdin)
+    process.stdin.close()
+    process.wait()
+    return process.stdout.read()
+
 class TestOutputtyCli(unittest.TestCase):
     def test_outputty_command_should_run(self):
-        process = sh('../outputty')
+        process = sh(OUTPUTTY_EXECUTABLE)
         self.assertEquals(process.returncode, 0)
         self.assertEquals(process.err, '')
 
     def test_outputty_without_parameters_should_return_help(self):
-        process = sh('../outputty')
+        output = execute()
         help_string = 'Show data in terminal in a beautiful way, with Python'
-        self.assertIn(help_string, process.out)
-        self.assertIn('usage', process.out)
-        self.assertIn('optional arguments', process.out)
+        self.assertIn(help_string, output)
+        self.assertIn('usage', output)
+        self.assertIn('optional arguments', output)
 
     def test_outputty_with_table_should_receive_data_from_stdin(self):
-        process = sh('../outputty --table', finalize=False)
-        process.stdin.write('a\n')
-        process.stdin.close()
-        process.wait()
-        output = process.stdout.read()
+        output = execute('--table', 'a\n')
         self.assertEquals(output, dedent('''
         +---+
         | a |
@@ -56,11 +63,7 @@ class TestOutputtyCli(unittest.TestCase):
         ''').strip() + '\n')
 
     def test_outputty_should_pretty_print_table_from_csv_data_in_stdin(self):
-        process = sh('../outputty --table', finalize=False)
-        process.stdin.write('a,b\n1,2\n')
-        process.stdin.close()
-        process.wait()
-        output = process.stdout.read()
+        output = execute('--table', 'a,b\n1,2\n')
         self.assertEquals(output, dedent('''
         +---+---+
         | a | b |
