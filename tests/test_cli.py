@@ -19,6 +19,7 @@ import subprocess
 import shlex
 import unittest
 import os
+import tempfile
 from textwrap import dedent
 
 
@@ -70,4 +71,16 @@ class TestOutputtyCli(unittest.TestCase):
         +---+---+
         | 1 | 2 |
         +---+---+
+        ''').strip() + '\n')
+
+    def test_receive_csv_data_in_stdin_and_save_in_a_csv_file(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        output = execute('--table --to-csv ' + temp_fp.name, 'a,b\n1,2\n')
+        temp_fp = open(temp_fp.name)
+        csv_contents = temp_fp.read()
+        os.remove(temp_fp.name)
+        self.assertEquals(csv_contents, dedent('''
+        "a","b"
+        "1","2"
         ''').strip() + '\n')

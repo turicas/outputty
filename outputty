@@ -24,11 +24,16 @@ from cStringIO import StringIO
 parser = argparse.ArgumentParser(description='Show data in terminal in a '
 'beautiful way, with Python')
 parser.add_argument('--table', dest='table', help='Create a table',
-        action='store_true')
+                    action='store_true')
+parser.add_argument('--to-csv', dest='to_csv', help='Export data to CSV file',
+                    action='store')
 
 args = parser.parse_args()
 if not args.table:
     parser.print_help()
 else:
     table = Table(from_csv=sys.stdin)
-    print table
+    if args.to_csv:
+        table.to_csv(args.to_csv)
+    else:
+        print table
