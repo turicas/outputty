@@ -16,13 +16,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from textwrap import dedent
-
 import unittest
 import tempfile
 import os
-import sys
-
-sys.path.insert(0, '..')
 from outputty import Table
 
 

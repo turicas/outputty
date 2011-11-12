@@ -18,11 +18,8 @@
 import unittest
 import tempfile
 import os
-import sys
 from cStringIO import StringIO
 from textwrap import dedent
-
-sys.path.insert(0, '..')
 from outputty import Table
 
 
