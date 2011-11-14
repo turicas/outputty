@@ -15,8 +15,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import argparse
+import os
 import sys
+import argparse
+import tempfile
 from outputty import Table
 from cStringIO import StringIO
 
@@ -26,14 +28,25 @@ parser = argparse.ArgumentParser(description='Show data in terminal in a '
 parser.add_argument('--table', dest='table', help='Create a table',
                     action='store_true')
 parser.add_argument('--to-csv', dest='to_csv', help='Export data to CSV file',
-                    action='store')
+                    action='store', metavar='filename', default='', nargs='?')
 
 args = parser.parse_args()
 if not args.table:
     parser.print_help()
 else:
     table = Table(from_csv=sys.stdin)
-    if args.to_csv:
-        table.to_csv(args.to_csv)
+    if args.to_csv != '':
+        if args.to_csv is None: #--to-csv without filename
+            temp_fp = tempfile.NamedTemporaryFile(delete=False)
+            temp_fp.close()
+            table.to_csv(temp_fp.name)
+            fp = open(temp_fp.name)
+            contents = fp.read()
+            fp.close()
+            os.remove(temp_fp.name)
+            print contents
+        else:
+            filename = args.to_csv
+            table.to_csv(filename)
     else:
         print table

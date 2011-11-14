@@ -52,3 +52,10 @@ class TestOutputtyCli(unittest.TestCase):
         "a","b"
         "1","2"
         ''').strip() + '\n')
+
+    def using_to_csv_parameter_without_filename_should_print_to_stdout(self):
+        output = execute('--table --to-csv', 'a,b\n1,2\n')
+        self.assertEquals(output, dedent('''
+        "a","b"
+        "1","2"
+        ''').strip() + '\n')
