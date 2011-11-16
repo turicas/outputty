@@ -59,3 +59,29 @@ class TestOutputtyCli(unittest.TestCase):
         "a","b"
         "1","2"
         ''').strip() + '\n')
+
+    def test_from_csv_without_filename_should_ignore_this_option(self):
+        output = execute('--table --from-csv', 'a,b\n1,2\n')
+        self.assertEquals(output, dedent('''
+        +---+---+
+        | a | b |
+        +---+---+
+        | 1 | 2 |
+        +---+---+
+        ''').strip() + '\n')
+
+    def test_from_csv_with_filename_should_print_correctly_data(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write("spam,eggs\nham,spam\neggs,ham")
+        temp_fp.close()
+        output = execute('--table --from-csv ' + temp_fp.name)
+        self.assertEquals(output, dedent('''
+        +------+------+
+        | spam | eggs |
+        +------+------+
+        |  ham | spam |
+        | eggs |  ham |
+        +------+------+
+        ''').strip() + '\n')
+
+    #TODO: test filenames that does not exist and check stderr and exit code

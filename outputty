@@ -29,13 +29,21 @@ parser.add_argument('--table', dest='table', help='Create a table',
                     action='store_true')
 parser.add_argument('--to-csv', dest='to_csv', help='Export data to CSV file',
                     action='store', metavar='filename', default='', nargs='?')
+parser.add_argument('--from-csv', dest='from_csv', help='Import data from CSV',
+                    action='store', metavar='filename', default='', nargs='?')
 
 args = parser.parse_args()
 if not args.table:
     parser.print_help()
 else:
-    table = Table(from_csv=sys.stdin)
-    if args.to_csv != '':
+    if args.from_csv:
+        input_filename = args.from_csv
+    else:
+        input_filename = sys.stdin
+
+    table = Table(from_csv=input_filename)
+
+    if args.to_csv != '': #if passed "--to-csv"
         if args.to_csv is None: #--to-csv without filename
             temp_fp = tempfile.NamedTemporaryFile(delete=False)
             temp_fp.close()
