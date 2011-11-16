@@ -19,7 +19,7 @@ import unittest
 import os
 import tempfile
 from textwrap import dedent
-from utils import execute
+from utils import execute, sh, OUTPUTTY_EXECUTABLE
 
 
 class TestOutputtyCli(unittest.TestCase):
@@ -84,4 +84,31 @@ class TestOutputtyCli(unittest.TestCase):
         +------+------+
         ''').strip() + '\n')
 
-    #TODO: test filenames that does not exist and check stderr and exit code
+    def test_from_csv_with_wrong_filename_returns_1_and_stderr_not_empty(self):
+        process = sh(OUTPUTTY_EXECUTABLE  + ' --table --from-csv doesnt-exist')
+        self.assertEquals(process.returncode, 1)
+
+        expected_error = "[Errno 2] No such file or directory: 'doesnt-exist'\n"
+        self.assertEquals(process.err, expected_error)
+        
+    def test_from_csv_without_permissions_returns_1_and_stderr_not_empty(self):
+        process = sh(OUTPUTTY_EXECUTABLE  + ' --table --from-csv /root/test',
+                     finalize=False)
+        process.stdin.write('a,b\n1,2')
+        process.stdin.close()
+        process.wait()
+
+        self.assertEquals(process.returncode, 1)
+        expected_error = "[Errno 13] Permission denied: '/root/test'\n"
+        self.assertEquals(process.stderr.read(), expected_error)
+        
+    def test_to_csv_without_permissions_returns_2_and_stderr_not_empty(self):
+        process = sh(OUTPUTTY_EXECUTABLE  + ' --table --to-csv /root/test',
+                     finalize=False)
+        process.stdin.write('a,b\n1,2')
+        process.stdin.close()
+        process.wait()
+
+        self.assertEquals(process.returncode, 2)
+        expected_error = "[Errno 13] Permission denied: '/root/test'\n"
+        self.assertEquals(process.stderr.read(), expected_error)

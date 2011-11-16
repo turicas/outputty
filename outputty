@@ -41,7 +41,11 @@ else:
     else:
         input_filename = sys.stdin
 
-    table = Table(from_csv=input_filename)
+    try:
+        table = Table(from_csv=input_filename)
+    except IOError as exception:
+        sys.stderr.write(str(exception) + '\n')
+        exit(1)
 
     if args.to_csv != '': #if passed "--to-csv"
         if args.to_csv is None: #--to-csv without filename
@@ -55,6 +59,10 @@ else:
             print contents
         else:
             filename = args.to_csv
-            table.to_csv(filename)
+            try:
+                table.to_csv(filename)
+            except IOError as exception:
+                sys.stderr.write(str(exception) + '\n')
+                exit(2)
     else:
         print table
