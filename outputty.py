@@ -16,6 +16,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import csv
+try:
+    import MySQLdb
+except ImportError:
+    pass
 
 
 class MyCSV(csv.Dialect):
@@ -43,6 +47,7 @@ class Table(object):
             self._import_from_csv(from_csv)
         elif from_mysql:
             self._get_mysql_config(from_mysql)
+            self._import_from_mysql()
 
     def _convert_to_unicode(self, element):
         if isinstance(element, (str, unicode)):
@@ -125,9 +130,20 @@ class Table(object):
         self.mysql_username = connection_str[:colon_index]
         self.mysql_password = connection_str[colon_index + 1:at_index]
         self.mysql_hostname = connection_str[at_index + 1:slash_index]
-        self.mysql_port = 3306 #TODO: make it flexible
+        self.mysql_port = 3306
         self.mysql_database = connection_str[slash_index + 1:second_slash_index]
         self.mysql_table = connection_str[second_slash_index + 1:]
+
+    def _import_from_mysql(self):
+        self.mysql_connection = MySQLdb.connect(user=self.mysql_username,
+                passwd=self.mysql_password, host=self.mysql_hostname,
+                port=self.mysql_port, db=self.mysql_database)
+        self.cursor = self.mysql_connection.cursor()
+        self.cursor.execute('SELECT * FROM ' + self.mysql_table)
+        self.headers = [x[0] for x in self.cursor.description]
+        self.rows = []
+        for row in self.cursor.fetchall():
+            self.rows.append(row)
 
     def to_csv(self, filename):
         self._organize_data()
