@@ -1,5 +1,5 @@
 ONLY=*
-TEST_RUNNER=nosetests --with-coverage
+TEST_RUNNER=nosetests --with-coverage --cover-package outputty
 
 # `make test` will execute:
 #  nosetests --with-coverage tests.test_*
