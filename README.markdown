@@ -127,7 +127,23 @@ want to contribute, please see our
 file.
 
 You can also use the [Github Issue Tracking
-System](https://github.com/turicas/outputty/issues) - it's up to you.
+System](https://github.com/turicas/outputty/issues) to report bugs.
+
+
+Contributing
+------------
+
+If you want to contribute to this project, please:
+
+- Use [Test-driven
+  development](http://en.wikipedia.org/wiki/Test-driven_development)
+- Create your new feature in branch `feature/name-of-the-new-feature`
+- Run __all tests__ (`make test`) _before_ pushing
+  - To run just one test file, execute `nosetests --with-coverage
+    tests/test_your-test-file.py`
+  - Try to have a test-coverage of 100%
+- Create/update documentation (`README.markdown`/docstrings/man page)
+
 
 Related Software
 ----------------

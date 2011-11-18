@@ -30,13 +30,15 @@ API
 - Create `Table(from_txt=...)` where txt file is in outputty format?
 
 
-Packaging
----------
+Packaging-related stuff
+-----------------------
 
-- Modify the file structure (or create a script to do it) so we can create a
-  Python package. See
+- __[really-needed]__ Create a man page.
+- __[really-needed]__ Modify the file structure (or create a script to do it)
+  so we can create a Python package. See
   [The Hitchhiker’s Guide to Packaging](http://guide.python-distribute.org/).
-- Register the project on [PyPi](http://pypi.python.org/pypi).
+- __[really-needed]__ Register the project on
+  [PyPi](http://pypi.python.org/pypi).
 
 
 Processing Input Data
