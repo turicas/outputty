@@ -95,11 +95,13 @@ class Histogram(object):
             his += line
         return his
 
-            
 
-if __name__ == "__main__":
-    from numpy.random import normal
-    d = normal(size=1000)
-    h = Histogram(d,bins=10)
-    print h.vertical(15)
-    print h.horizontal(5)
+
+#if __name__ == "__main__":
+#    from numpy.random import normal
+#    from numpy.random import seed
+#    seed(1234)
+#    d = normal(size=1000)
+#    h = Histogram(d,bins=10)
+#    print h.vertical(15)
+#    print h.horizontal(5)
