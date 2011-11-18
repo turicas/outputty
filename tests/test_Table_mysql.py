@@ -82,10 +82,39 @@ class TestTableMySQL(unittest.TestCase):
         +--------+--------+
         ''').strip())
 
+    def test_to_mysql_should_create_table_even_if_only_headers_present(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['spam', 'eggs'])
+        table.to_mysql(self.connection_string)
+        
+        self.cursor.execute('SELECT * FROM ' + self.table)
+        cols = [x[0] for x in self.cursor.description]
+        self.assertEquals(cols, ['spam', 'eggs'])
+
+    def test_to_mysql_should_not_create_table_if_it_exists(self):
+        table = Table()
+        table.to_mysql(self.connection_string)
+        
+        self.cursor.execute('SELECT * FROM ' + self.table)
+        cols = [x[0] for x in self.cursor.description]
+        self.assertEquals(cols, ['field1', 'field2'])
+
+    def test_to_mysql_should_add_rows_correctly(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['spam', 'eggs'])
+        table.rows.append(['python', 'rules'])
+        table.rows.append(['free software', 'ownz'])
+        table.to_mysql(self.connection_string)
+        
+        self.cursor.execute('SELECT * FROM ' + self.table)
+        rows = [row for row in self.cursor.fetchall()]
+        self.assertEquals(rows, [('python', 'rules'),
+                                 ('free software', 'ownz')])
+
     #TODO:    
-    #Change all values (including port) on connection string
-    #from_mysql
-    #to_mysql
+    #to_mysql overrides data from from_mysql. what to do?
+    #what if data have quotes?
+    #what if incompatible data types (self.rows vs table structure)?
     #from/to_mysql with exception (cannot connect, wrong user/pass etc.)
     #encodings
     #what if MySQLdb is not installed?

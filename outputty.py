@@ -138,14 +138,32 @@ class Table(object):
         self.mysql_database = connection_str[slash_index + 1:second_slash_index]
         self.mysql_table = connection_str[second_slash_index + 1:]
 
-    def _import_from_mysql(self):
+    def _connect_to_mysql(self):
         self.mysql_connection = MySQLdb.connect(user=self.mysql_username,
                 passwd=self.mysql_password, host=self.mysql_hostname,
                 port=self.mysql_port, db=self.mysql_database)
         self.cursor = self.mysql_connection.cursor()
+
+    def _import_from_mysql(self):
+        self._connect_to_mysql()
         self.cursor.execute('SELECT * FROM ' + self.mysql_table)
         self.headers = [x[0] for x in self.cursor.description]
         self.rows = [row for row in self.cursor.fetchall()]
+        self.mysql_connection.close()
+
+    def to_mysql(self, connection_string):
+        self._get_mysql_config(connection_string)
+        self._connect_to_mysql()
+        if self.headers:
+            columns_and_types = ['%s TEXT' % header for header in self.headers]
+            sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % \
+                  (self.mysql_table, ', '.join(columns_and_types))
+            self.mysql_connection.query(sql)
+        for row in self.rows:
+            values_with_quotes = ', '.join(['"%s"' % value for value in row])
+            sql = 'INSERT INTO %s VALUES (%s)' % (self.mysql_table,
+                                                  values_with_quotes)
+            self.mysql_connection.query(sql)
         self.mysql_connection.close()
 
     def to_csv(self, filename):
