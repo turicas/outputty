@@ -56,6 +56,16 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(table.mysql_database, 'database')
         self.assertEquals(table.mysql_table, 'table')
 
+    def test_connection_parameters_with_changed_port(self):
+        table = Table()
+        table._get_mysql_config('u:p@h:0/d/t')
+        self.assertEquals(table.mysql_username, 'u')
+        self.assertEquals(table.mysql_password, 'p')
+        self.assertEquals(table.mysql_hostname, 'h')
+        self.assertEquals(table.mysql_port, 0)
+        self.assertEquals(table.mysql_database, 'd')
+        self.assertEquals(table.mysql_table, 't')
+
     def test_from_mysql_should_retrieve_data_from_table(self):
         self.connection.query('INSERT INTO %s VALUES (123, "a")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (456, "b")' % self.table)

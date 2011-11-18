@@ -131,6 +131,10 @@ class Table(object):
         self.mysql_password = connection_str[colon_index + 1:at_index]
         self.mysql_hostname = connection_str[at_index + 1:slash_index]
         self.mysql_port = 3306
+        if ':' in self.mysql_hostname:
+            data = self.mysql_hostname.split(':')
+            self.mysql_hostname = data[0]
+            self.mysql_port = int(data[1])
         self.mysql_database = connection_str[slash_index + 1:second_slash_index]
         self.mysql_table = connection_str[second_slash_index + 1:]
 
