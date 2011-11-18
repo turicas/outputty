@@ -141,9 +141,8 @@ class Table(object):
         self.cursor = self.mysql_connection.cursor()
         self.cursor.execute('SELECT * FROM ' + self.mysql_table)
         self.headers = [x[0] for x in self.cursor.description]
-        self.rows = []
-        for row in self.cursor.fetchall():
-            self.rows.append(row)
+        self.rows = [row for row in self.cursor.fetchall()]
+        self.mysql_connection.close()
 
     def to_csv(self, filename):
         self._organize_data()
