@@ -24,6 +24,7 @@ A `Table` made with `dict`, `list` and `tuple`. This code:
 
     #!/usr/bin/env python
     # coding: utf-8
+
     from outputty import Table
     my_table = Table(headers=['First name', 'Last name'])
     my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
@@ -89,6 +90,7 @@ The code:
 > If do you want to see more examples, see the file
 > [tests/test_Table.py](https://github.com/turicas/outputty/blob/master/tests/test_Table.py).
 
+> To run these examples, see the folder `samples`.
 
 Type Of Data
 ------------
