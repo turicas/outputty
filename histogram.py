@@ -26,6 +26,7 @@ class Histogram(object):
         self.data = data
         self.bins = bins
         self.h = histogram(self.data, bins=self.bins)
+
     def horizontal(self, height=4, character ='|'):
         """Returns a multiline string containing a
         a horizontal histogram representation of self.data
@@ -44,23 +45,24 @@ class Histogram(object):
                    |||||||||||||
         -3.42                         3.09
         """
-        his = """"""
-        bars = self.h[0]/max(self.h[0])*height
-        for l in reversed(range(1,height+1)):
-            line = ""
+        his = []
+        bars = self.h[0] / max(self.h[0]) * height
+        for l in reversed(range(1, height + 1)):
+            line = ''
             if l == height:
-                line = '%s '%max(self.h[0]) #histogram top count
+                line = '%s ' % max(self.h[0]) #histogram top count
             else:
-                line = ' '*(len(str(max(self.h[0])))+1) #add leading spaces
+                line = ' ' * (len(str(max(self.h[0]))) + 1) #add leading spaces
             for c in bars:
                 if c >= ceil(l):
                     line += character
                 else:
                     line += ' '
-            line +='\n'
-            his += line
-        his += '%.2f'%self.h[1][0] + ' '*(self.bins) +'%.2f'%self.h[1][-1] + '\n'
-        return his
+            his.append(line.rstrip())
+        his.append('%.2f%s%.2f' % (self.h[1][0], ' ' * self.bins,
+                                   self.h[1][-1]))
+        return '\n'.join(his)
+
     def vertical(self,height=20, character ='|'):
         """
         Returns a Multi-line string containing a
@@ -85,17 +87,15 @@ class Histogram(object):
         1.68 : *
         2.32 :
         """
-        his = """"""
-        xl = ['%.2f'%n for n in self.h[1]]
+        his = []
+        xl = ['%.2f' % n for n in self.h[1]]
         lxl = [len(l) for l in xl]
-        bars = self.h[0]/max(self.h[0])*height
-        his += ' '*(max(bars)+2+max(lxl))+'%s\n'%max(self.h[0])
+        bars = self.h[0] / max(self.h[0]) * height
+        his.append(' ' * (max(bars) + 2 + max(lxl)) + '%s\n' % max(self.h[0]))
         for i,c in enumerate(bars):
-            line = xl[i] +' '*(max(lxl)-lxl[i])+': '+ character*c+'\n'
-            his += line
-        return his
-
-
+            line = xl[i] + ' ' * (max(lxl) - lxl[i]) + ': ' + character * c
+            his.append(line.rstrip())
+        return '\n'.join(his)
 
 #if __name__ == "__main__":
 #    from numpy.random import normal
