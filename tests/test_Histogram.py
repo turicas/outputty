@@ -4,7 +4,7 @@
 Tests for histogram module
 """
 import unittest
-from histogram import Histogram
+from outputty import Histogram
 from numpy.random import seed
 from numpy.random import normal
 from textwrap import dedent
