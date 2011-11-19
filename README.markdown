@@ -132,7 +132,7 @@ This code:
 
 > If do you want to see more examples, see `tests/test_*.py`.
 
-> To run these examples, see the folder `samples`.
+> To run these examples, see the folder `examples`.
 
 Type Of Data
 ------------
