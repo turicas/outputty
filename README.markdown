@@ -4,8 +4,7 @@ outputty
 With `outputty` you can show the data of your Python software in text mode
 (terminal, CSV or TXT) in a easy and beautiful way.
 
-By now we have only the class `Table` (in future we'll add progress bar,
-histogram and more).
+By now we have only the classes `Table` and `Histogram` (more to be added).
 
 
 Installation
@@ -18,9 +17,10 @@ Just copy the file `outputty.py` in some path you can do `import outputty`
 Examples
 --------
 
-### Example 1
+### Example 1 -- `Table`
 
-A `Table` made with `dict`, `list` and `tuple`. This code:
+A `Table` made with `dict`-like, `list`-like and `tuple`-like objects. For
+example, this code:
 
     #!/usr/bin/env python
     # coding: utf-8
@@ -43,7 +43,7 @@ A `Table` made with `dict`, `list` and `tuple`. This code:
     +------------+-----------+
 
 
-### Example 2
+### Example 2 -- `Table.to_csv`
 
 If you want to export your data to CSV (Comma-Separated Values), just execute:
 
@@ -59,7 +59,7 @@ If you want to export your data to CSV (Comma-Separated Values), just execute:
     "Flávio","Amieiro"
 
 
-### Example 3
+### Example 3 -- `Table(from_csv=...)` and `Table.to_text_file`
 
 You can also import data from a CSV file and export it to a text file:
 
@@ -87,8 +87,50 @@ The code:
     +----+---------+-------------------------+
 
 
-> If do you want to see more examples, see the file
-> [tests/test_Table.py](https://github.com/turicas/outputty/blob/master/tests/test_Table.py).
+### Example 4 -- `Histogram`
+
+This code:
+
+    from numpy.random import normal
+    from numpy.random import seed
+    from outputty import Histogram
+
+    seed(1234)
+    distribution = normal(size=1000)
+    my_histogram = Histogram(distribution, bins=10)
+    print 'Vertical:'
+    print my_histogram.vertical(15)
+    print
+    print 'Horizontal:'
+    print my_histogram.horizontal(5)
+
+
+...will produce:
+
+    Vertical:
+                          265
+
+    -3.56:
+    -2.93:
+    -2.30: ||
+    -1.67: ||||
+    -1.03: ||||||||||
+    -0.40: |||||||||||||||
+    0.23 : ||||||||||||
+    0.87 : ||||||
+    1.50 : |||
+    2.13 :
+
+    Horizontal:
+    265      |
+             ||
+            |||
+            ||||
+           ||||||
+    -3.56          2.76
+
+
+> If do you want to see more examples, see `tests/test_*.py`.
 
 > To run these examples, see the folder `samples`.
 
