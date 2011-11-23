@@ -195,3 +195,4 @@ Related Software
 - [fabulous](http://lobstertech.com/fabulous.html)
 - [tablib](https://github.com/kennethreitz/tablib)
 - [clint](https://github.com/kennethreitz/clint)
+- [csvstudio](http://code.google.com/p/csvstudio/)
