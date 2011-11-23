@@ -10,7 +10,7 @@ from numpy.random import normal
 from textwrap import dedent
 
 
-class TestTableTxt(unittest.TestCase):
+class TestHistogram(unittest.TestCase):
     def test_horizontal_histogram(self):
         seed(1234) # Setting the seed to get repeatable results
         d = normal(size=1000)
