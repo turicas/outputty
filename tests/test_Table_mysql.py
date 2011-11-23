@@ -16,6 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import datetime
 from textwrap import dedent
 from outputty import Table
 import MySQLdb
@@ -86,7 +87,7 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs'])
         table.to_mysql(self.connection_string)
-        
+
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(cols, ['spam', 'eggs'])
@@ -94,7 +95,7 @@ class TestTableMySQL(unittest.TestCase):
     def test_to_mysql_should_not_create_table_if_it_exists(self):
         table = Table()
         table.to_mysql(self.connection_string)
-        
+
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(cols, ['field1', 'field2'])
@@ -105,16 +106,51 @@ class TestTableMySQL(unittest.TestCase):
         table.rows.append(['python', 'rules'])
         table.rows.append(['free software', 'ownz'])
         table.to_mysql(self.connection_string)
-        
+
         self.cursor.execute('SELECT * FROM ' + self.table)
         rows = [row for row in self.cursor.fetchall()]
         self.assertEquals(rows, [('python', 'rules'),
                                  ('free software', 'ownz')])
 
-    #TODO:    
+    def test_should_indentify_type_str_correctly(self):
+        table = Table(headers=['eggs'])
+        table.rows.append(['spam'])
+        table.rows.append(['ham'])
+        table._identify_type_of_data()
+        self.assertEqual(table.types['eggs'], str)
+
+    def test_should_indentify_type_int_correctly(self):
+        table = Table(headers=['spam'])
+        table.rows.append([1])
+        table.rows.append([2])
+        table._identify_type_of_data()
+        self.assertEqual(table.types['spam'], int)
+
+    def test_should_indentify_type_float_correctly(self):
+        table = Table(headers=['ham'])
+        table.rows.append([1.0])
+        table.rows.append([3.14])
+        table._identify_type_of_data()
+        self.assertEqual(table.types['ham'], float)
+
+    def test_should_indentify_type_date_correctly(self):
+        table = Table(headers=['Python'])
+        table.rows.append(['2010-11-15'])
+        table.rows.append(['2011-11-20'])
+        table._identify_type_of_data()
+        self.assertEqual(table.types['Python'], datetime.date)
+
+    def test_should_indentify_type_datetime_correctly(self):
+        table = Table(headers=['Monty'])
+        table.rows.append(['2010-11-15 02:42:01'])
+        table.rows.append(['2011-11-20 21:05:59'])
+        table._identify_type_of_data()
+        self.assertEqual(table.types['Monty'], datetime.datetime)
+
+    #TODO:
     #to_mysql overrides data from from_mysql. what to do?
-    #what if data have quotes?
+    #what if data have quotes? use MySQLdb.escape_string
     #what if incompatible data types (self.rows vs table structure)?
     #from/to_mysql with exception (cannot connect, wrong user/pass etc.)
-    #encodings
+    #deal with encodings
     #what if MySQLdb is not installed?

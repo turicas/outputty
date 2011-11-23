@@ -18,6 +18,8 @@
 import csv
 try:
     import MySQLdb
+    import datetime # only used with MySQL
+    import re # only used with MySQL
 except ImportError:
     pass
 
@@ -43,6 +45,7 @@ class Table(object):
         self.output_encoding = output_encoding
         self.csv_filename = None
         self.rows = []
+        self.types = {}
         if from_csv:
             self._import_from_csv(from_csv)
         elif from_mysql:
@@ -143,6 +146,33 @@ class Table(object):
                 passwd=self.mysql_password, host=self.mysql_hostname,
                 port=self.mysql_port, db=self.mysql_database)
         self.cursor = self.mysql_connection.cursor()
+
+    def _identify_type_of_data(self):
+        columns = zip(*self.rows)
+        date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
+                                    '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
+        for i, column in enumerate(columns):
+            column_types = [int, float, datetime.date, datetime.datetime, str]
+            cant_be = set()
+            for value in column:
+                try:
+                    converted = int(value)
+                    if str(converted) != str(value):
+                        raise ValueError('It is float')
+                except ValueError:
+                    cant_be.add(int)
+                try:
+                    converted = float(value)
+                except ValueError:
+                    cant_be.add(float)
+                if datetime_regex.match(str(value)) is None:
+                    cant_be.add(datetime.datetime)
+                if date_regex.match(str(value)) is None:
+                    cant_be.add(datetime.date)
+            for removed_type in cant_be:
+                column_types.remove(removed_type)
+            self.types[self.headers[i]] = column_types[0]
 
     def _import_from_mysql(self):
         self._connect_to_mysql()
