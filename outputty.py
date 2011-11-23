@@ -200,7 +200,9 @@ class Table(object):
                   (self.mysql_table, ', '.join(columns_and_types))
             self.mysql_connection.query(sql)
         for row in self.rows:
-            values_with_quotes = ', '.join(['"%s"' % value for value in row])
+            values = ['"%s"' % self.mysql_connection.escape_string(str(value)) \
+                      for value in row]
+            values_with_quotes = ', '.join(values)
             sql = 'INSERT INTO %s VALUES (%s)' % (self.mysql_table,
                                                   values_with_quotes)
             self.mysql_connection.query(sql)

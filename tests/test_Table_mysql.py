@@ -175,11 +175,20 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(data_types['Monty'], 'datetime')
         self.assertEquals(data_types['Python'], 'text')
 
+    def test_should_threat_quotes_correctly(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['eggs'])
+        table.rows.append(['spam"ham'])
+        table.to_mysql(self.connection_string)
+
+        table_2 = Table(from_mysql=self.connection_string)
+        self.assertEquals(table_2.rows[0][0], 'spam"ham')
+
 
     #TODO:
-    #to_mysql overrides data from from_mysql. what to do?
-    #what if data have quotes? use MySQLdb.escape_string
-    #what if incompatible data types (self.rows vs table structure)?
-    #from/to_mysql with exception (cannot connect, wrong user/pass etc.)
     #deal with encodings
+    #from/to_mysql with exception (cannot connect, wrong user/pass etc.)
+    #to_mysql overrides data from from_mysql. what to do?
+    #what if incompatible data types (self.rows vs table structure)?
     #what if MySQLdb is not installed?
+    #should be lazy (don't put things in memory until needed)
