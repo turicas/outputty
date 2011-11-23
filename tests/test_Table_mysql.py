@@ -90,7 +90,7 @@ class TestTableMySQL(unittest.TestCase):
 
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
-        self.assertEquals(cols, ['spam', 'eggs'])
+        self.assertEquals(set(cols), set(['spam', 'eggs']))
 
     def test_to_mysql_should_not_create_table_if_it_exists(self):
         table = Table()
@@ -98,7 +98,7 @@ class TestTableMySQL(unittest.TestCase):
 
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
-        self.assertEquals(cols, ['field1', 'field2'])
+        self.assertEquals(set(cols), set(['field1', 'field2']))
 
     def test_to_mysql_should_add_rows_correctly(self):
         self.connection.query('DROP TABLE ' + self.table)
@@ -112,12 +112,22 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(rows, [('python', 'rules'),
                                  ('free software', 'ownz')])
 
-    def test_should_indentify_type_str_correctly(self):
-        table = Table(headers=['eggs'])
-        table.rows.append(['spam'])
-        table.rows.append(['ham'])
+    def test_should_indentify_type_str_when_only_headers_present(self):
+        table = Table(headers=['eggs', 'ham'])
         table._identify_type_of_data()
         self.assertEqual(table.types['eggs'], str)
+        self.assertEqual(table.types['ham'], str)
+
+    def test_should_indentify_type_str_correctly(self):
+        table = Table(headers=['eggs', 'ham'])
+        table.rows.append(['spam eggs', 1])
+        table.rows.append(['spam spam', 3.14])
+        table.rows.append(['eggs spam', 'testing'])
+        table.rows.append(['spam spam', '2011-11-23'])
+        table.rows.append(['spam  ham', '2011-11-23 02:00:17'])
+        table._identify_type_of_data()
+        self.assertEqual(table.types['eggs'], str)
+        self.assertEqual(table.types['ham'], str)
 
     def test_should_indentify_type_int_correctly(self):
         table = Table(headers=['spam'])
@@ -146,6 +156,25 @@ class TestTableMySQL(unittest.TestCase):
         table.rows.append(['2011-11-20 21:05:59'])
         table._identify_type_of_data()
         self.assertEqual(table.types['Monty'], datetime.datetime)
+
+    def test_to_mysql_should_create_the_table_with_correct_data_types(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
+        table.rows.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
+        table.rows.append([2, 3.14, '2011-01-02', '2011-01-01 00:00:01', 'fgh'])
+        table.rows.append([3, 1.23, '2011-01-03', '2011-01-01 00:00:02', 'jkl'])
+        table.rows.append([4, 4.56, '2011-01-04', '2011-01-01 00:00:03', 'qwe'])
+        table.rows.append([5, 7.89, '2011-01-05', '2011-01-01 00:00:04', 'rty'])
+        table.to_mysql(self.connection_string)
+
+        self.cursor.execute('DESCRIBE ' + self.table)
+        data_types = dict([[x[0], x[1]] for x in self.cursor.fetchall()])
+        self.assertTrue(data_types['spam'].startswith('int'))
+        self.assertEquals(data_types['eggs'], 'float')
+        self.assertEquals(data_types['ham'], 'date')
+        self.assertEquals(data_types['Monty'], 'datetime')
+        self.assertEquals(data_types['Python'], 'text')
+
 
     #TODO:
     #to_mysql overrides data from from_mysql. what to do?

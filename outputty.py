@@ -20,6 +20,9 @@ try:
     import MySQLdb
     import datetime # only used with MySQL
     import re # only used with MySQL
+
+    MYSQL_TYPE = {str: 'TEXT', int: 'INT', float: 'FLOAT',
+                  datetime.date: 'DATE', datetime.datetime: 'DATETIME'}
 except ImportError:
     pass
 
@@ -152,27 +155,32 @@ class Table(object):
         date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
                                     '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
-        for i, column in enumerate(columns):
+        for i, header in enumerate(self.headers):
             column_types = [int, float, datetime.date, datetime.datetime, str]
             cant_be = set()
-            for value in column:
-                try:
-                    converted = int(value)
-                    if str(converted) != str(value):
-                        raise ValueError('It is float')
-                except ValueError:
-                    cant_be.add(int)
-                try:
-                    converted = float(value)
-                except ValueError:
-                    cant_be.add(float)
-                if datetime_regex.match(str(value)) is None:
-                    cant_be.add(datetime.datetime)
-                if date_regex.match(str(value)) is None:
-                    cant_be.add(datetime.date)
-            for removed_type in cant_be:
-                column_types.remove(removed_type)
-            self.types[self.headers[i]] = column_types[0]
+            try:
+                column = columns[i]
+            except IndexError:
+                self.types[header] = str
+            else:
+                for value in column:
+                    try:
+                        converted = int(value)
+                        if str(converted) != str(value):
+                            raise ValueError('It is float')
+                    except ValueError:
+                        cant_be.add(int)
+                    try:
+                        converted = float(value)
+                    except ValueError:
+                        cant_be.add(float)
+                    if datetime_regex.match(str(value)) is None:
+                        cant_be.add(datetime.datetime)
+                    if date_regex.match(str(value)) is None:
+                        cant_be.add(datetime.date)
+                for removed_type in cant_be:
+                    column_types.remove(removed_type)
+                self.types[header] = column_types[0]
 
     def _import_from_mysql(self):
         self._connect_to_mysql()
@@ -183,9 +191,11 @@ class Table(object):
 
     def to_mysql(self, connection_string):
         self._get_mysql_config(connection_string)
+        self._identify_type_of_data()
         self._connect_to_mysql()
         if self.headers:
-            columns_and_types = ['%s TEXT' % header for header in self.headers]
+            columns_and_types = ['%s %s' % (k, MYSQL_TYPE[v]) \
+                                 for k, v in self.types.iteritems()]
             sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % \
                   (self.mysql_table, ', '.join(columns_and_types))
             self.mysql_connection.query(sql)
