@@ -58,6 +58,8 @@ class Table(object):
     def _convert_to_unicode(self, element):
         if isinstance(element, (str, unicode)):
             return element.decode(self.input_encoding)
+        elif element is None:
+            return unicode()
         else:
             return unicode(element)
 
