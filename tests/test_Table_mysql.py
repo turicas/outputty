@@ -136,6 +136,14 @@ class TestTableMySQL(unittest.TestCase):
         table._identify_type_of_data()
         self.assertEqual(table.types['spam'], int)
 
+    def test_should_not_indentify_non_fractional_floats_as_int(self):
+        table = Table(headers=['ham'])
+        table.rows.append([1.0])
+        table.rows.append([2.0])
+        table.rows.append([3.0])
+        table._identify_type_of_data()
+        self.assertEqual(table.types['ham'], float)
+
     def test_should_indentify_type_float_correctly(self):
         table = Table(headers=['ham'])
         table.rows.append([1.0])
@@ -160,10 +168,6 @@ class TestTableMySQL(unittest.TestCase):
     def test_None_should_not_affect_data_type(self):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.rows.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
-        table.rows.append([2, 3.14, '2011-01-02', '2011-01-01 00:00:01', 'fgh'])
-        table.rows.append([3, 1.23, '2011-01-03', '2011-01-01 00:00:02', 'jkl'])
-        table.rows.append([4, 4.56, '2011-01-04', '2011-01-01 00:00:03', 'qwe'])
-        table.rows.append([5, 7.89, '2011-01-05', '2011-01-01 00:00:04', 'rty'])
         table.rows.append([None, None, None, None, None])
         table._identify_type_of_data()
         self.assertEquals(table.types['spam'], int)
@@ -193,21 +197,14 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.rows.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
-        table.rows.append([2, 3.14, '2011-01-02', '2011-01-01 00:00:01', 'fgh'])
-        table.rows.append([3, 1.23, '2011-01-03', '2011-01-01 00:00:02', 'jkl'])
-        table.rows.append([4, 4.56, '2011-01-04', '2011-01-01 00:00:03', 'qwe'])
-        table.rows.append([5, 7.89, '2011-01-05', '2011-01-01 00:00:04', 'rty'])
         table.rows.append([None, None, None, None, None])
         table.to_mysql(self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
         rows = self.cursor.fetchall()
-        self.assertIs(rows[-1][0], None)
-        self.assertIs(rows[-1][1], None)
-        self.assertIs(rows[-1][2], None)
-        self.assertIs(rows[-1][3], None)
-        self.assertIs(rows[-1][4], None)
+        for i in range(5):
+            self.assertIs(rows[-1][i], None)
 
-    def test_should_threat_quotes_correctly(self):
+    def test_should_deal_correctly_with_quotes(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['eggs'])
         table.rows.append(['spam"ham'])
