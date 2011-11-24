@@ -221,6 +221,17 @@ class TestTable(unittest.TestCase):
         +-------+-------+
         ''').strip().decode('utf8'))
 
+    def test_should_accept_None_in_header(self):
+        my_table = Table(headers=[None])
+        my_table.rows.append(['eggs'])
+        self.assertEqual(unicode(my_table), dedent('''
+        +------+
+        |      |
+        +------+
+        | eggs |
+        +------+
+        ''').strip())
+
     def test_should_accept_None_in_rows(self):
         my_table = Table(headers=['spam'])
         my_table.rows.append([None])
