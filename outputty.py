@@ -16,6 +16,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import csv
+import sqlite3
+
+BACKENDS = {'sqlite': sqlite3}
+
 try:
     import MySQLdb
     import datetime # only used with MySQL
@@ -23,6 +27,7 @@ try:
 
     MYSQL_TYPE = {str: 'TEXT', int: 'INT', float: 'FLOAT',
                   datetime.date: 'DATE', datetime.datetime: 'DATETIME'}
+    BACKENDS['mysql'] = MySQLdb
 except ImportError:
     pass
 
@@ -39,7 +44,7 @@ class MyCSV(csv.Dialect):
 class Table(object):
     def __init__(self, headers=[], dash='-', pipe='|', plus='+',
                  input_encoding='utf8', output_encoding='utf8', from_csv=None,
-                 from_mysql=None):
+                 from_mysql=None, from_database=None):
         self.headers = headers
         self.dash = dash
         self.pipe = pipe
@@ -54,6 +59,8 @@ class Table(object):
         elif from_mysql:
             self._get_mysql_config(from_mysql)
             self._import_from_mysql()
+        elif from_database:
+            self._import_from_database(**from_database)
 
     def _convert_to_unicode(self, element):
         if isinstance(element, (str, unicode)):
@@ -188,6 +195,15 @@ class Table(object):
                 for removed_type in cant_be:
                     column_types.remove(removed_type)
                 self.types[header] = column_types[0]
+
+    def _import_from_database(self, backend, config, table):
+        connection = BACKENDS[backend].connect(config)
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM ' + table)
+        self.headers = [x[0] for x in cursor.description]
+        self.rows = [row for row in cursor.fetchall()]
+        cursor.close()
+        connection.close()
 
     def _import_from_mysql(self):
         self._connect_to_mysql()

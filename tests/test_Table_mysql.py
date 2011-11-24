@@ -18,8 +18,11 @@
 import unittest
 import datetime
 from textwrap import dedent
+import tempfile
+import os
 from outputty import Table
 import MySQLdb
+import sqlite3
 
 
 class TestTableMySQL(unittest.TestCase):
@@ -224,6 +227,26 @@ class TestTableMySQL(unittest.TestCase):
         table.to_mysql(self.connection_string)
         table_2 = Table(from_mysql=self.connection_string)
         self.assertEquals(table_2.rows[0][0], 'spam"ham')
+
+    def test_should_import_from_any_python_db_api_compatible(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        filename = temp_fp.name
+        sqlite_connection = sqlite3.connect(filename)
+        sqlite_cursor = sqlite_connection.cursor()
+        sqlite_cursor.execute('CREATE TABLE testing (spam INT, eggs TEXT)')
+        sqlite_cursor.execute('INSERT INTO testing VALUES (42, "python")')
+        sqlite_cursor.execute('INSERT INTO testing VALUES (43, "rules")')
+        sqlite_connection.commit()
+        sqlite_cursor.close()
+        sqlite_connection.close()
+        table = Table(from_database={'backend': 'sqlite', 'config': filename,
+                                     'table': 'testing'})
+        os.remove(filename)
+        self.assertEquals(table.rows[0][0], 42)
+        self.assertEquals(table.rows[0][1], 'python')
+        self.assertEquals(table.rows[1][0], 43)
+        self.assertEquals(table.rows[1][1], 'rules')
 
 
     #TODO:
