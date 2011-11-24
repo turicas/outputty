@@ -31,11 +31,9 @@ class TestTableMySQL(unittest.TestCase):
         self.table = 'temp_table'
         self.connection_string = '%s:%s@%s/%s/%s' % (self.username,
                 self.password, self.hostname, self.database, self.table)
-
         self.connection = MySQLdb.connect(user=self.username,
                                          passwd=self.password,
                                          host=self.hostname)
-
         self.connection.query('DROP DATABASE IF EXISTS ' + self.database)
         self.connection.query('CREATE DATABASE ' + self.database)
         self.connection.select_db(self.database)
@@ -72,7 +70,6 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('INSERT INTO %s VALUES (456, "b")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (789, "c")' % self.table)
         table = Table(from_mysql=self.connection_string)
-
         self.assertEquals(str(table), dedent('''
         +--------+--------+
         | field1 | field2 |
@@ -83,11 +80,29 @@ class TestTableMySQL(unittest.TestCase):
         +--------+--------+
         ''').strip())
 
+    def test_from_mysql_should_get_data_with_correct_types(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        self.connection.query('CREATE TABLE %s (a INT(11), b FLOAT, c DATE, \
+                               d DATETIME, e TEXT)' % self.table)
+        self.connection.query('INSERT INTO %s VALUES (1, 3.14, "2011-11-11", \
+                               "2011-11-11 11:11:11", "Python")' % self.table)
+        table = Table(from_mysql=self.connection_string)
+        int_value = table.rows[0][0]
+        float_value = table.rows[0][1]
+        date_value = table.rows[0][2]
+        datetime_value = table.rows[0][3]
+        text_value = table.rows[0][4]
+        self.assertIn(type(int_value), (type(1), type(1L)))
+        self.assertEquals(type(float_value), type(1.0))
+        self.assertEquals(type(date_value), type(datetime.date(2011, 11, 11)))
+        self.assertEquals(type(datetime_value),
+                          type(datetime.datetime(2011, 11, 11, 11, 11, 11)))
+        self.assertEquals(type(text_value), type(''))
+
     def test_to_mysql_should_create_table_even_if_only_headers_present(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs'])
         table.to_mysql(self.connection_string)
-
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(set(cols), set(['spam', 'eggs']))
@@ -95,7 +110,6 @@ class TestTableMySQL(unittest.TestCase):
     def test_to_mysql_should_not_create_table_if_it_exists(self):
         table = Table()
         table.to_mysql(self.connection_string)
-
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(set(cols), set(['field1', 'field2']))
@@ -106,7 +120,6 @@ class TestTableMySQL(unittest.TestCase):
         table.rows.append(['python', 'rules'])
         table.rows.append(['free software', 'ownz'])
         table.to_mysql(self.connection_string)
-
         self.cursor.execute('SELECT * FROM ' + self.table)
         rows = [row for row in self.cursor.fetchall()]
         self.assertEquals(rows, [('python', 'rules'),
