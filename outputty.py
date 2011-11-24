@@ -172,14 +172,19 @@ class Table(object):
                             raise ValueError('It is float')
                     except ValueError:
                         cant_be.add(int)
+                    except TypeError:
+                        pass #None should pass
                     try:
                         converted = float(value)
                     except ValueError:
                         cant_be.add(float)
-                    if datetime_regex.match(str(value)) is None:
-                        cant_be.add(datetime.datetime)
-                    if date_regex.match(str(value)) is None:
-                        cant_be.add(datetime.date)
+                    except TypeError:
+                        pass #None should pass
+                    if value is not None:
+                        if datetime_regex.match(str(value)) is None:
+                            cant_be.add(datetime.datetime)
+                        if date_regex.match(str(value)) is None:
+                            cant_be.add(datetime.date)
                 for removed_type in cant_be:
                     column_types.remove(removed_type)
                 self.types[header] = column_types[0]
@@ -202,8 +207,14 @@ class Table(object):
                   (self.mysql_table, ', '.join(columns_and_types))
             self.mysql_connection.query(sql)
         for row in self.rows:
-            values = ['"%s"' % self.mysql_connection.escape_string(str(value)) \
-                      for value in row]
+            values = []
+            for value in row:
+                if value is None:
+                    value = 'NULL'
+                else:
+                    value = '"%s"' % \
+                            self.mysql_connection.escape_string(str(value))
+                values.append(value)
             values_with_quotes = ', '.join(values)
             sql = 'INSERT INTO %s VALUES (%s)' % (self.mysql_table,
                                                   values_with_quotes)

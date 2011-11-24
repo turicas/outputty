@@ -157,6 +157,21 @@ class TestTableMySQL(unittest.TestCase):
         table._identify_type_of_data()
         self.assertEqual(table.types['Monty'], datetime.datetime)
 
+    def test_None_should_not_affect_data_type(self):
+        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
+        table.rows.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
+        table.rows.append([2, 3.14, '2011-01-02', '2011-01-01 00:00:01', 'fgh'])
+        table.rows.append([3, 1.23, '2011-01-03', '2011-01-01 00:00:02', 'jkl'])
+        table.rows.append([4, 4.56, '2011-01-04', '2011-01-01 00:00:03', 'qwe'])
+        table.rows.append([5, 7.89, '2011-01-05', '2011-01-01 00:00:04', 'rty'])
+        table.rows.append([None, None, None, None, None])
+        table._identify_type_of_data()
+        self.assertEquals(table.types['spam'], int)
+        self.assertEquals(table.types['eggs'], float)
+        self.assertEquals(table.types['ham'], datetime.date)
+        self.assertEquals(table.types['Monty'], datetime.datetime)
+        self.assertEquals(table.types['Python'], str)
+
     def test_to_mysql_should_create_the_table_with_correct_data_types(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
@@ -166,7 +181,6 @@ class TestTableMySQL(unittest.TestCase):
         table.rows.append([4, 4.56, '2011-01-04', '2011-01-01 00:00:03', 'qwe'])
         table.rows.append([5, 7.89, '2011-01-05', '2011-01-01 00:00:04', 'rty'])
         table.to_mysql(self.connection_string)
-
         self.cursor.execute('DESCRIBE ' + self.table)
         data_types = dict([[x[0], x[1]] for x in self.cursor.fetchall()])
         self.assertTrue(data_types['spam'].startswith('int'))
@@ -175,12 +189,29 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(data_types['Monty'], 'datetime')
         self.assertEquals(data_types['Python'], 'text')
 
+    def test_None_should_be_saved_as_NULL_and_returned_as_None(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
+        table.rows.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
+        table.rows.append([2, 3.14, '2011-01-02', '2011-01-01 00:00:01', 'fgh'])
+        table.rows.append([3, 1.23, '2011-01-03', '2011-01-01 00:00:02', 'jkl'])
+        table.rows.append([4, 4.56, '2011-01-04', '2011-01-01 00:00:03', 'qwe'])
+        table.rows.append([5, 7.89, '2011-01-05', '2011-01-01 00:00:04', 'rty'])
+        table.rows.append([None, None, None, None, None])
+        table.to_mysql(self.connection_string)
+        self.cursor.execute('SELECT * FROM ' + self.table)
+        rows = self.cursor.fetchall()
+        self.assertIs(rows[-1][0], None)
+        self.assertIs(rows[-1][1], None)
+        self.assertIs(rows[-1][2], None)
+        self.assertIs(rows[-1][3], None)
+        self.assertIs(rows[-1][4], None)
+
     def test_should_threat_quotes_correctly(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['eggs'])
         table.rows.append(['spam"ham'])
         table.to_mysql(self.connection_string)
-
         table_2 = Table(from_mysql=self.connection_string)
         self.assertEquals(table_2.rows[0][0], 'spam"ham')
 
