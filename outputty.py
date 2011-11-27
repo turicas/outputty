@@ -33,9 +33,9 @@ class MyCSV(csv.Dialect):
 
 
 class Table(object):
-    def __init__(self, headers=[], dash='-', pipe='|', plus='+',
+    def __init__(self, headers=None, dash='-', pipe='|', plus='+',
                  input_encoding='utf8', output_encoding='utf8', from_csv=None):
-        self.headers = headers
+        self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
         self.plus = plus
@@ -147,7 +147,7 @@ class Histogram(object):
     def __init__(self, data, bins=10):
         """
         Class constructor
-        
+
         :Parameters:
             - `data`: array like object
         """

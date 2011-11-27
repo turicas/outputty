@@ -92,18 +92,18 @@ class TestTable(unittest.TestCase):
 
     def test_table_with_changed_separators(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], dash='=', pipe='-',
-                         plus=' ')
+                         plus='*')
         my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
         my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
         my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
         self.assertEqual(str(my_table), dedent('''\
-         ===== ====== ====== 
+        *=====*======*======*
         - ham - spam - eggs -
-         ===== ====== ====== 
+        *=====*======*======*
         -     -      -      -
         -   1 -    2 -    3 -
         -  11 -   22 -   33 -
-         ===== ====== ====== '''))
+        *=====*======*======*'''))
 
     def test_table_should_accept_rows_as_dict_list_tuple_int_or_float(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
@@ -220,3 +220,12 @@ class TestTable(unittest.TestCase):
         |  eggs |  spam |
         +-------+-------+
         ''').strip().decode('utf8'))
+
+    def test_headers_of_one_table_should_not_affect_other(self):
+        table_1 = Table()
+        table_1.headers.append('spam')
+        table_1.headers.append('eggs')
+        table_2 = Table()
+
+        self.assertEquals(len(table_1.headers), 2)
+        self.assertEquals(len(table_2.headers), 0)
