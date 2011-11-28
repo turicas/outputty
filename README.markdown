@@ -42,6 +42,15 @@ example, this code:
     |     Flávio |   Amieiro |
     +------------+-----------+
 
+And if do you want to access all table rows as dicts, just convert it:
+
+    rows = my_table.to_list_of_dicts()
+    print rows[1]['First name']
+
+...and you'll see:
+
+    Tatiana
+
 
 ### Example 2 -- `Table.to_csv`
 
@@ -52,7 +61,7 @@ If you want to export your data to CSV (Comma-Separated Values), just execute:
 ...and see it:
 
 
-    alvaro@ideas:~/outputty $ cat my-data.csv 
+    alvaro@ideas:~/outputty $ cat my-data.csv
     "First name","Last name"
     "Álvaro","Justen"
     "Tatiana","Al-Chueyr"

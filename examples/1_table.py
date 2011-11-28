@@ -7,3 +7,6 @@ my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
 my_table.rows.append(['Tatiana', 'Al-Chueyr'])
 my_table.rows.append(('Flávio', 'Amieiro'))
 print my_table
+
+rows = my_table.to_list_of_dicts()
+print rows[1]['First name']
