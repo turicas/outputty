@@ -92,18 +92,18 @@ class TestTable(unittest.TestCase):
 
     def test_table_with_changed_separators(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], dash='=', pipe='-',
-                         plus=' ')
+                         plus='*')
         my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
         my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
         my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
         self.assertEqual(str(my_table), dedent('''\
-         ===== ====== ====== 
+        *=====*======*======*
         - ham - spam - eggs -
-         ===== ====== ====== 
+        *=====*======*======*
         -     -      -      -
         -   1 -    2 -    3 -
         -  11 -   22 -   33 -
-         ===== ====== ====== '''))
+        *=====*======*======*'''))
 
     def test_table_should_accept_rows_as_dict_list_tuple_int_or_float(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
@@ -220,3 +220,20 @@ class TestTable(unittest.TestCase):
         |  eggs |  spam |
         +-------+-------+
         ''').strip().decode('utf8'))
+
+    def test_to_dict_should_return_a_list_of_dict_with_headers_as_keys(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'])
+        my_table.rows.append((123, 456, 789))
+        my_table.rows.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
+        my_table.rows.append((987, 654, 321))
+        my_dict = my_table.to_list_of_dicts()
+        self.assertEquals(len(my_dict), 3)
+        self.assertEquals(my_dict[0]['ham'], 123)
+        self.assertEquals(my_dict[0]['spam'], 456)
+        self.assertEquals(my_dict[0]['eggs'], 789)
+        self.assertEquals(my_dict[1]['ham'], 'abc')
+        self.assertEquals(my_dict[1]['spam'], 'def')
+        self.assertEquals(my_dict[1]['eggs'], 'ghi')
+        self.assertEquals(my_dict[2]['ham'], 987)
+        self.assertEquals(my_dict[2]['spam'], 654)
+        self.assertEquals(my_dict[2]['eggs'], 321)

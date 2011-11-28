@@ -119,6 +119,15 @@ class Table(object):
             headers = data[0]
             self.headers, self.rows = data[0], data[1:]
 
+    def to_list_of_dicts(self):
+        rows = []
+        for row in self.rows:
+            if isinstance(row, dict):
+                rows.append(row)
+            else:
+                rows.append(dict(zip(self.headers, row)))
+        return rows
+
     def to_csv(self, filename):
         self._organize_data()
         encoded_data = [[info.encode(self.output_encoding) for info in row] \
@@ -147,7 +156,7 @@ class Histogram(object):
     def __init__(self, data, bins=10):
         """
         Class constructor
-        
+
         :Parameters:
             - `data`: array like object
         """
