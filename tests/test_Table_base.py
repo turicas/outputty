@@ -221,6 +221,15 @@ class TestTable(unittest.TestCase):
         +-------+-------+
         ''').strip().decode('utf8'))
 
+    def test_headers_of_one_table_should_not_affect_other(self):
+        table_1 = Table()
+        table_1.headers.append('spam')
+        table_1.headers.append('eggs')
+        table_2 = Table()
+
+        self.assertEquals(len(table_1.headers), 2)
+        self.assertEquals(len(table_2.headers), 0)
+
     def test_to_dict_should_return_a_list_of_dict_with_headers_as_keys(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append((123, 456, 789))

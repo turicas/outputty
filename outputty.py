@@ -33,9 +33,9 @@ class MyCSV(csv.Dialect):
 
 
 class Table(object):
-    def __init__(self, headers=[], dash='-', pipe='|', plus='+',
+    def __init__(self, headers=None, dash='-', pipe='|', plus='+',
                  input_encoding='utf8', output_encoding='utf8', from_csv=None):
-        self.headers = headers
+        self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
         self.plus = plus
@@ -116,7 +116,6 @@ class Table(object):
         self.headers = []
         self.rows = []
         if data:
-            headers = data[0]
             self.headers, self.rows = data[0], data[1:]
 
     def to_list_of_dicts(self):
@@ -145,9 +144,9 @@ class Table(object):
 
 
 class Histogram(object):
-    __author__="fccoelho"
-    __date__ ="$12/10/2009 14:25:05$"
-    __license__="GPL v3"
+    __author__ = "fccoelho"
+    __date__ = "$12/10/2009 14:25:05$"
+    __license__ = "GPL v3"
     __docformat__ = "restructuredtext en"
 
     """
@@ -164,7 +163,7 @@ class Histogram(object):
         self.bins = bins
         self.h = histogram(self.data, bins=self.bins)
 
-    def horizontal(self, height=4, character ='|'):
+    def horizontal(self, height=4, character='|'):
         """Returns a multiline string containing a
         a horizontal histogram representation of self.data
 
@@ -229,7 +228,7 @@ class Histogram(object):
         lxl = [len(l) for l in xl]
         bars = self.h[0] / max(self.h[0]) * height
         his.append(' ' * (max(bars) + 2 + max(lxl)) + '%s\n' % max(self.h[0]))
-        for i,c in enumerate(bars):
+        for i, c in enumerate(bars):
             line = xl[i] + ' ' * (max(lxl) - lxl[i]) + ': ' + character * c
             his.append(line.rstrip())
         return '\n'.join(his)
