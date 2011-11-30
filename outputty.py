@@ -34,7 +34,8 @@ class MyCSV(csv.Dialect):
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8', from_csv=None):
+                 input_encoding='utf8', output_encoding='utf8', from_csv=None,
+                 order_by=None):
         self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
@@ -45,6 +46,7 @@ class Table(object):
         self.rows = []
         if from_csv:
             self._import_from_csv(from_csv)
+        self.order_by = order_by
 
     def _convert_to_unicode(self, element):
         if isinstance(element, (str, unicode)):
@@ -55,6 +57,11 @@ class Table(object):
     def _organize_data(self):
         result = []
         result.append([self._convert_to_unicode(x) for x in self.headers])
+
+        if self.order_by:
+            index = self.headers.index(self.order_by)
+            self.rows.sort(lambda x, y: cmp(x[index], y[index]))
+
         for row in self.rows:
             if isinstance(row, dict):
                 row_data = []

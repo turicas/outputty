@@ -246,3 +246,35 @@ class TestTable(unittest.TestCase):
         self.assertEquals(my_dict[2]['ham'], 987)
         self.assertEquals(my_dict[2]['spam'], 654)
         self.assertEquals(my_dict[2]['eggs'], 321)
+
+    def test_ordering_table_with_one_column(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append(('ham', ))
+        my_table.rows.append(('eggs', ))
+        my_table.rows.append(('idle', ))
+        output = dedent('''
+        +------+
+        | spam |
+        +------+
+        | eggs |
+        |  ham |
+        | idle |
+        +------+
+        ''').strip()
+        self.assertEqual(str(my_table), output)
+
+    def test_ordering_two_columns_table_by_second_header(self):
+        my_table = Table(headers=['spam', 'ham'], order_by='ham')
+        my_table.rows.append(('eggs', 'ham'))
+        my_table.rows.append(('ham', 'eggs'))
+        my_table.rows.append(('ham', '123'))
+        output = dedent('''
+        +------+------+
+        | spam | ham  |
+        +------+------+
+        |  ham |  123 |
+        |  ham | eggs |
+        | eggs |  ham |
+        +------+------+
+        ''').strip()
+        self.assertEqual(str(my_table), output)
