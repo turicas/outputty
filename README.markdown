@@ -96,7 +96,34 @@ The code:
     +----+---------+-------------------------+
 
 
-### Example 4 -- `Histogram`
+### Example 4 -- `Table(order_by=<header_name>`
+
+To order the columns of a `Table` by some header see this code:
+
+    #!/usr/bin/env python
+    # coding: utf-8
+
+    from outputty import Table
+    my_table = Table(headers=['First name', 'Last name'], order_by='Last name')
+    my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+    my_table.rows.append({'First name': 'Renne'})
+    my_table.rows.append(['Tatiana', 'Al-Chueyr'])
+    my_table.rows.append(('Flávio', 'Amieiro'))
+    print my_table
+
+...will produce:
+
+    +------------+-----------+
+    | First name | Last name |
+    +------------+-----------+
+    |     Renne  |           |
+    |    Tatiana | Al-Chueyr |
+    |     Flávio |   Amieiro |
+    |     Álvaro |    Justen |
+    +------------+-----------+
+
+
+### Example 5 -- `Histogram`
 
 This code:
 
