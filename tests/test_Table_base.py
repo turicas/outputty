@@ -297,20 +297,20 @@ class TestTable(unittest.TestCase):
     def test_ordering_table_with_rows_as_dict_list_tuple(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
         my_table.rows.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
-        my_table.rows.append({'ham': 'eggs', 'eggs': 'spam'})
+        my_table.rows.append({'ham': 'eggs', 'spam': 'python', 'eggs': 'spam'})
         my_table.rows.append([1, 42, 3])
         my_table.rows.append([3.14, 2.71, 0.0])
         my_table.rows.append(('spam', 'eggs', 'ham'))
         self.assertEqual(str(my_table), dedent('''
-        +------+------+------+
-        | ham  | spam | eggs |
-        +------+------+------+
-        | eggs |      | spam |
-        | 3.14 | 2.71 |  0.0 |
-        |    1 |   42 |    3 |
-        | spam | eggs |  ham |
-        | eggs |  ham | spam |
-        +------+------+------+
+        +------+--------+------+
+        | ham  |  spam  | eggs |
+        +------+--------+------+
+        | 3.14 |   2.71 |  0.0 |
+        |    1 |     42 |    3 |
+        | spam |   eggs |  ham |
+        | eggs |    ham | spam |
+        | eggs | python | spam |
+        +------+--------+------+
         ''').strip())
 
     def test_ordering_table_without_data(self):
