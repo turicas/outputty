@@ -320,3 +320,35 @@ class TestTable(unittest.TestCase):
         | ham | spam | eggs |
         +-----+------+------+
         ''').strip())
+
+    def test_ordering_numbers(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append([5])
+        my_table.rows.append([42])
+        my_table.rows.append([3.14])
+        self.assertEqual(str(my_table), dedent('''
+        +------+
+        | spam |
+        +------+
+        | 3.14 |
+        |    5 |
+        |   42 |
+        +------+
+        ''').strip())
+
+    def test_ordering_numbers_as_strings(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append(['5'])
+        my_table.rows.append([31])
+        my_table.rows.append(['42'])
+        self.assertEqual(str(my_table), dedent('''
+        +------+
+        | spam |
+        +------+
+        |   31 |
+        |   42 |
+        |    5 |
+        +------+
+        ''').strip())
+
+    #TODO: identify data types before ordering

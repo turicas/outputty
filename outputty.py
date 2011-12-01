@@ -49,7 +49,7 @@ class Table(object):
         self.order_by = order_by
 
     def _convert_to_unicode(self, element):
-        if isinstance(element, (str, unicode)):
+        if isinstance(element, str):
             return element.decode(self.input_encoding)
         else:
             return unicode(element)
@@ -64,9 +64,9 @@ class Table(object):
                 for header_name in self.headers:
                     if header_name not in row:
                         row[header_name] = ''
-                    row_data.append(self._convert_to_unicode(row[header_name]))
+                    row_data.append(row[header_name])
             else:
-                row_data = [self._convert_to_unicode(info) for info in row]
+                row_data = row
             result.append(row_data)
 
         if self.order_by:
@@ -75,7 +75,14 @@ class Table(object):
             result.sort(lambda x, y: cmp(x[index], y[index]))
             result.insert(0, headers)
 
-        self.data = result
+        unicode_result = []
+        for row in result:
+            new_row = []
+            for value in row:
+                new_row.append(self._convert_to_unicode(value))
+            unicode_result.append(new_row)
+
+        self.data = unicode_result
 
     def _define_maximum_column_sizes(self):
         self.max_size = {}
