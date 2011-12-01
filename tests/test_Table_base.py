@@ -278,3 +278,45 @@ class TestTable(unittest.TestCase):
         +------+------+
         ''').strip()
         self.assertEqual(str(my_table), output)
+
+    def test_ordering_table_with_missing_column_in_some_rows(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
+        my_table.rows.append({'spam': 4567, 'eggs': 8910})
+        my_table.rows.append({'ham': 321, 'eggs': 1098})
+        my_table.rows.append({'ham': 'abc', 'spam': 'defg'})
+        self.assertEqual(str(my_table), dedent('''
+        +-----+------+------+
+        | ham | spam | eggs |
+        +-----+------+------+
+        | 321 |      | 1098 |
+        |     | 4567 | 8910 |
+        | abc | defg |      |
+        +-----+------+------+
+        ''').strip())
+
+    def test_ordering_table_with_rows_as_dict_list_tuple(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
+        my_table.rows.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
+        my_table.rows.append({'ham': 'eggs', 'eggs': 'spam'})
+        my_table.rows.append([1, 42, 3])
+        my_table.rows.append([3.14, 2.71, 0.0])
+        my_table.rows.append(('spam', 'eggs', 'ham'))
+        self.assertEqual(str(my_table), dedent('''
+        +------+------+------+
+        | ham  | spam | eggs |
+        +------+------+------+
+        | eggs |      | spam |
+        | 3.14 | 2.71 |  0.0 |
+        |    1 |   42 |    3 |
+        | spam | eggs |  ham |
+        | eggs |  ham | spam |
+        +------+------+------+
+        ''').strip())
+
+    def test_ordering_table_without_data(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
+        self.assertEqual(str(my_table), dedent('''
+        +-----+------+------+
+        | ham | spam | eggs |
+        +-----+------+------+
+        ''').strip())

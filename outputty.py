@@ -58,10 +58,6 @@ class Table(object):
         result = []
         result.append([self._convert_to_unicode(x) for x in self.headers])
 
-        if self.order_by:
-            index = self.headers.index(self.order_by)
-            self.rows.sort(lambda x, y: cmp(x[index], y[index]))
-
         for row in self.rows:
             if isinstance(row, dict):
                 row_data = []
@@ -72,6 +68,13 @@ class Table(object):
             else:
                 row_data = [self._convert_to_unicode(info) for info in row]
             result.append(row_data)
+
+        if self.order_by:
+            headers = result.pop(0)
+            index = headers.index(self.order_by)
+            result.sort(lambda x, y: cmp(x[index], y[index]))
+            result.insert(0, headers)
+
         self.data = result
 
     def _define_maximum_column_sizes(self):
