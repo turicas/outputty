@@ -54,6 +54,18 @@ class Table(object):
         else:
             return unicode(element)
 
+    def _order_result(self, result):
+        headers = result.pop(0)
+
+        index = 0
+        if self.order_by:
+            index = headers.index(self.order_by)
+
+        result.sort(lambda x, y: cmp(x[index], y[index]))
+        result.insert(0, headers)
+
+        return result
+
     def _organize_data(self):
         result = []
         result.append([self._convert_to_unicode(x) for x in self.headers])
@@ -70,10 +82,7 @@ class Table(object):
             result.append(row_data)
 
         if self.order_by:
-            headers = result.pop(0)
-            index = headers.index(self.order_by)
-            result.sort(lambda x, y: cmp(x[index], y[index]))
-            result.insert(0, headers)
+            result = self._order_result(result)
 
         unicode_result = []
         for row in result:
