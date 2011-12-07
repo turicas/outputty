@@ -336,6 +336,7 @@ class TestTable(unittest.TestCase):
         +------+
         ''').strip())
 
+    @unittest.skip("still discussing how to handle this scenario")
     def test_ordering_numbers_as_strings(self):
         my_table = Table(headers=['spam'], order_by='spam')
         my_table.rows.append(['5'])
