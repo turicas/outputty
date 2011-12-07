@@ -281,17 +281,17 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_table_with_missing_column_in_some_rows(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
-        my_table.rows.append({'spam': 4567, 'eggs': 8910})
-        my_table.rows.append({'ham': 321, 'eggs': 1098})
-        my_table.rows.append({'ham': 'abc', 'spam': 'defg'})
+        my_table.rows.append({'spam': 'Eric', 'eggs': 'Idle'})
+        my_table.rows.append({'ham': 'John', 'eggs': 'Cleese'})
+        my_table.rows.append({'ham': 'Terry', 'spam': 'Jones'})
         self.assertEqual(str(my_table), dedent('''
-        +-----+------+------+
-        | ham | spam | eggs |
-        +-----+------+------+
-        | 321 |      | 1098 |
-        |     | 4567 | 8910 |
-        | abc | defg |      |
-        +-----+------+------+
+        +-------+-------+--------+
+        |  ham  |  spam |  eggs  |
+        +-------+-------+--------+
+        |  John |       | Cleese |
+        |       |  Eric |   Idle |
+        | Terry | Jones |        |
+        +-------+-------+--------+
         ''').strip())
 
     def test_ordering_table_with_rows_as_dict_list_tuple(self):
