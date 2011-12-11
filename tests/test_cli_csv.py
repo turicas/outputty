@@ -112,3 +112,16 @@ class TestOutputtyCli(unittest.TestCase):
         self.assertEquals(process.returncode, 2)
         expected_error = "[Errno 13] Permission denied: '/root/test'\n"
         self.assertEquals(process.stderr.read(), expected_error)
+
+    def test_from_stdin_with_input_encoding(self):
+        input_string = u'álvaro\ntesting'.encode('utf16')
+        out, err = execute('--table --from-csv --input-encoding utf16',
+                           input_string)
+        print err
+        self.assertEquals(out, dedent('''
+        +---------+
+        |  álvaro |
+        +---------+
+        | testing |
+        +---------+
+        ''').strip() + '\n')

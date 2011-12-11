@@ -31,38 +31,38 @@ parser.add_argument('--to-csv', dest='to_csv', help='Export data to CSV file',
                     action='store', metavar='filename', default='', nargs='?')
 parser.add_argument('--from-csv', dest='from_csv', help='Import data from CSV',
                     action='store', metavar='filename', default='', nargs='?')
+parser.add_argument('--input-encoding', dest='input_encoding',
+                    help='Set new input encoding (default: UTF-8)',
+                    action='store', metavar='encoding', default='utf8',
+                    nargs='?')
 
 args = parser.parse_args()
 if not args.table:
     parser.print_help()
 else:
-    if args.from_csv:
-        input_filename = args.from_csv
-    else:
-        input_filename = sys.stdin
-
+    input_filename = args.from_csv or sys.stdin
     try:
-        table = Table(from_csv=input_filename)
+        table = Table(from_csv=input_filename,
+                      input_encoding=args.input_encoding)
     except IOError as exception:
         sys.stderr.write(str(exception) + '\n')
         exit(1)
 
-    if args.to_csv != '': #if passed "--to-csv"
-        if args.to_csv is None: #--to-csv without filename
-            temp_fp = tempfile.NamedTemporaryFile(delete=False)
-            temp_fp.close()
-            table.to_csv(temp_fp.name)
-            fp = open(temp_fp.name)
-            contents = fp.read()
-            fp.close()
-            os.remove(temp_fp.name)
-            print contents
-        else:
-            filename = args.to_csv
-            try:
-                table.to_csv(filename)
-            except IOError as exception:
-                sys.stderr.write(str(exception) + '\n')
-                exit(2)
+    if args.to_csv is None: #--to-csv without filename
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        table.to_csv(temp_fp.name)
+        fp = open(temp_fp.name)
+        contents = fp.read()
+        fp.close()
+        os.remove(temp_fp.name)
+        print contents
+    elif args.to_csv:
+        filename = args.to_csv
+        try:
+            table.to_csv(filename)
+        except IOError as exception:
+            sys.stderr.write(str(exception) + '\n')
+            exit(2)
     else:
         print table
