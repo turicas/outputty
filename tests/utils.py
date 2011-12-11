@@ -37,4 +37,4 @@ def execute(arguments='', stdin=''):
     process.stdin.write(stdin)
     process.stdin.close()
     process.wait()
-    return process.stdout.read()
+    return process.stdout.read(), process.stderr.read()

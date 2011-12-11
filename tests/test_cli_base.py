@@ -26,11 +26,11 @@ class TestOutputtyCli(unittest.TestCase):
         self.assertEquals(process.err, '')
 
     def test_outputty_without_parameters_should_return_help(self):
-        output = execute()
+        out, err = execute()
         help_string = 'Show data in terminal in a beautiful way, with Python'
-        self.assertIn(help_string, output)
-        self.assertIn('usage', output)
-        self.assertIn('optional arguments', output)
+        self.assertIn(help_string, out)
+        self.assertIn('usage', out)
+        self.assertIn('optional arguments', out)
 
     #TODO: add tests to --input-encoding and --output-encoding
     #TODO: add parameter to change `dash`, `pipe` and `plus`
