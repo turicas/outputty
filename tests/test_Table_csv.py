@@ -136,3 +136,38 @@ class TestTableCsv(unittest.TestCase):
         +--------+
         ''').strip().decode('utf8').encode('utf16')
         self.assertEqual(str(my_table), output)
+
+    def test_from_csv_as_filepointer(self):
+        data = '"Álvaro"\n"Píton"'
+        temp_fp = tempfile.NamedTemporaryFile()
+        temp_fp.write(data)
+        temp_fp.seek(0)
+        my_table = Table(from_csv=temp_fp)
+        output = dedent('''
+        +--------+
+        | Álvaro |
+        +--------+
+        |  Píton |
+        +--------+
+        ''').strip()
+        table_output = str(my_table)
+        temp_fp.close()
+        self.assertEqual(table_output, output)
+
+    def test_input_encoding_in_parameter_from_csv_as_filepointer(self):
+        data = '"Álvaro"\n"Píton"'
+        temp_fp = tempfile.NamedTemporaryFile()
+        temp_fp.write(data.decode('utf8').encode('utf16'))
+        temp_fp.seek(0)
+        my_table = Table(from_csv=temp_fp, input_encoding='utf16',
+                         output_encoding='iso-8859-1')
+        output = dedent('''
+        +--------+
+        | Álvaro |
+        +--------+
+        |  Píton |
+        +--------+
+        ''').strip().decode('utf8').encode('iso-8859-1')
+        table_output = str(my_table)
+        temp_fp.close()
+        self.assertEqual(table_output, output)
