@@ -205,3 +205,4 @@ Related Software
 - [tablib](https://github.com/kennethreitz/tablib)
 - [clint](https://github.com/kennethreitz/clint)
 - [csvstudio](http://code.google.com/p/csvstudio/)
+- [PyTables](http://www.pytables.org/)
