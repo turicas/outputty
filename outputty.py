@@ -42,7 +42,7 @@ class Table(object):
             self._import_from_csv(from_csv)
 
     def _convert_to_unicode(self, element):
-        if isinstance(element, (str, unicode)):
+        if isinstance(element, (str)):
             return element.decode(self.input_encoding)
         else:
             return unicode(element)
@@ -104,15 +104,16 @@ class Table(object):
         else:
             fp = file_name_or_pointer
         self.fp = fp
-        reader = csv.reader(fp)
-        data = list(reader)  # reader is an iterator
+        info = fp.read().decode(self.input_encoding).encode('utf8')
+        reader = csv.reader(info.split('\n'))
+        self.data = [x for x in reader if x]
         if self.csv_filename:
             fp.close()
         self.headers = []
         self.rows = []
-        if data:
-            headers = data[0]
-            self.headers, self.rows = data[0], data[1:]
+        if self.data:
+            self.headers = [x.decode('utf8') for x in self.data[0]]
+            self.rows = [[y.decode('utf8') for y in x] for x in self.data[1:]]
 
     def to_csv(self, filename):
         self._organize_data()
