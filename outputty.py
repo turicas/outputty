@@ -34,7 +34,8 @@ class MyCSV(csv.Dialect):
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8', from_csv=None):
+                 input_encoding='utf8', output_encoding='utf8', from_csv='',
+                 order_by='', ordering=''):
         self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
@@ -45,32 +46,62 @@ class Table(object):
         self.rows = []
         if from_csv:
             self._import_from_csv(from_csv)
+        self.order_by_column = order_by
+        self.ordering = ordering
 
     def _convert_to_unicode(self, element):
-        if isinstance(element, (str)):
+        if isinstance(element, str):
             return element.decode(self.input_encoding)
         else:
             return unicode(element)
 
+    def order_by(self, column, ordering='asc'):
+        if not hasattr(self, 'data'):
+            self.order_by_column = column
+            self.ordering = ordering
+            self._organize_data()
+        else:
+            headers = self.data.pop(0)
+            index = headers.index(column)
+            if ordering.lower().startswith('desc'):
+                sort_function = lambda x, y: cmp(y[index], x[index])
+            else:
+                sort_function = lambda x, y: cmp(x[index], y[index])
+            self.data.sort(sort_function)
+            self.data.insert(0, headers)
+
     def _organize_data(self):
         result = []
         result.append([self._convert_to_unicode(x) for x in self.headers])
+
         for row in self.rows:
             if isinstance(row, dict):
                 row_data = []
                 for header_name in self.headers:
                     if header_name not in row:
                         row[header_name] = ''
-                    row_data.append(self._convert_to_unicode(row[header_name]))
+                    row_data.append(row[header_name])
             else:
-                row_data = [self._convert_to_unicode(info) for info in row]
+                row_data = row
             result.append(row_data)
-        self.data = result
+
+        unicode_result = []
+        for row in result:
+            new_row = []
+            for value in row:
+                if isinstance(value, str):
+                    value = self._convert_to_unicode(value)
+                new_row.append(value)
+            unicode_result.append(new_row)
+
+        self.data = unicode_result
+        if self.order_by_column:
+            self.order_by(self.order_by_column, self.ordering)
 
     def _define_maximum_column_sizes(self):
         self.max_size = {}
         for column in zip(*self.data):
-            self.max_size[column[0]] = max([len(x) for x in column])
+            self.max_size[column[0]] = max([len(unicode(x)) for x in column])
 
     def _make_line_from_row_data(self, row_data):
         return '%s %s %s' % (self.pipe, (' %s ' % self.pipe).join(row_data),
@@ -92,7 +123,7 @@ class Table(object):
         for row in rows:
             row_data = []
             for i, info in enumerate(row):
-                data = info.rjust(self.max_size[unicode_headers[i]])
+                data = unicode(info).rjust(self.max_size[unicode_headers[i]])
                 row_data.append(data)
             result.append(self._make_line_from_row_data(row_data))
         if self.rows:

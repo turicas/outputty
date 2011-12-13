@@ -96,7 +96,53 @@ The code:
     +----+---------+-------------------------+
 
 
-### Example 4 -- `Table.to_html(filename='')`
+### Example 4 -- `Table(order_by='header_name'[, ordering='asc|desc'])`
+
+You can specify to order data in your table with the parameters `order_by` and
+`ordering`. For example:
+
+    #!/usr/bin/env python
+    # coding: utf-8
+
+    from outputty import Table
+    my_table = Table(headers=['First name', 'Last name'], order_by='Last name')
+    my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+    my_table.rows.append({'First name': 'Renne'})
+    my_table.rows.append(['Tatiana', 'Al-Chueyr'])
+    my_table.rows.append(('Flávio', 'Amieiro'))
+    print my_table
+
+...will produce:
+
+    +------------+-----------+
+    | First name | Last name |
+    +------------+-----------+
+    |     Renne  |           |
+    |    Tatiana | Al-Chueyr |
+    |     Flávio |   Amieiro |
+    |     Álvaro |    Justen |
+    +------------+-----------+
+
+You can also order data using the method `order_by`. For example:
+
+    from outputty import Table
+    my_table = Table(headers=['Programming Languages'])
+    my_table.rows.extend([['Python'], ['Bash scripting'], ['C']])
+    my_table.order_by('Programming Languages') #ordering = 'asc' by default
+    print my_table
+
+...will print:
+
+    +-----------------------+
+    | Programming Languages |
+    +-----------------------+
+    |        Bash scripting |
+    |                     C |
+    |                Python |
+    +-----------------------+
+
+
+### Example 5 -- `Table.to_html(filename='')`
 
 You can export your data to HTML using the method `to_html`. If you don't pass
 any parameter it'll return a string (encoded with `output_encoding`, specified
@@ -136,7 +182,7 @@ The code:
     </table>
 
 
-### Example 5 -- `Histogram`
+### Example 6 -- `Histogram`
 
 This code:
 

@@ -246,3 +246,202 @@ class TestTable(unittest.TestCase):
         self.assertEquals(my_dict[2]['ham'], 987)
         self.assertEquals(my_dict[2]['spam'], 654)
         self.assertEquals(my_dict[2]['eggs'], 321)
+
+    def test_ordering_table_with_one_column(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append(('ham', ))
+        my_table.rows.append(('eggs', ))
+        my_table.rows.append(('idle', ))
+        output = dedent('''
+        +------+
+        | spam |
+        +------+
+        | eggs |
+        |  ham |
+        | idle |
+        +------+
+        ''').strip()
+        self.assertEqual(str(my_table), output)
+
+    def test_ordering_two_columns_table_by_second_header(self):
+        my_table = Table(headers=['spam', 'ham'], order_by='ham')
+        my_table.rows.append(('eggs', 'ham'))
+        my_table.rows.append(('ham', 'eggs'))
+        my_table.rows.append(('ham', '123'))
+        output = dedent('''
+        +------+------+
+        | spam | ham  |
+        +------+------+
+        |  ham |  123 |
+        |  ham | eggs |
+        | eggs |  ham |
+        +------+------+
+        ''').strip()
+        self.assertEqual(str(my_table), output)
+
+    def test_ordering_table_with_missing_column_in_some_rows(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
+        my_table.rows.append({'spam': 'Eric', 'eggs': 'Idle'})
+        my_table.rows.append({'ham': 'John', 'eggs': 'Cleese'})
+        my_table.rows.append({'ham': 'Terry', 'spam': 'Jones'})
+        self.assertEqual(str(my_table), dedent('''
+        +-------+-------+--------+
+        |  ham  |  spam |  eggs  |
+        +-------+-------+--------+
+        |  John |       | Cleese |
+        |       |  Eric |   Idle |
+        | Terry | Jones |        |
+        +-------+-------+--------+
+        ''').strip())
+
+    def test_ordering_table_with_rows_as_dict_list_tuple(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
+        my_table.rows.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
+        my_table.rows.append({'ham': 'eggs', 'spam': 'python', 'eggs': 'spam'})
+        my_table.rows.append([1, 42, 3])
+        my_table.rows.append([3.14, 2.71, 0.0])
+        my_table.rows.append(('spam', 'eggs', 'ham'))
+        self.assertEqual(str(my_table), dedent('''
+        +------+--------+------+
+        | ham  |  spam  | eggs |
+        +------+--------+------+
+        | 3.14 |   2.71 |  0.0 |
+        |    1 |     42 |    3 |
+        | spam |   eggs |  ham |
+        | eggs |    ham | spam |
+        | eggs | python | spam |
+        +------+--------+------+
+        ''').strip())
+
+    def test_ordering_table_without_data(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
+        self.assertEqual(str(my_table), dedent('''
+        +-----+------+------+
+        | ham | spam | eggs |
+        +-----+------+------+
+        ''').strip())
+
+    def test_ordering_numbers(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append([5])
+        my_table.rows.append([42])
+        my_table.rows.append([3.14])
+        self.assertEqual(str(my_table), dedent('''
+        +------+
+        | spam |
+        +------+
+        | 3.14 |
+        |    5 |
+        |   42 |
+        +------+
+        ''').strip())
+
+    def test_ordering_numbers_as_strings(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append(['5'])
+        my_table.rows.append([31])
+        my_table.rows.append(['42'])
+        self.assertEqual(str(my_table), dedent('''
+        +------+
+        | spam |
+        +------+
+        |   31 |
+        |   42 |
+        |    5 |
+        +------+
+        ''').strip())
+
+    def test_ordering_unicode(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append(['á'])
+        my_table.rows.append(['Á'])
+        self.assertEqual(str(my_table), dedent('''
+        +------+
+        | spam |
+        +------+
+        |    Á |
+        |    á |
+        +------+
+        ''').strip())
+
+    def test_ordering_descending(self):
+        table = Table(headers=['spam'], order_by='spam', ordering='descending')
+        table.rows.extend([[5], [3], [7], [10]])
+        table_2 = Table(headers=['spam'], order_by='spam', ordering='desc')
+        table_2.rows.extend([[5], [3], [7], [10]])
+        table_3 = Table(headers=['spam'], order_by='spam',
+                        ordering='DESCENDING')
+        table_3.rows.extend([[5], [3], [7], [10]])
+        table_4 = Table(headers=['spam'], order_by='spam', ordering='DESC')
+        table_4.rows.extend([[5], [3], [7], [10]])
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |   10 |
+        |    7 |
+        |    5 |
+        |    3 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+        self.assertEqual(str(table_2), expected_output)
+        self.assertEqual(str(table_3), expected_output)
+        self.assertEqual(str(table_4), expected_output)
+
+    def test_ordering_ascending(self):
+        table = Table(headers=['spam'], order_by='spam', ordering='ascending')
+        table.rows.extend([[5], [3], [7], [10]])
+        table_2 = Table(headers=['spam'], order_by='spam', ordering='asc')
+        table_2.rows.extend([[5], [3], [7], [10]])
+        table_3 = Table(headers=['spam'], order_by='spam',
+                        ordering='ASCENDING')
+        table_3.rows.extend([[5], [3], [7], [10]])
+        table_4 = Table(headers=['spam'], order_by='spam', ordering='ASC')
+        table_4.rows.extend([[5], [3], [7], [10]])
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |    3 |
+        |    5 |
+        |    7 |
+        |   10 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+        self.assertEqual(str(table_2), expected_output)
+
+    def test_order_by_method_should_order_data_internally(self):
+        table = Table(headers=['spam'])
+        table.rows.extend([[5], [3], [7], [10]])
+        table.order_by('spam', 'asc')
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |    3 |
+        |    5 |
+        |    7 |
+        |   10 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+
+    def test_order_by_method_should_order_ascending_by_default(self):
+        table = Table(headers=['spam'])
+        table.rows.extend([[5], [3], [7], [10]])
+        table.order_by('spam')
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |    3 |
+        |    5 |
+        |    7 |
+        |   10 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+
+    #TODO: identify data types before ordering and from_csv
