@@ -34,8 +34,8 @@ class MyCSV(csv.Dialect):
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8', from_csv=None,
-                 order_by=None, ordering='ascending'):
+                 input_encoding='utf8', output_encoding='utf8', from_csv='',
+                 order_by='', ordering=''):
         self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
@@ -55,7 +55,7 @@ class Table(object):
         else:
             return unicode(element)
 
-    def order_by(self, column, ordering):
+    def order_by(self, column, ordering='asc'):
         if not hasattr(self, 'data'):
             self.order_by_column = column
             self.ordering = ordering

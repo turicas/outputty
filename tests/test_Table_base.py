@@ -428,4 +428,20 @@ class TestTable(unittest.TestCase):
         ''').strip()
         self.assertEqual(str(table), expected_output)
 
+    def test_order_by_method_should_order_ascending_by_default(self):
+        table = Table(headers=['spam'])
+        table.rows.extend([[5], [3], [7], [10]])
+        table.order_by('spam')
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |    3 |
+        |    5 |
+        |    7 |
+        |   10 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+
     #TODO: identify data types before ordering and from_csv

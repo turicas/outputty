@@ -96,9 +96,10 @@ The code:
     +----+---------+-------------------------+
 
 
-### Example 4 -- `Table(order_by=<header_name>`
+### Example 4 -- `Table(order_by='header_name'[, ordering='asc|desc'])`
 
-To order the columns of a `Table` by some header see this code:
+You can specify to order data in your table with the parameters `order_by` and
+`ordering`. For example:
 
     #!/usr/bin/env python
     # coding: utf-8
@@ -121,6 +122,24 @@ To order the columns of a `Table` by some header see this code:
     |     Flávio |   Amieiro |
     |     Álvaro |    Justen |
     +------------+-----------+
+
+You can also order data using the method `order_by`. For example:
+
+    from outputty import Table
+    my_table = Table(headers=['Programming Languages'])
+    my_table.rows.extend([['Python'], ['Bash scripting'], ['C']])
+    my_table.order_by('Programming Languages') #ordering = 'asc' by default
+    print my_table
+
+...will print:
+
+    +-----------------------+
+    | Programming Languages |
+    +-----------------------+
+    |        Bash scripting |
+    |                     C |
+    |                Python |
+    +-----------------------+
 
 
 ### Example 5 -- `Histogram`
