@@ -180,20 +180,30 @@ class Table(object):
         if len(self.data) == 1 and not self.data[0]:
             return unicode()
         unicode_headers, rows = self.data[0], self.data[1:]
-        result = ['<table>', '  <tr>']
+        if self.css_classes:
+            result = ['<table>', '  <tr class="header">']
+        else:
+            result = ['<table>', '  <tr>']
         for header in unicode_headers:
             result.append('    <th>%s</th>' % header)
         result.append('  </tr>')
 
+        i = 1
         for row in rows:
-            result.append('  <tr>')
+            if self.css_classes:
+                result.append('  <tr class="%s">' % \
+                              ('odd' if i % 2 else 'even'))
+            else:
+                result.append('  <tr>')
             for value in row:
                 result.append('    <td>%s</td>' % value)
             result.append('  </tr>')
+            i += 1
         result.append('</table>')
         return '\n'.join(result)
 
-    def to_html(self, filename=''):
+    def to_html(self, filename='', css_classes=True):
+        self.css_classes = css_classes
         contents = self._to_html_unicode().encode(self.output_encoding)
         if not filename:
             return contents
