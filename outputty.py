@@ -162,9 +162,9 @@ class Table(object):
         result.append('</table>')
         return '\n'.join(result)
 
-    def to_html(self, filename=None):
+    def to_html(self, filename=''):
         contents = self._to_html_unicode().encode(self.output_encoding)
-        if filename is None:
+        if not filename:
             return contents
         else:
             fp = open(filename, 'w')

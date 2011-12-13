@@ -96,7 +96,47 @@ The code:
     +----+---------+-------------------------+
 
 
-### Example 4 -- `Histogram`
+### Example 4 -- `Table.to_html(filename='')`
+
+You can export your data to HTML using the method `to_html`. If you don't pass
+any parameter it'll return a string (encoded with `output_encoding`, specified
+in `Table.__init__`). But you can pass one parameter: the filename to be saved
+with the HTML inside.
+
+The code:
+
+    from outputty import Table
+    my_table = Table(from_csv='nice-software.csv')
+    my_table.to_html('nice-software.html')
+
+
+...will create the filename `nice-software.html` with this content:
+
+    <table>
+      <tr>
+        <th>id</th>
+        <th>name</th>
+        <th>website</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Python</td>
+        <td>http://www.python.org/</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>OpenSSH</td>
+        <td>http://www.openssh.com/</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>fabric</td>
+        <td>http://fabfile.org/</td>
+      </tr>
+    </table>
+
+
+### Example 5 -- `Histogram`
 
 This code:
 
