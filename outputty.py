@@ -61,8 +61,8 @@ class Table(object):
         if self.order_by:
             index = headers.index(self.order_by)
 
-        result.sort(lambda x, y: cmp(x[index], y[index]))
-        result.insert(0, headers)
+            result.sort(lambda x, y: cmp(x[index], y[index]))
+            result.insert(0, headers)
 
         return result
 
@@ -81,22 +81,24 @@ class Table(object):
                 row_data = row
             result.append(row_data)
 
-        if self.order_by:
-            result = self._order_result(result)
-
         unicode_result = []
         for row in result:
             new_row = []
             for value in row:
-                new_row.append(self._convert_to_unicode(value))
+                if isinstance(value, str):
+                    value = self._convert_to_unicode(value)
+                new_row.append(value)
             unicode_result.append(new_row)
 
-        self.data = unicode_result
+        if self.order_by:
+            self.data = self._order_result(unicode_result)
+        else:
+            self.data = unicode_result
 
     def _define_maximum_column_sizes(self):
         self.max_size = {}
         for column in zip(*self.data):
-            self.max_size[column[0]] = max([len(x) for x in column])
+            self.max_size[column[0]] = max([len(unicode(x)) for x in column])
 
     def _make_line_from_row_data(self, row_data):
         return '%s %s %s' % (self.pipe, (' %s ' % self.pipe).join(row_data),
@@ -118,7 +120,7 @@ class Table(object):
         for row in rows:
             row_data = []
             for i, info in enumerate(row):
-                data = info.rjust(self.max_size[unicode_headers[i]])
+                data = unicode(info).rjust(self.max_size[unicode_headers[i]])
                 row_data.append(data)
             result.append(self._make_line_from_row_data(row_data))
         if self.rows:
