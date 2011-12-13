@@ -35,7 +35,7 @@ class MyCSV(csv.Dialect):
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
                  input_encoding='utf8', output_encoding='utf8', from_csv=None,
-                 order_by=None):
+                 order_by=None, ordering='ascending'):
         self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
@@ -46,7 +46,8 @@ class Table(object):
         self.rows = []
         if from_csv:
             self._import_from_csv(from_csv)
-        self.order_by = order_by
+        self.order_by_column = order_by
+        self.ordering = ordering
 
     def _convert_to_unicode(self, element):
         if isinstance(element, str):
@@ -54,17 +55,20 @@ class Table(object):
         else:
             return unicode(element)
 
-    def _order_result(self, result):
-        headers = result.pop(0)
-
-        index = 0
-        if self.order_by:
-            index = headers.index(self.order_by)
-
-            result.sort(lambda x, y: cmp(x[index], y[index]))
-            result.insert(0, headers)
-
-        return result
+    def order_by(self, column, ordering):
+        if not hasattr(self, 'data'):
+            self.order_by_column = column
+            self.ordering = ordering
+            self._organize_data()
+        else:
+            headers = self.data.pop(0)
+            index = headers.index(column)
+            if ordering.lower().startswith('desc'):
+                sort_function = lambda x, y: cmp(y[index], x[index])
+            else:
+                sort_function = lambda x, y: cmp(x[index], y[index])
+            self.data.sort(sort_function)
+            self.data.insert(0, headers)
 
     def _organize_data(self):
         result = []
@@ -90,10 +94,9 @@ class Table(object):
                 new_row.append(value)
             unicode_result.append(new_row)
 
-        if self.order_by:
-            self.data = self._order_result(unicode_result)
-        else:
-            self.data = unicode_result
+        self.data = unicode_result
+        if self.order_by_column:
+            self.order_by(self.order_by_column, self.ordering)
 
     def _define_maximum_column_sizes(self):
         self.max_size = {}

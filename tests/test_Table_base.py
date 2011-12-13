@@ -363,4 +363,69 @@ class TestTable(unittest.TestCase):
         |    á |
         +------+
         ''').strip())
-    #TODO: identify data types before ordering for CSV
+
+    def test_ordering_descending(self):
+        table = Table(headers=['spam'], order_by='spam', ordering='descending')
+        table.rows.extend([[5], [3], [7], [10]])
+        table_2 = Table(headers=['spam'], order_by='spam', ordering='desc')
+        table_2.rows.extend([[5], [3], [7], [10]])
+        table_3 = Table(headers=['spam'], order_by='spam',
+                        ordering='DESCENDING')
+        table_3.rows.extend([[5], [3], [7], [10]])
+        table_4 = Table(headers=['spam'], order_by='spam', ordering='DESC')
+        table_4.rows.extend([[5], [3], [7], [10]])
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |   10 |
+        |    7 |
+        |    5 |
+        |    3 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+        self.assertEqual(str(table_2), expected_output)
+        self.assertEqual(str(table_3), expected_output)
+        self.assertEqual(str(table_4), expected_output)
+
+    def test_ordering_ascending(self):
+        table = Table(headers=['spam'], order_by='spam', ordering='ascending')
+        table.rows.extend([[5], [3], [7], [10]])
+        table_2 = Table(headers=['spam'], order_by='spam', ordering='asc')
+        table_2.rows.extend([[5], [3], [7], [10]])
+        table_3 = Table(headers=['spam'], order_by='spam',
+                        ordering='ASCENDING')
+        table_3.rows.extend([[5], [3], [7], [10]])
+        table_4 = Table(headers=['spam'], order_by='spam', ordering='ASC')
+        table_4.rows.extend([[5], [3], [7], [10]])
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |    3 |
+        |    5 |
+        |    7 |
+        |   10 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+        self.assertEqual(str(table_2), expected_output)
+
+    def test_order_by_method_should_order_data_internally(self):
+        table = Table(headers=['spam'])
+        table.rows.extend([[5], [3], [7], [10]])
+        table.order_by('spam', 'asc')
+        expected_output = dedent('''
+        +------+
+        | spam |
+        +------+
+        |    3 |
+        |    5 |
+        |    7 |
+        |   10 |
+        +------+
+        ''').strip()
+        self.assertEqual(str(table), expected_output)
+
+    #TODO: identify data types before ordering and from_csv
