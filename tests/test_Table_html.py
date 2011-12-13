@@ -18,7 +18,6 @@
 import unittest
 import tempfile
 import os
-from cStringIO import StringIO
 from textwrap import dedent
 from outputty import Table
 
@@ -94,6 +93,38 @@ class TestTableHtml(unittest.TestCase):
           <tr>
             <td></td>
             <td></td>
+            <td>ham</td>
+          </tr>
+        </table>
+        ''').strip()
+        self.assertEquals(output, expected)
+
+    def test_to_html_with_a_parameter_should_save_a_file(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        my_table = Table(headers=['ham', 'spam', 'eggs'])
+        my_table.rows.append(['python', 'rules', '!'])
+        my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
+        my_table.to_html(temp_fp.name)
+        temp_fp = open(temp_fp.name)
+        output = temp_fp.read()
+        temp_fp.close()
+        os.remove(temp_fp.name)
+        expected = dedent('''
+        <table>
+          <tr>
+            <th>ham</th>
+            <th>spam</th>
+            <th>eggs</th>
+          </tr>
+          <tr>
+            <td>python</td>
+            <td>rules</td>
+            <td>!</td>
+          </tr>
+          <tr>
+            <td>spam</td>
+            <td>eggs</td>
             <td>ham</td>
           </tr>
         </table>

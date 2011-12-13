@@ -162,8 +162,14 @@ class Table(object):
         result.append('</table>')
         return '\n'.join(result)
 
-    def to_html(self):
-        return self._to_html_unicode().encode(self.output_encoding)
+    def to_html(self, filename=None):
+        contents = self._to_html_unicode().encode(self.output_encoding)
+        if filename is None:
+            return contents
+        else:
+            fp = open(filename, 'w')
+            fp.write(contents)
+            fp.close()
 
 
 class Histogram(object):
