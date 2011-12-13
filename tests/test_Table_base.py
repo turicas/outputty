@@ -351,4 +351,16 @@ class TestTable(unittest.TestCase):
         +------+
         ''').strip())
 
-    #TODO: identify data types before ordering
+    def test_ordering_unicode(self):
+        my_table = Table(headers=['spam'], order_by='spam')
+        my_table.rows.append(['á'])
+        my_table.rows.append(['Á'])
+        self.assertEqual(str(my_table), dedent('''
+        +------+
+        | spam |
+        +------+
+        |    Á |
+        |    á |
+        +------+
+        ''').strip())
+    #TODO: identify data types before ordering for CSV
