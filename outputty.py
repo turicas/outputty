@@ -144,6 +144,27 @@ class Table(object):
         fp.write(self.__str__())
         fp.close()
 
+    def _to_html_unicode(self):
+        self._organize_data()
+        if len(self.data) == 1 and not self.data[0]:
+            return unicode()
+        unicode_headers, rows = self.data[0], self.data[1:]
+        result = ['<table>', '  <tr>']
+        for header in unicode_headers:
+            result.append('    <th>%s</th>' % header)
+        result.append('  </tr>')
+
+        for row in rows:
+            result.append('  <tr>')
+            for value in row:
+                result.append('    <td>%s</td>' % value)
+            result.append('  </tr>')
+        result.append('</table>')
+        return '\n'.join(result)
+
+    def to_html(self):
+        return self._to_html_unicode().encode(self.output_encoding)
+
 
 class Histogram(object):
     __author__ = "fccoelho"
