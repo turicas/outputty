@@ -1,17 +1,20 @@
-ONLY=*
-TEST_RUNNER=nosetests --with-coverage
+test:   nosetest
 
-# `make test` will execute:
-#  nosetests --with-coverage tests.test_*
-#
-# `make test ONLY=Table_csv TEST_RUNNER='python -m unittest'` will execute:
-#  python -m unittest tests.test_Table_csv
-
-test:	
+clear_screen:
 	@clear
-	${TEST_RUNNER} tests.test_${ONLY}
+
+run_nosetest:
+	nosetests --with-coverage --cover-package outputty tests/test_*.py
+
+run_unittest:
+	python -m unittest discover -s tests
+
+nosetest:  clear_screen clean run_nosetest
+
+unittest:  clear_screen clean run_unittest
 
 clean:
 	find -regex '.*\.pyc' -exec rm {} \;
+	find -regex '.*~' -exec rm {} \;
 
-.PHONY: test clean
+.PHONY: test clear_screen nosetest unittest clean run_unittest run_nosetest
