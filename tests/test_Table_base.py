@@ -160,14 +160,12 @@ class TestTable(unittest.TestCase):
     def test_character_count_in_row_data_should_use_unicode(self):
         my_table = Table(headers=['First name', 'Last name'])
         my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-        my_table.rows.append(['Tatiana', 'Al-Chueyr'])
         my_table.rows.append(('Flávio', 'Amieiro'))
         self.assertEqual(str(my_table), dedent('''
         +------------+-----------+
         | First name | Last name |
         +------------+-----------+
         |     Álvaro |    Justen |
-        |    Tatiana | Al-Chueyr |
         |     Flávio |   Amieiro |
         +------------+-----------+
         ''').strip())

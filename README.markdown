@@ -28,7 +28,6 @@ example, this code:
     from outputty import Table
     my_table = Table(headers=['First name', 'Last name'])
     my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-    my_table.rows.append(['Tatiana', 'Al-Chueyr'])
     my_table.rows.append(('Flávio', 'Amieiro'))
     print my_table
 
@@ -38,7 +37,6 @@ example, this code:
     | First name | Last name |
     +------------+-----------+
     |     Álvaro |    Justen |
-    |    Tatiana | Al-Chueyr |
     |     Flávio |   Amieiro |
     +------------+-----------+
 
@@ -49,7 +47,7 @@ And if do you want to access all table rows as dicts, just convert it:
 
 ...and you'll see:
 
-    Tatiana
+    Flávio
 
 
 ### Example 2 -- `Table.to_csv`
@@ -64,7 +62,6 @@ If you want to export your data to CSV (Comma-Separated Values), just execute:
     alvaro@ideas:~/outputty $ cat my-data.csv
     "First name","Last name"
     "Álvaro","Justen"
-    "Tatiana","Al-Chueyr"
     "Flávio","Amieiro"
 
 
@@ -108,7 +105,6 @@ You can specify to order data in your table with the parameters `order_by` and
     my_table = Table(headers=['First name', 'Last name'], order_by='Last name')
     my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
     my_table.rows.append({'First name': 'Renne'})
-    my_table.rows.append(['Tatiana', 'Al-Chueyr'])
     my_table.rows.append(('Flávio', 'Amieiro'))
     print my_table
 
@@ -118,7 +114,6 @@ You can specify to order data in your table with the parameters `order_by` and
     | First name | Last name |
     +------------+-----------+
     |     Renne  |           |
-    |    Tatiana | Al-Chueyr |
     |     Flávio |   Amieiro |
     |     Álvaro |    Justen |
     +------------+-----------+
