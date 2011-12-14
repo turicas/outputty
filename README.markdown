@@ -159,27 +159,30 @@ The code:
 ...will create the filename `nice-software.html` with this content:
 
     <table>
-      <tr>
+      <tr class="header">
         <th>id</th>
         <th>name</th>
         <th>website</th>
       </tr>
-      <tr>
+      <tr class="odd">
         <td>1</td>
         <td>Python</td>
         <td>http://www.python.org/</td>
       </tr>
-      <tr>
+      <tr class="even">
         <td>2</td>
         <td>OpenSSH</td>
         <td>http://www.openssh.com/</td>
       </tr>
-      <tr>
+      <tr class="odd">
         <td>3</td>
         <td>fabric</td>
         <td>http://fabfile.org/</td>
       </tr>
     </table>
+
+It automatically puts `header`, `odd` and `even` CSS classes so you can change
+the layout of the table without needing to change table's HTML code.
 
 
 ### Example 6 -- `Histogram`
