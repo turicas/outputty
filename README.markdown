@@ -79,7 +79,7 @@ column value as value you can specify `key` and `value` parameters, as in:
 
 ...that produces:
 
-{u'2011-12-04': 2.71, u'2011-12-03': 3.14, u'2011-12-02': 42, u'2011-12-01': 21}
+    {'2011-12-04': 2.71, '2011-12-03': 3.14, '2011-12-02': 42, '2011-12-01': 21}
 
 And if do you need to normalize table data, you can transform all its rows in
 lists with the method `normalize`, as in:
