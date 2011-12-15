@@ -49,26 +49,19 @@ class Table(object):
         self.order_by_column = order_by
         self.ordering = ordering
 
-    def _convert_to_unicode(self, element):
+    def _str_to_unicode(self, element):
         if isinstance(element, str):
             return element.decode(self.input_encoding)
         else:
             return unicode(element)
 
     def order_by(self, column, ordering='asc'):
-        if not hasattr(self, 'data'):
-            self.order_by_column = column
-            self.ordering = ordering
-            self._organize_data()
+        index = self.headers.index(column)
+        if ordering.lower().startswith('desc'):
+            sort_function = lambda x, y: cmp(y[index], x[index])
         else:
-            headers = self.data.pop(0)
-            index = headers.index(column)
-            if ordering.lower().startswith('desc'):
-                sort_function = lambda x, y: cmp(y[index], x[index])
-            else:
-                sort_function = lambda x, y: cmp(x[index], y[index])
-            self.data.sort(sort_function)
-            self.data.insert(0, headers)
+            sort_function = lambda x, y: cmp(x[index], y[index])
+        self.rows.sort(sort_function)
 
     def normalize(self):
         result = []
@@ -84,26 +77,40 @@ class Table(object):
             result.append(row_data)
         self.rows = result
 
-    def _organize_data(self):
-        self.normalize()
-        self.data = []
-        self.data.append([self._convert_to_unicode(x) for x in self.headers])
+    def convert_to_unicode(self):
+        result = []
         for row in self.rows:
             new_row = []
             for value in row:
                 if value is None:
                     value = u''
                 elif isinstance(value, str):
-                    value = self._convert_to_unicode(value)
+                    value = self._str_to_unicode(value)
                 new_row.append(value)
-            self.data.append(new_row)
+            result.append(new_row)
+        self.rows = result
+        headers = []
+        for header in self.headers:
+            if header is None:
+                header = ''
+            elif not isinstance(header, unicode):
+                header = str(header).decode(self.input_encoding)
+            headers.append(header)
+        self.headers = headers
+
+    def _organize_data(self):
+        self.normalize()
+        self.convert_to_unicode()
         if self.order_by_column:
             self.order_by(self.order_by_column, self.ordering)
 
     def _define_maximum_column_sizes(self):
-        self.max_size = {}
-        for column in zip(*self.data):
-            self.max_size[column[0]] = max([len(unicode(x)) for x in column])
+        self.max_size = dict([(x, len(x)) for x in self.headers])
+        for index, column in enumerate(zip(*self.rows)):
+            max_size = max([len(unicode(x)) for x in column])
+            if max_size > self.max_size[self.headers[index]]:
+                self.max_size[self.headers[index]] = max_size
+        print self.max_size
 
     def _make_line_from_row_data(self, row_data):
         return '%s %s %s' % (self.pipe, (' %s ' % self.pipe).join(row_data),
@@ -111,21 +118,20 @@ class Table(object):
 
     def __unicode__(self):
         self._organize_data()
-        if len(self.data) == 1 and not self.data[0]:
-            return unicode()
         self._define_maximum_column_sizes()
-        unicode_headers, rows = self.data[0], self.data[1:]
+        if not len(self.headers) and not len(self.rows):
+            return unicode()
 
-        dashes = [self.dash * (self.max_size[x] + 2) for x in unicode_headers]
-        centered_headers = [x.center(self.max_size[x]) for x in unicode_headers]
+        dashes = [self.dash * (self.max_size[x] + 2) for x in self.headers]
+        centered_headers = [x.center(self.max_size[x]) for x in self.headers]
         split_line = self.plus + self.plus.join(dashes) + self.plus
         header_line = self._make_line_from_row_data(centered_headers)
 
         result = [split_line, header_line, split_line]
-        for row in rows:
+        for row in self.rows:
             row_data = []
             for i, info in enumerate(row):
-                data = unicode(info).rjust(self.max_size[unicode_headers[i]])
+                data = unicode(info).rjust(self.max_size[self.headers[i]])
                 row_data.append(data)
             result.append(self._make_line_from_row_data(row_data))
         if self.rows:
@@ -164,8 +170,10 @@ class Table(object):
 
     def to_csv(self, filename):
         self._organize_data()
-        encoded_data = [[info.encode(self.output_encoding) for info in row] \
-                        for row in self.data]
+        encoded_headers = [x.encode(self.output_encoding) for x in self.headers]
+        encoded_rows = [[info.encode(self.output_encoding) for info in row] \
+                        for row in self.rows]
+        encoded_data = [encoded_headers] + encoded_rows
         fp = open(filename, 'w')
         writer = csv.writer(fp, dialect=MyCSV)
         writer.writerows(encoded_data)
@@ -194,19 +202,18 @@ class Table(object):
 
     def _to_html_unicode(self):
         self._organize_data()
-        if len(self.data) == 1 and not self.data[0]:
+        if not len(self.headers) and not len(self.rows):
             return unicode()
-        unicode_headers, rows = self.data[0], self.data[1:]
         if self.css_classes:
             result = ['<table>', '  <tr class="header">']
         else:
             result = ['<table>', '  <tr>']
-        for header in unicode_headers:
+        for header in self.headers:
             result.append('    <th>%s</th>' % header)
         result.append('  </tr>')
 
         i = 1
-        for row in rows:
+        for row in self.rows:
             if self.css_classes:
                 result.append('  <tr class="%s">' % \
                               ('odd' if i % 2 else 'even'))
