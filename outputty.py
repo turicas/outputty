@@ -175,6 +175,21 @@ class Table(object):
         fp.write(self.__str__())
         fp.close()
 
+    def to_dict(self, only=None, key=None, value=None):
+        self._organize_data()
+        table_dict = {}
+        if key is not None and value is not None:
+            key_index = self.headers.index(key)
+            value_index = self.headers.index(value)
+            for row in self.data[1:]:
+                table_dict[row[key_index]] = row[value_index]
+        else:
+            for index, column in enumerate(zip(*self.data[1:])):
+                header_name = self.headers[index]
+                if only is None or header_name in only:
+                    table_dict[header_name] = column
+        return table_dict
+
     def _to_html_unicode(self):
         self._organize_data()
         if len(self.data) == 1 and not self.data[0]:

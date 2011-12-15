@@ -442,4 +442,28 @@ class TestTable(unittest.TestCase):
         ''').strip()
         self.assertEqual(str(table), expected_output)
 
+    def test_to_dict_should_create_a_dict_with_column_names_and_values(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.rows.append([42, 3.14])
+        table.rows.append(['python', 'rules'])
+        table_dict = table.to_dict()
+        expected = {'spam': (42, 'python'), 'eggs': (3.14, 'rules')}
+        self.assertEqual(table_dict, expected)
+
+    def test_to_dict_should_filter_some_columns(self):
+        table = Table(headers=['spam', 'eggs', 'ham'])
+        table.rows.append([42, 3.14, 2.71])
+        table.rows.append(['python', 'rules', 'yeh'])
+        table_dict = table.to_dict(only=('eggs', 'ham'))
+        expected = {'eggs': (3.14, 'rules'), 'ham': (2.71, 'yeh')}
+        self.assertEqual(table_dict, expected)
+
+    def test_to_dict_should_filter_create_dict_from_values(self):
+        table = Table(headers=['spam', 'eggs', 'ham'])
+        table.rows.append([42, 3.14, 2.71])
+        table.rows.append(['python', 'rules', 'yeh'])
+        table_dict = table.to_dict(key='spam', value='ham')
+        expected = {42: 2.71, 'python': 'yeh'}
+        self.assertEqual(table_dict, expected)
+
     #TODO: identify data types before ordering and from_csv
