@@ -458,7 +458,7 @@ class TestTable(unittest.TestCase):
         table.rows.append([42, 3.14])
         table.rows.append(['python', 'rules'])
         table_dict = table.to_dict()
-        expected = {'spam': (42, 'python'), 'eggs': (3.14, 'rules')}
+        expected = {'spam': [42, 'python'], 'eggs': [3.14, 'rules']}
         self.assertEqual(table_dict, expected)
 
     def test_to_dict_should_filter_some_columns(self):
@@ -466,7 +466,7 @@ class TestTable(unittest.TestCase):
         table.rows.append([42, 3.14, 2.71])
         table.rows.append(['python', 'rules', 'yeh'])
         table_dict = table.to_dict(only=('eggs', 'ham'))
-        expected = {'eggs': (3.14, 'rules'), 'ham': (2.71, 'yeh')}
+        expected = {'eggs': [3.14, 'rules'], 'ham': [2.71, 'yeh']}
         self.assertEqual(table_dict, expected)
 
     def test_to_dict_should_filter_create_dict_from_values(self):
@@ -476,5 +476,26 @@ class TestTable(unittest.TestCase):
         table_dict = table.to_dict(key='spam', value='ham')
         expected = {42: 2.71, 'python': 'yeh'}
         self.assertEqual(table_dict, expected)
+
+    def test_to_dict_should_handle_encodings_correctly(self):
+        table = Table(headers=['spam', 'eggs', 'ham'],
+                      input_encoding='iso-8859-1', output_encoding='utf16')
+        table.rows.append([42, 3.14, 2.71])
+        table.rows.append(['python', 'rules', 'yeh'])
+        table.rows.append([u'Álvaro'.encode('iso-8859-1'), '...', 'Justen'])
+        table_dict = table.to_dict(key='spam', value='ham')
+        expected = {42: 2.71,
+                    u'python'.encode('utf16'): u'yeh'.encode('utf16'),
+                    u'Álvaro'.encode('utf16'): u'Justen'.encode('utf16')}
+        self.assertEqual(table_dict, expected)
+
+        table_dict_2 = table.to_dict()
+        expected_2 = {u'spam'.encode('utf16'): [42, u'python'.encode('utf16'),
+                                                u'Álvaro'.encode('utf16')],
+                      u'eggs'.encode('utf16'): [3.14, u'rules'.encode('utf16'),
+                                                u'...'.encode('utf16')],
+                      u'ham'.encode('utf16'): [2.71, u'yeh'.encode('utf16'),
+                                               u'Justen'.encode('utf16')]}
+        self.assertEqual(table_dict_2, expected_2)
 
     #TODO: identify data types before ordering and from_csv
