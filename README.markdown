@@ -26,28 +26,60 @@ example, this code:
     # coding: utf-8
 
     from outputty import Table
-    my_table = Table(headers=['First name', 'Last name'])
-    my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-    my_table.rows.append(('Flávio', 'Amieiro'))
+    my_table = Table(headers=['First Name', 'Last Name', 'Main Language'])
+    my_table.rows.append({'First Name': 'Álvaro', 'Last Name': 'Justen',
+                          'Main Language': 'Python'})
+    my_table.rows.append(('Flávio', 'Amieiro', 'Python'))
     print my_table
+
 
 ...will produce:
 
-    +------------+-----------+
-    | First name | Last name |
-    +------------+-----------+
-    |     Álvaro |    Justen |
-    |     Flávio |   Amieiro |
-    +------------+-----------+
+    +------------+-----------+---------------+
+    | First Name | Last Name | Main Language |
+    +------------+-----------+---------------+
+    |     Álvaro |    Justen |        Python |
+    |     Flávio |   Amieiro |        Python |
+    +------------+-----------+---------------+
 
-And if do you want to access all table rows as dicts, just convert it:
+And if do you want to access all table rows as dicts, just convert it using the
+method `to_list_of_dicts`, like in:
 
     rows = my_table.to_list_of_dicts()
-    print rows[1]['First name']
+    print rows[1]['First Name']
 
 ...and you'll see:
 
     Flávio
+
+You can also convert your table to a `dict`, with header names as keys and
+columns as values and filter which columns will go to the dictionary:
+
+    table_dict = my_table.to_dict()
+    print table_dict
+
+    table_dict_filtered = my_table.to_dict(only=['First Name', 'Last Name'])
+    print table_dict_filtered
+
+...will print:
+
+    {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio'), 'Main Language': (u'Python', u'Python')}
+    {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio')}
+
+And if do you want to create a `dict` with some column value as key and other
+column value as value you can specify `key` and `value` parameters, as in:
+
+    other_table = Table(headers=['date', 'measure'])
+    other_table.rows.append(('2011-12-01', 21))
+    other_table.rows.append(('2011-12-02', 42))
+    other_table.rows.append(('2011-12-03', 3.14))
+    other_table.rows.append(('2011-12-04', 2.71))
+    values_as_dict = other_table.to_dict(key='date', value='measure')
+    print values_as_dict
+
+...that produces:
+
+{u'2011-12-04': 2.71, u'2011-12-03': 3.14, u'2011-12-02': 42, u'2011-12-01': 21}
 
 
 ### Example 2 -- `Table.to_csv`
