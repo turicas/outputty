@@ -442,6 +442,17 @@ class TestTable(unittest.TestCase):
         ''').strip()
         self.assertEqual(str(table), expected_output)
 
+    def test_normalize_method_should_transform_all_rows_to_lists(self):
+        table = Table(headers=['spam', 'eggs', 'ham'])
+        table.rows.append(['ham', 'eggs', 'spam'])
+        table.rows.append({'ham': 42})
+        table.rows.append({'eggs': 3.14, 'spam': 2.71})
+        table.normalize()
+        expected = [['ham', 'eggs', 'spam'],
+                    [None, None, 42],
+                    [2.71, 3.14, None]]
+        self.assertEqual(table.rows, expected)
+
     def test_to_dict_should_create_a_dict_with_column_names_and_values(self):
         table = Table(headers=['spam', 'eggs'])
         table.rows.append([42, 3.14])
