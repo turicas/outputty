@@ -9,3 +9,6 @@ print my_table
 
 rows = my_table.to_list_of_dicts()
 print rows[1]['First name']
+
+my_table.normalize()
+print my_table.rows

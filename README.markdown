@@ -49,6 +49,20 @@ And if do you want to access all table rows as dicts, just convert it:
 
     Flávio
 
+And if do you need to normalize table data, you can transform all its rows in
+lists with the method `normalize`, as in:
+
+    my_table.normalize()
+
+...and `table.rows` will be:
+
+    [['\xc3\x81lvaro', 'Justen'], ['Fl\xc3\xa1vio', 'Amieiro']]
+
+> Note: __all__ output operations (like `Table.to_csv`, `Table.__str__`) and
+> `Table.order_by` need to normalize data, but we don't like to maintain a
+> normalized and a non-normalized copy of rows, so a side effect is that
+> `table.rows` is changed when you execute these operations.
+
 
 ### Example 2 -- `Table.to_csv`
 

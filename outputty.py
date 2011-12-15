@@ -70,31 +70,33 @@ class Table(object):
             self.data.sort(sort_function)
             self.data.insert(0, headers)
 
-    def _organize_data(self):
+    def normalize(self):
         result = []
-        result.append([self._convert_to_unicode(x) for x in self.headers])
-
         for row in self.rows:
             if isinstance(row, dict):
                 row_data = []
                 for header_name in self.headers:
                     if header_name not in row:
-                        row[header_name] = ''
+                        row[header_name] = None
                     row_data.append(row[header_name])
             else:
-                row_data = row
+                row_data = list(row)
             result.append(row_data)
+        self.rows = result
 
-        unicode_result = []
-        for row in result:
+    def _organize_data(self):
+        self.normalize()
+        self.data = []
+        self.data.append([self._convert_to_unicode(x) for x in self.headers])
+        for row in self.rows:
             new_row = []
             for value in row:
-                if isinstance(value, str):
+                if value is None:
+                    value = u''
+                elif isinstance(value, str):
                     value = self._convert_to_unicode(value)
                 new_row.append(value)
-            unicode_result.append(new_row)
-
-        self.data = unicode_result
+            self.data.append(new_row)
         if self.order_by_column:
             self.order_by(self.order_by_column, self.ordering)
 
