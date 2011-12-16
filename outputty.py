@@ -19,6 +19,8 @@ from __future__ import division
 import csv
 try:
     from numpy import histogram, ceil
+    import datetime
+    import re
 except ImportError:
     pass
 
@@ -44,6 +46,7 @@ class Table(object):
         self.output_encoding = output_encoding
         self.csv_filename = None
         self.rows = []
+        self.types = {}
         if from_csv:
             self._import_from_csv(from_csv)
         self.order_by_column = order_by
@@ -185,6 +188,43 @@ class Table(object):
             else:
                 rows.append(dict(zip(self.headers, row)))
         return rows
+
+    def _identify_type_of_data(self):
+        columns = zip(*self.rows)
+        date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
+                                    '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
+        for i, header in enumerate(self.headers):
+            column_types = [int, float, datetime.date, datetime.datetime, str]
+            cant_be = set()
+            try:
+                column = columns[i]
+            except IndexError:
+                self.types[header] = str
+            else:
+                for value in column:
+                    try:
+                        converted = int(value)
+                        if str(converted) != str(value):
+                            raise ValueError('It is float')
+                    except ValueError:
+                        cant_be.add(int)
+                    except TypeError:
+                        pass #None should pass
+                    try:
+                        converted = float(value)
+                    except ValueError:
+                        cant_be.add(float)
+                    except TypeError:
+                        pass #None should pass
+                    if value is not None:
+                        if datetime_regex.match(str(value)) is None:
+                            cant_be.add(datetime.datetime)
+                        if date_regex.match(str(value)) is None:
+                            cant_be.add(datetime.date)
+                for removed_type in cant_be:
+                    column_types.remove(removed_type)
+                self.types[header] = column_types[0]
 
     def to_csv(self, filename):
         self._organize_data()
