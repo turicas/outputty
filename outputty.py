@@ -226,6 +226,28 @@ class Table(object):
                     column_types.remove(removed_type)
                 self.types[header] = column_types[0]
 
+    def normalize_types(self):
+        self._identify_type_of_data()
+        rows_converted = []
+        for row in self.rows:
+            row_data = []
+            for index, value in enumerate(row):
+                type_ = self.types[self.headers[index]]
+                if value is None:
+                    row_data.append(None)
+                elif type_ == datetime.date:
+                    info = [int(x) for x in value.split('-')]
+                    row_data.append(datetime.date(*info))
+                elif type_ == datetime.datetime:
+                    info = value.split()
+                    date = [int(x) for x in info[0].split('-')]
+                    rest = [int(x) for x in info[1].split(':')]
+                    row_data.append(datetime.datetime(*(date + rest)))
+                else:
+                    row_data.append(type_(value))
+            rows_converted.append(row_data)
+        self.rows = rows_converted
+
     def to_csv(self, filename):
         self._organize_data()
         encoded_headers = [x.encode(self.output_encoding) for x in self.headers]
