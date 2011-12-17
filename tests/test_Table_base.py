@@ -447,7 +447,7 @@ class TestTable(unittest.TestCase):
         table.rows.append(['ham', 'eggs', 'spam'])
         table.rows.append({'ham': 42})
         table.rows.append({'eggs': 3.14, 'spam': 2.71})
-        table.normalize()
+        table.normalize_structure()
         expected = [['ham', 'eggs', 'spam'],
                     [None, None, 42],
                     [2.71, 3.14, None]]

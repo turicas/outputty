@@ -60,7 +60,7 @@ class Table(object):
             sort_function = lambda x, y: cmp(x[index], y[index])
         self.rows.sort(sort_function)
 
-    def normalize(self):
+    def normalize_structure(self):
         result = []
         for row in self.rows:
             if isinstance(row, dict):
@@ -105,7 +105,7 @@ class Table(object):
         self.headers = [self._str_decode(h, codec) for h in self.headers]
 
     def _organize_data(self):
-        self.normalize()
+        self.normalize_structure()
         self.decode()
         if self.order_by_column:
             self.order_by(self.order_by_column, self.ordering)
