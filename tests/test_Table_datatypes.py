@@ -85,11 +85,23 @@ class TestTableDataTypes(unittest.TestCase):
         self.assertEquals(table.types['Monty'], datetime.datetime)
         self.assertEquals(table.types['Python'], str)
 
+    def test_empty_string_should_not_affect_data_type(self):
+        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
+        table.rows.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
+        table.rows.append(['', '', '', '', ''])
+        table._identify_type_of_data()
+        self.assertEquals(table.types['spam'], int)
+        self.assertEquals(table.types['eggs'], float)
+        self.assertEquals(table.types['ham'], datetime.date)
+        self.assertEquals(table.types['Monty'], datetime.datetime)
+        self.assertEquals(table.types['Python'], str)
+
     def test_normalize_types_should_convert_types_correctly(self):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.rows.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04',
                            'asd'])
         table.rows.append([None, None, None, None, None])
+        table.rows.append([None, None, None, None, 42])
         table.normalize_types()
         self.assertEquals(table.rows[0][0], 1)
         self.assertEquals(table.rows[0][1], 2.71)

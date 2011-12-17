@@ -179,6 +179,7 @@ class Table(object):
         if self.data:
             self.headers = [x.decode('utf8') for x in self.data[0]]
             self.rows = [[y.decode('utf8') for y in x] for x in self.data[1:]]
+        self.normalize_types()
 
     def to_list_of_dicts(self):
         rows = []
@@ -203,6 +204,8 @@ class Table(object):
                 self.types[header] = str
             else:
                 for value in column:
+                    if value == '':
+                        value = None
                     try:
                         converted = int(value)
                         if str(converted) != str(value):
@@ -218,9 +221,9 @@ class Table(object):
                     except TypeError:
                         pass #None should pass
                     if value is not None:
-                        if datetime_regex.match(str(value)) is None:
+                        if datetime_regex.match(unicode(value)) is None:
                             cant_be.add(datetime.datetime)
-                        if date_regex.match(str(value)) is None:
+                        if date_regex.match(unicode(value)) is None:
                             cant_be.add(datetime.date)
                 for removed_type in cant_be:
                     column_types.remove(removed_type)
@@ -233,7 +236,7 @@ class Table(object):
             row_data = []
             for index, value in enumerate(row):
                 type_ = self.types[self.headers[index]]
-                if value is None:
+                if value is None or value == '':
                     row_data.append(None)
                 elif type_ == datetime.date:
                     info = [int(x) for x in value.split('-')]
@@ -243,6 +246,13 @@ class Table(object):
                     date = [int(x) for x in info[0].split('-')]
                     rest = [int(x) for x in info[1].split(':')]
                     row_data.append(datetime.datetime(*(date + rest)))
+                elif type_ == str:
+                    if isinstance(value, unicode):
+                        row_data.append(value)
+                    else:
+                        if not isinstance(value, str):
+                            value = str(value)
+                        row_data.append(value.decode(self.input_encoding))
                 else:
                     row_data.append(type_(value))
             rows_converted.append(row_data)

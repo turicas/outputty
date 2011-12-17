@@ -20,6 +20,8 @@ import tempfile
 import os
 from cStringIO import StringIO
 from textwrap import dedent
+import types
+import datetime
 from outputty import Table
 
 
@@ -171,3 +173,29 @@ class TestTableCsv(unittest.TestCase):
         table_output = str(my_table)
         temp_fp.close()
         self.assertEqual(table_output, output)
+
+    def test_from_csv_should_automatically_convert_data_types(self):
+        data = dedent('''
+        "spam","eggs","ham"
+        "42","3","2011-01-02"
+        "","3.14","2012-01-11"
+        "21","","2010-01-03"
+        "2","2.71",""
+        ''')
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        my_table = Table(from_csv=temp_fp.name)
+        os.remove(temp_fp.name)
+        self.assertEquals(type(my_table.rows[0][0]), types.IntType)
+        self.assertEquals(type(my_table.rows[1][0]), types.NoneType)
+        self.assertEquals(type(my_table.rows[2][0]), types.IntType)
+        self.assertEquals(type(my_table.rows[3][0]), types.IntType)
+        self.assertEquals(type(my_table.rows[0][1]), types.FloatType)
+        self.assertEquals(type(my_table.rows[1][1]), types.FloatType)
+        self.assertEquals(type(my_table.rows[2][1]), types.NoneType)
+        self.assertEquals(type(my_table.rows[3][1]), types.FloatType)
+        self.assertEquals(type(my_table.rows[0][2]), datetime.date)
+        self.assertEquals(type(my_table.rows[1][2]), datetime.date)
+        self.assertEquals(type(my_table.rows[2][2]), datetime.date)
+        self.assertEquals(type(my_table.rows[3][2]), types.NoneType)
