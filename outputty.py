@@ -17,10 +17,10 @@
 
 from __future__ import division
 import csv
+import datetime
+import re
 try:
     from numpy import histogram, ceil
-    import datetime
-    import re
 except ImportError:
     pass
 
@@ -302,8 +302,6 @@ class Table(object):
 
     def _to_html_unicode(self):
         self._organize_data()
-        if not len(self.headers) and not len(self.rows):
-            return unicode()
         if self.css_classes:
             result = ['<table>', '  <tr class="header">']
         else:

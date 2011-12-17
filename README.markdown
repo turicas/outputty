@@ -81,28 +81,6 @@ column value as value you can specify `key` and `value` parameters, as in:
 
     {'2011-12-04': 2.71, '2011-12-03': 3.14, '2011-12-02': 42, '2011-12-01': 21}
 
-#### Normalizing Data
-
-We have two kinds of normalization in `Table`:
-
-- `.normalize_structure()`: transform `table.rows` in a list of lists. __All__
-  output operations (like `Table.to_csv`, `Table.__str__`) and `Table.order_by`
-  need to normalize data structure, but we don't like to maintain a normalized
-  and a non-normalized copy of rows, so a side effect is that `table.rows` is
-  changed when you execute these operations.
-  An example, from the table above: `my_table.normalize_structure()` will
-  transform `table.rows` in `[[u'\xc1lvaro', u'Justen', u'Python'],
-  [u'Fl\xe1vio', u'Amieiro', u'Python']]`.
-
-- `.normalize_types()`: used by default when importing from CSV, this method
-  convert table rows to the types it identify. All data that in first place are
-  strings will be converted to `int`, `float`, `datetime.date` or
-  `datetime.datetime` when identified.
-
-> If you want all your data as `unicode` when importing from CSV you can pass
-> `convert_types=False` to `Table` so it won't use `normalize_types` after
-> importing data.
-
 ### Example 2 -- `Table.to_csv`
 
 If you want to export your data to CSV (Comma-Separated Values), just execute:
@@ -308,6 +286,36 @@ You can also get the table string decoded, in unicode:
 > complete list of the supported encodings.
 
 
+Notes About Data Normalization
+------------------------------
+
+We have three kinds of normalization in `Table`:
+
+- `.normalize_structure()`: transform `table.rows` in a list of lists. __All__
+  output operations (like `Table.to_csv`, `Table.__str__`) and `Table.order_by`
+  need to normalize data structure, but we don't like to maintain a normalized
+  and a non-normalized copy of rows, so a side effect is that `table.rows` is
+  changed when you execute these operations.
+  An example, from the table in Example 1: `my_table.normalize_structure()`
+  will transform `table.rows` in `[[u'\xc1lvaro', u'Justen', u'Python'],
+  [u'Fl\xe1vio', u'Amieiro', u'Python']]`.
+
+- `.normalize_types()`: used by default when importing from CSV, this method
+  convert table rows to the types it identify. All data that in first moment
+  are strings will be converted to `unicode`, `int`, `float`, `datetime.date`
+  or `datetime.datetime` when identified.
+
+> If you want all your data as `unicode` when importing from CSV you can pass
+> `convert_types=False` to `Table` so it won't use `normalize_types` after
+> importing data (it'll just decode your strings using `input_encoding`).
+
+- `unicode` normalization: all operations in `Table` (import from some format,
+  output table in some format, normalization and ordering) will convert data
+  internally to `unicode` using `input_encoding` as codec (passed in
+  `Table.__init__`). When `convert_types=False`, all row's values will be
+  `unicode`, otherwise only types identified as string will be converted to
+  `unicode`.
+
 New Features
 ------------
 
@@ -328,9 +336,9 @@ If you want to contribute to this project, please:
 - Use [Test-driven
   development](http://en.wikipedia.org/wiki/Test-driven_development)
 - Create your new feature in branch `feature/name-of-the-new-feature`
+  (`git checkout -b feature/new-feature`)
 - Run __all tests__ (`make test`) _before_ pushing
-  - To run just one test file, execute `nosetests --with-coverage
-    tests/test_your-test-file.py`
+  - To run just one test file, execute: `nosetests --with-coverage --cover-package outputty  tests/test_your-test-file.py`
   - Try to have a test-coverage of 100%
 - Create/update documentation (`README.markdown`/docstrings/man page)
 
