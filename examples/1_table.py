@@ -25,5 +25,5 @@ other_table.rows.append(('2011-12-04', 2.71))
 values_as_dict = other_table.to_dict(key='date', value='measure')
 print values_as_dict
 
-my_table.normalize()
+my_table.normalize_structure()
 print my_table.rows

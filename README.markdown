@@ -91,8 +91,8 @@ We have two kinds of normalization in `Table`:
   and a non-normalized copy of rows, so a side effect is that `table.rows` is
   changed when you execute these operations.
   An example, from the table above: `my_table.normalize_structure()` will
-  transform `table.rows` in `[['\xc3\x81lvaro', 'Justen'], ['Fl\xc3\xa1vio',
-  'Amieiro']]`.
+  transform `table.rows` in `[[u'\xc1lvaro', u'Justen', u'Python'],
+  [u'Fl\xe1vio', u'Amieiro', u'Python']]`.
 
 - `.normalize_types()`: used by default when importing from CSV, this method
   convert table rows to the types it identify. All data that in first place are
