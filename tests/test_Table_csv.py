@@ -199,3 +199,20 @@ class TestTableCsv(unittest.TestCase):
         self.assertEquals(type(my_table.rows[1][2]), datetime.date)
         self.assertEquals(type(my_table.rows[2][2]), datetime.date)
         self.assertEquals(type(my_table.rows[3][2]), types.NoneType)
+
+    def test_from_csv_shouldnt_convert_types_when_convert_types_is_False(self):
+        data = dedent('''
+        "spam","eggs","ham"
+        "42","3","2011-01-02"
+        "","3.14","2012-01-11"
+        "21","","2010-01-03"
+        "2","2.71",""
+        ''')
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        my_table = Table(from_csv=temp_fp.name, convert_types=False)
+        os.remove(temp_fp.name)
+        for row in my_table.rows:
+            for value in row:
+                self.assertEquals(type(value), types.UnicodeType)

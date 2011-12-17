@@ -37,7 +37,7 @@ class MyCSV(csv.Dialect):
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
                  input_encoding='utf8', output_encoding='utf8', from_csv='',
-                 order_by='', ordering=''):
+                 convert_types=True, order_by='', ordering=''):
         self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
@@ -48,6 +48,7 @@ class Table(object):
         self.rows = []
         self.types = {}
         if from_csv:
+            self.convert_types = convert_types
             self._import_from_csv(from_csv)
         self.order_by_column = order_by
         self.ordering = ordering
@@ -179,7 +180,8 @@ class Table(object):
         if self.data:
             self.headers = [x.decode('utf8') for x in self.data[0]]
             self.rows = [[y.decode('utf8') for y in x] for x in self.data[1:]]
-        self.normalize_types()
+            if self.convert_types:
+                self.normalize_types()
 
     def to_list_of_dicts(self):
         rows = []

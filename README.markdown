@@ -99,6 +99,9 @@ We have two kinds of normalization in `Table`:
   strings will be converted to `int`, `float`, `datetime.date` or
   `datetime.datetime` when identified.
 
+> If you want all your data as `unicode` when importing from CSV you can pass
+> `convert_types=False` to `Table` so it won't use `normalize_types` after
+> importing data.
 
 ### Example 2 -- `Table.to_csv`
 
