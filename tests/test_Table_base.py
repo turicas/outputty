@@ -228,6 +228,30 @@ class TestTable(unittest.TestCase):
         self.assertEquals(len(table_1.headers), 2)
         self.assertEquals(len(table_2.headers), 0)
 
+    def test_decode_method_should_normalize_and_use_input_encoding(self):
+        my_table = Table(headers=[u'ham'.encode('utf16'),
+                                  u'spam'.encode('utf16'),
+                                  u'eggs'.encode('utf16')],
+                         input_encoding='utf16')
+        my_table.rows.append((123, 456, 789))
+        my_table.rows.append((987, 654, u'python'.encode('utf16')))
+        my_table.decode()
+        my_table.encode()
+        self.assertEquals(my_table.rows[1][2], u'python')
+
+    def test_encode_method_should_normalize_and_use_output_encoding(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'],
+                         output_encoding='utf16')
+        my_table.rows.append((123, 456, 789))
+        my_table.rows.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
+        my_table.rows.append((987, 654, 'python'))
+        my_table.decode()
+        my_table.encode()
+        self.assertEquals(my_table.rows[1][0], u'abc'.encode('utf16'))
+        self.assertEquals(my_table.rows[1][1], u'def'.encode('utf16'))
+        self.assertEquals(my_table.rows[1][2], u'ghi'.encode('utf16'))
+        self.assertEquals(my_table.rows[2][2], u'python'.encode('utf16'))
+
     def test_to_dict_should_return_a_list_of_dict_with_headers_as_keys(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append((123, 456, 789))
@@ -244,6 +268,24 @@ class TestTable(unittest.TestCase):
         self.assertEquals(my_dict[2]['ham'], 987)
         self.assertEquals(my_dict[2]['spam'], 654)
         self.assertEquals(my_dict[2]['eggs'], 321)
+
+    def test_list_of_dicts_should_handle_output_encoding_correctly(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'],
+                         output_encoding='utf16')
+        my_table.rows.append((123, 456, 789))
+        my_table.rows.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
+        my_table.rows.append((987, 654, 321))
+        my_dicts = my_table.to_list_of_dicts()
+        self.assertEquals(len(my_dicts), 3)
+        self.assertEquals(my_dicts[1][u'ham'.encode('utf16')],
+                          u'abc'.encode('utf16'))
+        self.assertEquals(my_dicts[1][u'spam'.encode('utf16')],
+                          u'def'.encode('utf16'))
+        self.assertEquals(my_dicts[1][u'eggs'.encode('utf16')],
+                          u'ghi'.encode('utf16'))
+        self.assertEquals(my_dicts[2][u'ham'.encode('utf16')], 987)
+        self.assertEquals(my_dicts[2][u'spam'.encode('utf16')], 654)
+        self.assertEquals(my_dicts[2][u'eggs'.encode('utf16')], 321)
 
     def test_ordering_table_with_one_column(self):
         my_table = Table(headers=['spam'], order_by='spam')

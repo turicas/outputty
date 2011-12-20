@@ -343,6 +343,21 @@ If you want to contribute to this project, please:
 - Create/update documentation (`README.markdown`/docstrings/man page)
 
 
+### New `Table.to_*` methods
+
+If do you want to create a new export method, like `to_dict`, `to_html` etc.,
+please organize data and encode before performing any actions and decode (using
+`self.output_encoding`) after doing your stuff. For example:
+
+    def to_list_of_dicts(self):
+        self._organize_data() # organize structure internally and decode
+        self.encode() # encode data to self.output_encoding
+        # Now, do what you need to:
+        rows = [dict(zip(self.headers, row)) for row in self.rows]
+        self.decode(self.output_encoding) # decode again (self.rows is unicode)
+        return rows # here you can output to a file or whatever you want
+
+
 Related Software
 ----------------
 

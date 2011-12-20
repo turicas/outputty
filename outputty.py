@@ -88,6 +88,7 @@ class Table(object):
             return element
 
     def encode(self, codec=None):
+        self.normalize_structure()
         if codec is None:
             codec = self.output_encoding
         self.headers = [self._unicode_encode(x, codec) for x in self.headers]
@@ -97,6 +98,7 @@ class Table(object):
         self.rows = rows
 
     def decode(self, codec=None):
+        self.normalize_structure()
         if codec is None:
             codec = self.input_encoding
         rows = []
@@ -184,12 +186,10 @@ class Table(object):
                 self.normalize_types()
 
     def to_list_of_dicts(self):
-        rows = []
-        for row in self.rows:
-            if isinstance(row, dict):
-                rows.append(row)
-            else:
-                rows.append(dict(zip(self.headers, row)))
+        self._organize_data()
+        self.encode()
+        rows = [dict(zip(self.headers, row)) for row in self.rows]
+        self.decode(self.output_encoding)
         return rows
 
     def _identify_type_of_data(self):
