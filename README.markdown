@@ -2,9 +2,8 @@ outputty
 ========
 
 With `outputty` you can show the data of your Python software in text mode
-(terminal, CSV or TXT) in a easy and beautiful way.
-
-By now we have only the classes `Table` and `Histogram` (more to be added).
+(terminal, CSV or TXT) in a easy and beautiful way. You can also import data
+easily.
 
 
 Installation
@@ -16,6 +15,9 @@ Just copy the file `outputty.py` in some path you can do `import outputty`
 
 Examples
 --------
+
+You can run all the examples below - see `examples` folder. You can also see
+the tests we have at `tests/test_*.py`.
 
 ### Example 1 -- `Table`
 
@@ -211,52 +213,51 @@ It automatically puts `header`, `odd` and `even` CSS classes so you can change
 the layout of the table without needing to change table's HTML code.
 
 
-### Example 6 -- `Histogram`
+### Example 6 -- `Table.to_histogram`
 
 This code:
 
     from numpy.random import normal
     from numpy.random import seed
-    from outputty import Histogram
+    from outputty import Table
 
     seed(1234)
     distribution = normal(size=1000)
-    my_histogram = Histogram(distribution, bins=10)
+    my_table = Table(headers=['numbers'])
+    my_table.rows.extend([[value] for value in distribution])
     print 'Vertical:'
-    print my_histogram.vertical(15)
+    print my_table.to_histogram('numbers', 'vertical', bins=10, height=7)
     print
     print 'Horizontal:'
-    print my_histogram.horizontal(5)
+    print my_table.to_histogram('numbers', 'horizontal', bins=10, height=7,
+                                character='#')
 
-
-...will produce:
+...will print:
 
     Vertical:
-                          265
+    265      |
+             |
+            |||
+            |||
+            ||||
+           |||||
+          |||||||
+    -3.56          2.76
+
+    Horizontal:
+                  265
 
     -3.56:
     -2.93:
-    -2.30: ||
-    -1.67: ||||
-    -1.03: ||||||||||
-    -0.40: |||||||||||||||
-    0.23 : ||||||||||||
-    0.87 : ||||||
-    1.50 : |||
+    -2.30: #
+    -1.67: ##
+    -1.03: #####
+    -0.40: #######
+    0.23 : #####
+    0.87 : ###
+    1.50 : #
     2.13 :
 
-    Horizontal:
-    265      |
-             ||
-            |||
-            ||||
-           ||||||
-    -3.56          2.76
-
-
-> If do you want to see more examples, see `tests/test_*.py`.
-
-> To run these examples, see the folder `examples`.
 
 Type Of Data
 ------------

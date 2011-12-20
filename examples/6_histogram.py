@@ -3,13 +3,15 @@
 
 from numpy.random import normal
 from numpy.random import seed
-from outputty import Histogram
+from outputty import Table
 
 seed(1234)
 distribution = normal(size=1000)
-my_histogram = Histogram(distribution, bins=10)
+my_table = Table(headers=['numbers'])
+my_table.rows.extend([[value] for value in distribution])
 print 'Vertical:'
-print my_histogram.vertical(15)
+print my_table.to_histogram('numbers', 'vertical', bins=10, height=7)
 print
 print 'Horizontal:'
-print my_histogram.horizontal(5)
+print my_table.to_histogram('numbers', 'horizontal', bins=10, height=7,
+                            character='#')
