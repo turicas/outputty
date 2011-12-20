@@ -354,7 +354,7 @@ If you want to contribute to this project, please:
 - To run tests, execute `make test`. I use some `nose` plugins -- to install
   it, execute:
 
-    pip install nose coverage ipdbplugin yanc nose-f7u12
+    pip install nose coverage ipdbplugin yanc
 
 
 ### New `Table.to_*` methods
@@ -376,6 +376,7 @@ Related Software
 ----------------
 
 - [fabulous](http://lobstertech.com/fabulous.html)
+- [termcolor](http://pypi.python.org/pypi/termcolor)
 - [tablib](https://github.com/kennethreitz/tablib)
 - [clint](https://github.com/kennethreitz/clint)
 - [csvstudio](http://code.google.com/p/csvstudio/)
