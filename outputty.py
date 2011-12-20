@@ -19,10 +19,7 @@ from __future__ import division
 import csv
 import datetime
 import re
-try:
-    from numpy import histogram, ceil
-except ImportError:
-    pass
+from numpy import histogram, ceil
 
 
 class MyCSV(csv.Dialect):
@@ -302,27 +299,31 @@ class Table(object):
 
     def _to_html_unicode(self):
         self._organize_data()
+        result = ['<table>', '  <thead>']
         if self.css_classes:
-            result = ['<table>', '  <tr class="header">']
+            result.append('    <tr class="header">')
         else:
-            result = ['<table>', '  <tr>']
+            result.append('    <tr>')
         for header in self.headers:
-            result.append('    <th>%s</th>' % header)
-        result.append('  </tr>')
-
+            result.append('      <th>%s</th>' % header)
+        result.extend(['    </tr>', '  </thead>'])
+        if len(self.rows):
+            result.append('  <tbody>')
         i = 1
         for row in self.rows:
             if self.css_classes:
-                result.append('  <tr class="%s">' % \
+                result.append('    <tr class="%s">' % \
                               ('odd' if i % 2 else 'even'))
             else:
-                result.append('  <tr>')
+                result.append('    <tr>')
             for value in row:
                 if value is None:
                     value = ''
-                result.append('    <td>%s</td>' % value)
-            result.append('  </tr>')
+                result.append('      <td>%s</td>' % value)
+            result.append('    </tr>')
             i += 1
+        if len(self.rows):
+            result.append('  </tbody>')
         result.append('</table>')
         return '\n'.join(result)
 

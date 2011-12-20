@@ -32,11 +32,13 @@ class TestTableHtml(unittest.TestCase):
         output = my_table.to_html(css_classes=False)
         expected = dedent('''
         <table>
-          <tr>
-            <th>ham</th>
-            <th>spam</th>
-            <th>eggs</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>ham</th>
+              <th>spam</th>
+              <th>eggs</th>
+            </tr>
+          </thead>
         </table>
         ''').strip()
         self.assertEquals(output, expected)
@@ -48,21 +50,25 @@ class TestTableHtml(unittest.TestCase):
         output = my_table.to_html(css_classes=False)
         expected = dedent('''
         <table>
-          <tr>
-            <th>ham</th>
-            <th>spam</th>
-            <th>eggs</th>
-          </tr>
-          <tr>
-            <td>python</td>
-            <td>rules</td>
-            <td>!</td>
-          </tr>
-          <tr>
-            <td>spam</td>
-            <td>eggs</td>
-            <td>ham</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>ham</th>
+              <th>spam</th>
+              <th>eggs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>python</td>
+              <td>rules</td>
+              <td>!</td>
+            </tr>
+            <tr>
+              <td>spam</td>
+              <td>eggs</td>
+              <td>ham</td>
+            </tr>
+          </tbody>
         </table>
         ''').strip()
         self.assertEquals(output, expected)
@@ -75,26 +81,30 @@ class TestTableHtml(unittest.TestCase):
         output = my_table.to_html(css_classes=False)
         expected = dedent('''
         <table>
-          <tr>
-            <th>ham</th>
-            <th>spam</th>
-            <th>eggs</th>
-          </tr>
-          <tr>
-            <td>spam</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>eggs</td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td>ham</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>ham</th>
+              <th>spam</th>
+              <th>eggs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>spam</td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>eggs</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td>ham</td>
+            </tr>
+          </tbody>
         </table>
         ''').strip()
         self.assertEquals(output, expected)
@@ -112,21 +122,25 @@ class TestTableHtml(unittest.TestCase):
         os.remove(temp_fp.name)
         expected = dedent('''
         <table>
-          <tr>
-            <th>ham</th>
-            <th>spam</th>
-            <th>eggs</th>
-          </tr>
-          <tr>
-            <td>python</td>
-            <td>rules</td>
-            <td>!</td>
-          </tr>
-          <tr>
-            <td>spam</td>
-            <td>eggs</td>
-            <td>ham</td>
-          </tr>
+          <thead>
+            <tr>
+              <th>ham</th>
+              <th>spam</th>
+              <th>eggs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>python</td>
+              <td>rules</td>
+              <td>!</td>
+            </tr>
+            <tr>
+              <td>spam</td>
+              <td>eggs</td>
+              <td>ham</td>
+            </tr>
+          </tbody>
         </table>
         ''').strip()
         self.assertEquals(output, expected)
@@ -140,31 +154,35 @@ class TestTableHtml(unittest.TestCase):
         output = my_table.to_html(css_classes=True)
         expected = dedent('''
         <table>
-          <tr class="header">
-            <th>ham</th>
-            <th>spam</th>
-            <th>eggs</th>
-          </tr>
-          <tr class="odd">
-            <td>python</td>
-            <td>rules</td>
-            <td>!</td>
-          </tr>
-          <tr class="even">
-            <td>spam</td>
-            <td>eggs</td>
-            <td>ham</td>
-          </tr>
-          <tr class="odd">
-            <td>python</td>
-            <td>rules</td>
-            <td>!</td>
-          </tr>
-          <tr class="even">
-            <td>spam</td>
-            <td>eggs</td>
-            <td>ham</td>
-          </tr>
+          <thead>
+            <tr class="header">
+              <th>ham</th>
+              <th>spam</th>
+              <th>eggs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>python</td>
+              <td>rules</td>
+              <td>!</td>
+            </tr>
+            <tr class="even">
+              <td>spam</td>
+              <td>eggs</td>
+              <td>ham</td>
+            </tr>
+            <tr class="odd">
+              <td>python</td>
+              <td>rules</td>
+              <td>!</td>
+            </tr>
+            <tr class="even">
+              <td>spam</td>
+              <td>eggs</td>
+              <td>ham</td>
+            </tr>
+          </tbody>
         </table>
         ''').strip()
         self.assertEquals(output, expected)
