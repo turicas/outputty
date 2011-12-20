@@ -81,13 +81,13 @@ class TestTable(unittest.TestCase):
         my_table.rows.append({'ham': 321, 'eggs': 1098})
         my_table.rows.append({'ham': 'abc', 'spam': 'defg'})
         self.assertEqual(str(my_table), dedent('''
-        +-----+------+------+
-        | ham | spam | eggs |
-        +-----+------+------+
-        |     | 4567 | 8910 |
-        | 321 |      | 1098 |
-        | abc | defg |      |
-        +-----+------+------+
+        +------+------+------+
+        | ham  | spam | eggs |
+        +------+------+------+
+        | None | 4567 | 8910 |
+        |  321 | None | 1098 |
+        |  abc | defg | None |
+        +------+------+------+
         ''').strip())
 
     def test_table_with_changed_separators(self):
@@ -123,11 +123,23 @@ class TestTable(unittest.TestCase):
         ''').strip())
 
     def test_table_should_accept_headers_as_dict_list_tuple_int_or_float(self):
-        my_table = Table(headers=[42, 3.14, (4, 2), [3, 14], {'answer': 42}])
+        my_table = Table(headers=[42, 3.14, (4, 2), [3, 14], {'answer': 42},
+                                  None])
         self.assertEqual(str(my_table), dedent('''
-        +----+------+--------+---------+----------------+
-        | 42 | 3.14 | (4, 2) | [3, 14] | {'answer': 42} |
-        +----+------+--------+---------+----------------+
+        +----+------+--------+---------+----------------+------+
+        | 42 | 3.14 | (4, 2) | [3, 14] | {'answer': 42} | None |
+        +----+------+--------+---------+----------------+------+
+        ''').strip())
+
+    def test_None_in_rows(self):
+        my_table = Table(headers=['a', 'b', 'c'])
+        my_table.rows.append([None, None, None])
+        self.assertEqual(str(my_table), dedent('''
+        +------+------+------+
+        |  a   |  b   |  c   |
+        +------+------+------+
+        | None | None | None |
+        +------+------+------+
         ''').strip())
 
     def test_table_with_many_headers_and_rows_right_aligned(self):
@@ -328,9 +340,9 @@ class TestTable(unittest.TestCase):
         +-------+-------+--------+
         |  ham  |  spam |  eggs  |
         +-------+-------+--------+
-        |  John |       | Cleese |
-        |       |  Eric |   Idle |
-        | Terry | Jones |        |
+        |  John |  None | Cleese |
+        |  None |  Eric |   Idle |
+        | Terry | Jones |   None |
         +-------+-------+--------+
         ''').strip())
 

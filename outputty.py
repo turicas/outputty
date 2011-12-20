@@ -21,7 +21,6 @@ import datetime
 import re
 from numpy import histogram, ceil
 
-
 class MyCSV(csv.Dialect):
     delimiter = ','
     quotechar = '"'
@@ -119,8 +118,6 @@ class Table(object):
         for index, column in enumerate(zip(*self.rows)):
             sizes = []
             for value in column:
-                if value is None:
-                    value = ''
                 sizes.append(len(unicode(value)))
             max_size = max(sizes)
             if max_size > self.max_size[self.headers[index]]:
@@ -141,8 +138,8 @@ class Table(object):
         for header in self.headers:
             if not isinstance(header, unicode):
                 header = str(header)
-            dashes.append(self.dash * (self.max_size[header] + 2))
             centered_headers.append(header.center(self.max_size[header]))
+            dashes.append(self.dash * (self.max_size[header] + 2))
         split_line = self.plus + self.plus.join(dashes) + self.plus
         header_line = self._make_line_from_row_data(centered_headers)
 
@@ -150,8 +147,6 @@ class Table(object):
         for row in self.rows:
             row_data = []
             for i, info in enumerate(row):
-                if info is None:
-                    info = ''
                 data = unicode(info).rjust(self.max_size[self.headers[i]])
                 row_data.append(data)
             result.append(self._make_line_from_row_data(row_data))
