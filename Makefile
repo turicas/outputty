@@ -4,7 +4,8 @@ clear_screen:
 	@clear
 
 run_nosetest:
-	nosetests --with-coverage --cover-package outputty tests/test_*.py
+	nosetests --ipdb --with-yanc --with-f7u12 --with-coverage \
+	          --cover-package outputty tests/test_*.py
 
 run_unittest:
 	python -m unittest discover -s tests

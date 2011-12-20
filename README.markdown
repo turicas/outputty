@@ -351,6 +351,10 @@ If you want to contribute to this project, please:
   - To run just one test file, execute: `nosetests --with-coverage --cover-package outputty  tests/test_your-test-file.py`
   - Try to have a test-coverage of 100%
 - Create/update documentation (`README.markdown`/docstrings/man page)
+- To run tests, execute `make test`. I use some `nose` plugins -- to install
+  it, execute:
+
+    pip install nose coverage ipdbplugin yanc nose-f7u12
 
 
 ### New `Table.to_*` methods
