@@ -316,6 +316,16 @@ We have three kinds of normalization in `Table`:
   `unicode`, otherwise only types identified as string will be converted to
   `unicode`.
 
+### Encoding and Decoding
+
+- __Decoding__: if do you need `table.headers` and `table.rows` in unicode,
+  just call `table.decode()` and it'll decode all data using
+  `table.input_encoding` (you can pass an alternative codec as parameter).
+- __Encoding__: if do you need `table.headers` and `table.rows` encoded to some
+  codec, just call `table.decode()` and it'll encode all data using
+  `table.output_encoding` (you can pass an alternative codec as parameter).
+
+
 New Features
 ------------
 
