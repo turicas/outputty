@@ -15,25 +15,14 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
-import csv
 import datetime
 import re
-from numpy import histogram, ceil
-
-class MyCSV(csv.Dialect):
-    delimiter = ','
-    quotechar = '"'
-    doublequote = True
-    skipinitialspace = False
-    lineterminator = '\n'
-    quoting = csv.QUOTE_ALL
 
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8', from_csv='',
-                 convert_types=True, order_by='', ordering=''):
+                 input_encoding='utf8', output_encoding='utf8', order_by='',
+                 ordering=''):
         self.headers = headers if headers is not None else []
         self.dash = dash
         self.pipe = pipe
@@ -43,9 +32,7 @@ class Table(object):
         self.csv_filename = None
         self.rows = []
         self.types = {}
-        if from_csv:
-            self.convert_types = convert_types
-            self._import_from_csv(from_csv)
+        self.plugins = {}
         self.order_by_column = order_by
         self.ordering = ordering
 
@@ -157,26 +144,6 @@ class Table(object):
     def __str__(self):
         return self.__unicode__().encode(self.output_encoding)
 
-    def _import_from_csv(self, file_name_or_pointer):
-        if isinstance(file_name_or_pointer, (str, unicode)):
-            self.csv_filename = file_name_or_pointer
-            fp = open(file_name_or_pointer, 'r')
-        else:
-            fp = file_name_or_pointer
-        self.fp = fp
-        info = fp.read().decode(self.input_encoding).encode('utf8')
-        reader = csv.reader(info.split('\n'))
-        self.data = [x for x in reader if x]
-        if self.csv_filename:
-            fp.close()
-        self.headers = []
-        self.rows = []
-        if self.data:
-            self.headers = [x.decode('utf8') for x in self.data[0]]
-            self.rows = [[y.decode('utf8') for y in x] for x in self.data[1:]]
-            if self.convert_types:
-                self.normalize_types()
-
     def to_list_of_dicts(self):
         self._organize_data()
         self.encode()
@@ -252,23 +219,6 @@ class Table(object):
             rows_converted.append(row_data)
         self.rows = rows_converted
 
-    def to_csv(self, filename):
-        self._organize_data()
-        encoded_headers = [x.encode(self.output_encoding) for x in self.headers]
-        encoded_rows = [[info.encode(self.output_encoding) for info in row] \
-                        for row in self.rows]
-        encoded_data = [encoded_headers] + encoded_rows
-        fp = open(filename, 'w')
-        writer = csv.writer(fp, dialect=MyCSV)
-        writer.writerows(encoded_data)
-        fp.close()
-
-    def to_text_file(self, filename):
-        self._organize_data()
-        fp = open(filename, 'w')
-        fp.write(self.__str__())
-        fp.close()
-
     def to_dict(self, only=None, key=None, value=None):
         self._organize_data()
         self.encode()
@@ -292,73 +242,17 @@ class Table(object):
         self.decode(self.output_encoding)
         return table_dict
 
-    def _to_html_unicode(self):
-        self._organize_data()
-        result = ['<table>', '  <thead>']
-        if self.css_classes:
-            result.append('    <tr class="header">')
-        else:
-            result.append('    <tr>')
-        for header in self.headers:
-            result.append('      <th>%s</th>' % header)
-        result.extend(['    </tr>', '  </thead>'])
-        if len(self.rows):
-            result.append('  <tbody>')
-        i = 1
-        for row in self.rows:
-            if self.css_classes:
-                result.append('    <tr class="%s">' % \
-                              ('odd' if i % 2 else 'even'))
-            else:
-                result.append('    <tr>')
-            for value in row:
-                if value is None:
-                    value = ''
-                result.append('      <td>%s</td>' % value)
-            result.append('    </tr>')
-            i += 1
-        if len(self.rows):
-            result.append('  </tbody>')
-        result.append('</table>')
-        return '\n'.join(result)
+    def _load_plugin(self, plugin_name):
+        if plugin_name not in self.plugins:
+            complete_name = 'outputty.plugin_' + plugin_name
+            plugin = __import__(complete_name, fromlist=['outputty'])
+            self.plugins[plugin_name] = plugin
+        return self.plugins[plugin_name]
 
-    def to_html(self, filename='', css_classes=True):
-        self.css_classes = css_classes
-        contents = self._to_html_unicode().encode(self.output_encoding)
-        if not filename:
-            return contents
-        else:
-            fp = open(filename, 'w')
-            fp.write(contents)
-            fp.close()
+    def read(self, plugin_name, *args, **kwargs):
+        plugin = self._load_plugin(plugin_name)
+        return plugin.read(self, *args, **kwargs)
 
-    def to_histogram(self, column, orientation='vertical', height=4,
-                     character='|', bins=5):
-        values = zip(*self.rows)[self.headers.index(column)]
-        self.histogram = histogram(values, bins)
-        his = []
-        bars = self.histogram[0] / max(self.histogram[0]) * height
-        if orientation == 'vertical':
-            for l in reversed(range(1, height + 1)):
-                line = ''
-                if l == height:
-                    line = '%s ' % max(self.histogram[0]) #histogram top count
-                else:
-                    line = ' ' * (len(str(max(self.histogram[0]))) + 1) #add leading spaces
-                for c in bars:
-                    if c >= ceil(l):
-                        line += character
-                    else:
-                        line += ' '
-                his.append(line.rstrip())
-            his.append('%.2f%s%.2f' % (self.histogram[1][0], ' ' * bins,
-                                       self.histogram[1][-1]))
-        else:
-            xl = ['%.2f' % n for n in self.histogram[1]]
-            lxl = [len(l) for l in xl]
-            his.append(' ' * (max(bars) + 2 + max(lxl)) + '%s\n' % \
-                       max(self.histogram[0]))
-            for i, c in enumerate(bars):
-                line = xl[i] + ' ' * (max(lxl) - lxl[i]) + ': ' + character * c
-                his.append(line.rstrip())
-        return '\n'.join(his)
+    def write(self, plugin_name, *args, **kwargs):
+        plugin = self._load_plugin(plugin_name)
+        return plugin.write(self, *args, **kwargs)

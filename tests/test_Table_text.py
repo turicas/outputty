@@ -32,7 +32,8 @@ class TestTableTxt(unittest.TestCase):
         my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
         my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
 
-        my_table.to_text_file(temp_fp.name)
+        my_table.write('text', temp_fp.name)
+        output = my_table.write('text')
         fp = open(temp_fp.name, 'r')
         contents = fp.read()
         fp.close()
@@ -46,6 +47,7 @@ class TestTableTxt(unittest.TestCase):
         |  11 |   22 |   33 |
         +-----+------+------+
         ''').strip())
+        self.assertEquals(contents, output)
 
     def test_input_and_output_character_encoding_in_method_to_text_file(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
@@ -53,7 +55,7 @@ class TestTableTxt(unittest.TestCase):
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
         my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
-        my_table.to_text_file(temp_fp.name)
+        my_table.write('text', temp_fp.name)
 
         fp = open(temp_fp.name)
         file_contents = fp.read()

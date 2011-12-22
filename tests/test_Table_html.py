@@ -25,11 +25,11 @@ from outputty import Table
 class TestTableHtml(unittest.TestCase):
     def test_to_html_should_without_parameters_should_return_string(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        self.assertTrue(isinstance(my_table.to_html(), str))
+        self.assertTrue(isinstance(my_table.write('html'), str))
 
     def test_to_html_with_only_headers(self):
         my_table = Table(headers=['ham', 'spam', 'eggs', None])
-        output = my_table.to_html(css_classes=False)
+        output = my_table.write('html', css_classes=False)
         expected = dedent('''
         <table>
           <thead>
@@ -48,7 +48,7 @@ class TestTableHtml(unittest.TestCase):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append(['python', 'rules', '!'])
         my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
-        output = my_table.to_html(css_classes=False)
+        output = my_table.write('html', css_classes=False)
         expected = dedent('''
         <table>
           <thead>
@@ -79,7 +79,7 @@ class TestTableHtml(unittest.TestCase):
         my_table.rows.append({'ham': 'spam'})
         my_table.rows.append({'spam': 'eggs'})
         my_table.rows.append({'eggs': 'ham'})
-        output = my_table.to_html(css_classes=False)
+        output = my_table.write('html', css_classes=False)
         expected = dedent('''
         <table>
           <thead>
@@ -116,7 +116,7 @@ class TestTableHtml(unittest.TestCase):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append(['python', 'rules', '!'])
         my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
-        my_table.to_html(temp_fp.name, css_classes=False)
+        my_table.write('html', temp_fp.name, css_classes=False)
         temp_fp = open(temp_fp.name)
         output = temp_fp.read()
         temp_fp.close()
@@ -152,7 +152,7 @@ class TestTableHtml(unittest.TestCase):
         my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
         my_table.rows.append(['python', 'rules', '!'])
         my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
-        output = my_table.to_html(css_classes=True)
+        output = my_table.write('html', css_classes=True)
         expected = dedent('''
         <table>
           <thead>

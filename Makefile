@@ -25,6 +25,7 @@ unittest:  clear_screen clean run_unittest
 clean:
 	find -regex '.*\.pyc' -exec rm {} \;
 	find -regex '.*~' -exec rm {} \;
+	rm -rf reg_settings.py*
 
 .PHONY: test clear_screen nosetest unittest clean run_unittest run_nosetest \
         test_failures nosetest_ipdb_failures run_nosetest_ipdb_failures
