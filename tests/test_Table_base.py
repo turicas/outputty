@@ -465,20 +465,21 @@ class TestTable(unittest.TestCase):
         self.assertEqual(str(table_2), expected_output)
 
     def test_order_by_method_should_order_data_internally(self):
-        table = Table(headers=['spam'])
-        table.rows.extend([[5], [3], [7], [10]])
-        table.order_by('spam', 'asc')
+        my_table = Table(headers=['spam', 'ham', 'eggs'])
+        my_table.rows.append({'spam': 'Eric', 'eggs': 'Idle'})
+        my_table.rows.append({'ham': 'John', 'eggs': 'Cleese'})
+        my_table.rows.append({'ham': 'Terry', 'spam': 'Jones'})
+        my_table.order_by('spam', 'asc')
         expected_output = dedent('''
-        +------+
-        | spam |
-        +------+
-        |    3 |
-        |    5 |
-        |    7 |
-        |   10 |
-        +------+
+        +-------+-------+--------+
+        |  spam |  ham  |  eggs  |
+        +-------+-------+--------+
+        |  None |  John | Cleese |
+        |  Eric |  None |   Idle |
+        | Jones | Terry |   None |
+        +-------+-------+--------+
         ''').strip()
-        self.assertEqual(str(table), expected_output)
+        self.assertEqual(str(my_table), expected_output)
 
     def test_order_by_method_should_order_ascending_by_default(self):
         table = Table(headers=['spam'])
@@ -551,5 +552,3 @@ class TestTable(unittest.TestCase):
                       u'ham'.encode('utf16'): [2.71, u'yeh'.encode('utf16'),
                                                u'Justen'.encode('utf16')]}
         self.assertEqual(table_dict_2, expected_2)
-
-    #TODO: identify data types before ordering and from_csv

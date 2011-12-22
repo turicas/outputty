@@ -37,6 +37,8 @@ class Table(object):
         self.ordering = ordering
 
     def order_by(self, column, ordering='asc'):
+        self.normalize_structure()
+        self.decode()
         index = self.headers.index(column)
         if ordering.lower().startswith('desc'):
             sort_function = lambda x, y: cmp(y[index], x[index])
