@@ -50,17 +50,19 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_connection_parameters(self):
         table = Table()
-        table._get_mysql_config('username:password@hostname/database/table')
-        self.assertEquals(table.mysql_username, 'username')
-        self.assertEquals(table.mysql_password, 'password')
-        self.assertEquals(table.mysql_hostname, 'hostname')
+        plugin_mysql = table._load_plugin('mysql')
+        plugin_mysql._get_mysql_config(table, 'u:p@h/d/t')
+        self.assertEquals(table.mysql_username, 'u')
+        self.assertEquals(table.mysql_password, 'p')
+        self.assertEquals(table.mysql_hostname, 'h')
         self.assertEquals(table.mysql_port, 3306)
-        self.assertEquals(table.mysql_database, 'database')
-        self.assertEquals(table.mysql_table, 'table')
+        self.assertEquals(table.mysql_database, 'd')
+        self.assertEquals(table.mysql_table, 't')
 
     def test_connection_parameters_with_changed_port(self):
         table = Table()
-        table._get_mysql_config('u:p@h:0/d/t')
+        plugin_mysql = table._load_plugin('mysql')
+        plugin_mysql._get_mysql_config(table, 'u:p@h:0/d/t')
         self.assertEquals(table.mysql_username, 'u')
         self.assertEquals(table.mysql_password, 'p')
         self.assertEquals(table.mysql_hostname, 'h')
@@ -72,7 +74,8 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('INSERT INTO %s VALUES (123, "a")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (456, "b")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (789, "c")' % self.table)
-        table = Table(from_mysql=self.connection_string)
+        table = Table()
+        table.read('mysql', self.connection_string)
         self.assertEquals(str(table), dedent('''
         +--------+--------+
         | field1 | field2 |
@@ -89,7 +92,8 @@ class TestTableMySQL(unittest.TestCase):
                                d DATETIME, e TEXT)' % self.table)
         self.connection.query('INSERT INTO %s VALUES (1, 3.14, "2011-11-11", \
                                "2011-11-11 11:11:11", "Python")' % self.table)
-        table = Table(from_mysql=self.connection_string)
+        table = Table()
+        table.read('mysql', self.connection_string)
         int_value = table.rows[0][0]
         float_value = table.rows[0][1]
         date_value = table.rows[0][2]
@@ -105,14 +109,14 @@ class TestTableMySQL(unittest.TestCase):
     def test_to_mysql_should_create_table_even_if_only_headers_present(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs'])
-        table.to_mysql(self.connection_string)
+        table.write('mysql', self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(set(cols), set(['spam', 'eggs']))
 
     def test_to_mysql_should_not_create_table_if_it_exists(self):
         table = Table()
-        table.to_mysql(self.connection_string)
+        table.write('mysql', self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(set(cols), set(['field1', 'field2']))
@@ -122,7 +126,7 @@ class TestTableMySQL(unittest.TestCase):
         table = Table(headers=['spam', 'eggs'])
         table.rows.append(['python', 'rules'])
         table.rows.append(['free software', 'ownz'])
-        table.to_mysql(self.connection_string)
+        table.write('mysql', self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
         rows = [row for row in self.cursor.fetchall()]
         self.assertEquals(rows, [('python', 'rules'),
@@ -200,7 +204,7 @@ class TestTableMySQL(unittest.TestCase):
         table.rows.append([3, 1.23, '2011-01-03', '2011-01-01 00:00:02', 'jkl'])
         table.rows.append([4, 4.56, '2011-01-04', '2011-01-01 00:00:03', 'qwe'])
         table.rows.append([5, 7.89, '2011-01-05', '2011-01-01 00:00:04', 'rty'])
-        table.to_mysql(self.connection_string)
+        table.write('mysql', self.connection_string)
         self.cursor.execute('DESCRIBE ' + self.table)
         data_types = dict([[x[0], x[1]] for x in self.cursor.fetchall()])
         self.assertTrue(data_types['spam'].startswith('int'))
@@ -214,7 +218,7 @@ class TestTableMySQL(unittest.TestCase):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.rows.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
         table.rows.append([None, None, None, None, None])
-        table.to_mysql(self.connection_string)
+        table.write('mysql', self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
         rows = self.cursor.fetchall()
         for i in range(5):
@@ -224,10 +228,12 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['eggs'])
         table.rows.append(['spam"ham'])
-        table.to_mysql(self.connection_string)
-        table_2 = Table(from_mysql=self.connection_string)
+        table.write('mysql', self.connection_string)
+        table_2 = Table()
+        table_2.read('mysql', self.connection_string)
         self.assertEquals(table_2.rows[0][0], 'spam"ham')
 
+    @unittest.skip('Not implemented')
     def test_should_import_from_any_python_db_api_compatible(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
