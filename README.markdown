@@ -379,6 +379,22 @@ or `my_table.read('name', optional_parameters)` (where `name` is the name of
 your plugin), then `outputty` will call `outputty.plugin_name.read` or
 `outputty.plugin_name.write`.
 
+### Contributors
+
+My sincerely thanks to:
+
+- [Fundação Getúlio Vargas](http://www.fgv.br/) for letting me invest my time
+  on it.
+- [Douglas Andrade](https://github.com/douglas) for showing me
+  `textwrap.dedent` and writting more legible tests.
+- [Flávio Coelho](https://github.com/fccoelho) for creating `histogram` and
+  giving a lot of suggestions.
+- [Renne Rocha](https://github.com/rennerocha) for creating `order_by`.
+- [Tatiana Al-Chueyr](https://github.com/tatiana) for helping me design the
+  simple yet powerful plugin API.
+- [Flávio Amieiro](https://github.com/flavioamieiro) for a lot of suggestions
+  and interpretations about design.
+
 
 Related Software
 ----------------
