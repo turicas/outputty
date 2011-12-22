@@ -15,6 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import types
 from textwrap import dedent
 import unittest
 from outputty import Table
@@ -552,3 +553,12 @@ class TestTable(unittest.TestCase):
                       u'ham'.encode('utf16'): [2.71, u'yeh'.encode('utf16'),
                                                u'Justen'.encode('utf16')]}
         self.assertEqual(table_dict_2, expected_2)
+
+    def test_available_plugins_method_should_return_a_dict(self):
+        table = Table()
+        plugins = table.available_plugins()
+        self.assertEquals(type(plugins), types.DictType)
+        self.assertEquals(plugins['text'], ['write'])
+        self.assertEquals(plugins['html'], ['write'])
+        self.assertEquals(plugins['histogram'], ['write'])
+        self.assertEquals(plugins['csv'], ['read', 'write'])

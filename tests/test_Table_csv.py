@@ -160,6 +160,21 @@ class TestTableCsv(unittest.TestCase):
         temp_fp.close()
         self.assertEqual(table_output, output)
 
+    def test_write_csv_should_accept_filepointer(self):
+        data = '"Álvaro"\n"Píton"\n'
+        temp_fp_r = tempfile.NamedTemporaryFile()
+        temp_fp_w = tempfile.NamedTemporaryFile()
+        temp_fp_r.write(data)
+        temp_fp_r.seek(0)
+        my_table = Table()
+        my_table.read('csv', temp_fp_r)
+        my_table.write('csv', temp_fp_w)
+        temp_fp_w.seek(0)
+        contents = temp_fp_w.read()
+        temp_fp_r.close()
+        temp_fp_w.close()
+        self.assertEqual(contents, data)
+
     def test_input_encoding_should_affect_read_csv_when_using_filepointer(self):
         data = '"Álvaro"\n"Píton"'
         temp_fp = tempfile.NamedTemporaryFile()

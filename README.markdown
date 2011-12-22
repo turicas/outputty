@@ -98,6 +98,7 @@ The file `nice-software.txt` will be created with this content:
     |  3 |  fabric |     http://fabfile.org/ |
     +----+---------+-------------------------+
 
+
 ### Example 4: Ordering `Table` Data
 
 You can order your table's data with the method `Table.order_by`.

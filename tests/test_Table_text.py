@@ -26,12 +26,10 @@ class TestTableTxt(unittest.TestCase):
     def test_should_save_data_into_text_file(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
-
         my_table = Table(headers=['ham', 'spam', 'eggs'])
         my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
         my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
         my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
-
         my_table.write('text', temp_fp.name)
         output = my_table.write('text')
         fp = open(temp_fp.name, 'r')
@@ -46,7 +44,7 @@ class TestTableTxt(unittest.TestCase):
         |   1 |    2 |    3 |
         |  11 |   22 |   33 |
         +-----+------+------+
-        ''').strip())
+        ''').strip() + '\n')
         self.assertEquals(contents, output)
 
     def test_input_and_output_character_encoding_in_method_to_text_file(self):
@@ -67,5 +65,24 @@ class TestTableTxt(unittest.TestCase):
         +--------+
         |  Píton |
         +--------+
-        ''').strip().decode('utf8').encode('iso-8859-1')
+        ''').strip() + '\n'
+        output = output.decode('utf8').encode('iso-8859-1')
+        self.assertEqual(file_contents, output)
+
+    def test_input_file_can_be_a_filepointer(self):
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        my_table = Table(headers=['python'])
+        my_table.rows.append(['rules'])
+        my_table.write('text', temp_fp)
+        temp_fp.seek(0)
+        file_contents = temp_fp.read()
+        temp_fp.close()
+        os.remove(temp_fp.name)
+        output = dedent('''
+        +--------+
+        | python |
+        +--------+
+        |  rules |
+        +--------+
+        ''').strip() + '\n'
         self.assertEqual(file_contents, output)

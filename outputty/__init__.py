@@ -15,13 +15,18 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import sys
 import datetime
 import re
+from glob import glob
 
+
+sys.path.insert(0, os.path.dirname(__file__))
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8', order_by='',
+                 input_encoding='utf-8', output_encoding='utf-8', order_by='',
                  ordering=''):
         self.headers = headers if headers is not None else []
         self.dash = dash
@@ -258,3 +263,17 @@ class Table(object):
     def write(self, plugin_name, *args, **kwargs):
         plugin = self._load_plugin(plugin_name)
         return plugin.write(self, *args, **kwargs)
+
+    def available_plugins(self):
+        plugins = {}
+        for filename in glob(os.path.join(os.path.dirname(__file__), '*.py')):
+            filename = os.path.basename(filename)
+            if filename.startswith('plugin_'):
+                name = filename.replace('plugin_', '').replace('.py', '')
+                plugins[name] = []
+                plugin = self._load_plugin(name)
+                if hasattr(plugin, 'read'):
+                    plugins[name].append('read')
+                if hasattr(plugin, 'write'):
+                    plugins[name].append('write')
+        return plugins

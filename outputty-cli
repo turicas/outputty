@@ -23,46 +23,56 @@ from cStringIO import StringIO
 from outputty import Table
 
 
-parser = argparse.ArgumentParser(description='Show data in terminal in a '
-'beautiful way, with Python')
-parser.add_argument('--table', dest='table', help='Create a table',
-                    action='store_true')
-parser.add_argument('--to-csv', dest='to_csv', help='Export data to CSV file',
-                    action='store', metavar='filename', default='', nargs='?')
-parser.add_argument('--from-csv', dest='from_csv', help='Import data from CSV',
-                    action='store', metavar='filename', default='', nargs='?')
+table = Table()
+parser = argparse.ArgumentParser(description='outputty: import, filter and '
+                                             'export data easily.')
 parser.add_argument('--input-encoding', dest='input_encoding',
-                    help='Set new input encoding (default: UTF-8)',
+                    help='Set new input encoding (default: %s)' % \
+                    table.input_encoding,
                     action='store', metavar='encoding', default='utf8',
                     nargs='?')
+plugins = table.available_plugins()
+plugin_names = plugins.keys()
+plugin_names.sort()
+for plugin in plugin_names:
+    if 'read' in plugins[plugin]:
+        parser.add_argument('--read-' + plugin, dest='read_' + plugin,
+                            help='Import data using plugin ' + plugin,
+                            action='store', metavar='filename', default='',
+                            nargs='?')
+    if 'write' in plugins[plugin]:
+        parser.add_argument('--write-' + plugin, dest='write_' + plugin,
+                            help='Export data using plugin ' + plugin,
+                            action='store', metavar='filename', default='',
+                            nargs='?')
 
-args = parser.parse_args()
-if not args.table:
-    parser.print_help()
-else:
-    input_filename = args.from_csv or sys.stdin
-    try:
-        table = Table(input_encoding=args.input_encoding)
-        table.read('csv', input_filename)
-    except IOError as exception:
-        sys.stderr.write(str(exception) + '\n')
-        exit(1)
+args = vars(parser.parse_args())
+table.input_encoding = args['input_encoding']
+read_parameter = sys.stdin
+write_parameter = sys.stdout
+read_plugin = 'csv'
+write_plugin = 'text'
+plugin_names.reverse()
+for plugin in plugin_names:
+    if 'read' in plugins[plugin] and 'read_' + plugin in args and \
+       args['read_' + plugin]:
+        read_plugin = plugin
+        if args['read_' + plugin]:
+            read_parameter = args['read_' + plugin]
+    if 'write' in plugins[plugin] and 'write_' + plugin in args and \
+       args['write_' + plugin]:
+        write_plugin = plugin
+        if args['write_' + plugin]:
+            write_parameter = args['write_' + plugin]
 
-    if args.to_csv is None: #--to-csv without filename
-        temp_fp = tempfile.NamedTemporaryFile(delete=False)
-        temp_fp.close()
-        table.write('csv', temp_fp.name)
-        fp = open(temp_fp.name)
-        contents = fp.read()
-        fp.close()
-        os.remove(temp_fp.name)
-        print contents
-    elif args.to_csv:
-        filename = args.to_csv
-        try:
-            table.write('csv', filename)
-        except IOError as exception:
-            sys.stderr.write(str(exception) + '\n')
-            exit(2)
-    else:
-        print table
+try:
+    table.read(read_plugin, read_parameter)
+except IOError as e:
+    sys.stderr.write(str(e) + '\n')
+    sys.exit(1)
+
+try:
+    table.write(write_plugin, write_parameter)
+except IOError as e:
+    sys.stderr.write(str(e) + '\n')
+    sys.exit(2)

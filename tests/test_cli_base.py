@@ -20,18 +20,12 @@ from utils import sh, execute, OUTPUTTY_EXECUTABLE
 
 
 class TestOutputtyCli(unittest.TestCase):
-    def test_outputty_command_should_run(self):
-        process = sh(OUTPUTTY_EXECUTABLE)
-        self.assertEquals(process.returncode, 0)
-        self.assertEquals(process.err, '')
-
-    def test_outputty_without_parameters_should_return_help(self):
-        out, err = execute()
-        help_string = 'Show data in terminal in a beautiful way, with Python'
-        self.assertIn(help_string, out)
+    def test_outputty_with_dash_h_should_return_help(self):
+        out, err = execute('-h')
+        self.assertIn('import, filter and export data easily', out)
         self.assertIn('usage', out)
         self.assertIn('optional arguments', out)
 
-    #TODO: add tests to --input-encoding and --output-encoding
+    #TODO: add tests to --output-encoding
     #TODO: add parameter to change `dash`, `pipe` and `plus`
     #TODO: create test_cli_txt.py

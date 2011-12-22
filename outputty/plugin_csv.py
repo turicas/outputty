@@ -12,36 +12,40 @@ class MyCSV(csv.Dialect):
     lineterminator = '\n'
     quoting = csv.QUOTE_ALL
 
-def read(table, file_name_or_pointer, convert_types=True):
-    table.convert_types = convert_types
-    if isinstance(file_name_or_pointer, (str, unicode)):
-        table.csv_filename = file_name_or_pointer
-        fp = open(file_name_or_pointer, 'r')
+def read(table, filename_or_pointer, convert_types=True):
+    if isinstance(filename_or_pointer, (str, unicode)):
+        fp = open(filename_or_pointer, 'r')
+        close = True
     else:
-        fp = file_name_or_pointer
-    table.fp = fp
+        fp = filename_or_pointer
+        close = False
     info = fp.read().decode(table.input_encoding).encode('utf8')
     reader = csv.reader(info.split('\n'))
-    table.data = [x for x in reader if x]
-    if table.csv_filename:
-        fp.close()
+    data = [x for x in reader if x]
     table.headers = []
     table.rows = []
-    if table.data:
-        table.headers = table.data[0]
-        table.rows = table.data[1:]
+    if data:
+        table.headers = data[0]
+        table.rows = data[1:]
         table.decode('utf-8')
-        if table.convert_types:
+        if convert_types:
             table.normalize_types()
+    if close:
+        fp.close()
 
-def write(table, filename):
+def write(table, filename_or_pointer):
     table.decode()
     table.encode()
     encoded_data = [[str(x) for x in table.headers]] + \
                    [[str(v) for v in row] for row in table.rows]
-    print encoded_data
-    fp = open(filename, 'w')
+    if isinstance(filename_or_pointer, (str, unicode)):
+        fp = open(filename_or_pointer, 'w')
+        close = True
+    else:
+        fp = filename_or_pointer
+        close = False
     writer = csv.writer(fp, dialect=MyCSV)
     writer.writerows(encoded_data)
-    fp.close()
     table.decode(table.output_encoding)
+    if close:
+        fp.close()
