@@ -3,5 +3,6 @@
 def _transform(data):
     return ', '.join([str(x) for x in data])
 
-def out(table):
+def write(table):
+    '''Writes `table.data` to stdout'''
     print 'Your data is: ', _transform(table.data)

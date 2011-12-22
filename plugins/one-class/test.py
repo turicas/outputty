@@ -7,5 +7,9 @@ my_table = Table()
 print dir(my_table)
 
 my_table.sort()
-my_table.out('show')
-my_table.out('savefile', 'test.txt')
+my_table.write('show')
+my_table.write('file', 'test.txt')
+
+other_table = Table()
+other_table.read('file', 'data.txt')
+print other_table.data
