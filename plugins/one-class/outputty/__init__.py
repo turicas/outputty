@@ -2,7 +2,9 @@
 
 class Table(object):
     def __init__(self, data=None):
-        self.data = data or [5, 4, 3, 2, 1]
+        if data is None:
+            data = []
+        self.data = data
         self.plugins = {}
 
     def _load_plugin(self, plugin_name):
