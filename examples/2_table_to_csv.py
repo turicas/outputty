@@ -5,4 +5,4 @@ from outputty import Table
 my_table = Table(headers=['First name', 'Last name'])
 my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
 my_table.rows.append(('Flávio', 'Amieiro'))
-my_table.to_csv('my-data.csv')
+my_table.write('csv', 'my-data.csv')

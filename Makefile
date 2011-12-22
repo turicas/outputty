@@ -26,6 +26,9 @@ clean:
 	find -regex '.*\.pyc' -exec rm {} \;
 	find -regex '.*~' -exec rm {} \;
 	rm -rf reg_settings.py*
+	rm -rf examples/my-data.csv
+	rm -rf examples/nice-software.html
+	rm -rf examples/nice-software.txt
 
 .PHONY: test clear_screen nosetest unittest clean run_unittest run_nosetest \
         test_failures nosetest_ipdb_failures run_nosetest_ipdb_failures

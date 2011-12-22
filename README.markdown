@@ -2,8 +2,12 @@ outputty
 ========
 
 With `outputty` you can show the data of your Python software in text mode
-(terminal, CSV or TXT) in a easy and beautiful way. You can also import data
-easily.
+(standard output, CSV, TXT, HTML etc.) in a easy and beautiful way. You can
+import and export data easily. `outputty` is just a Python library that helps
+you importing, filtering and exporting data.
+
+It has a concept of plugins so you can write your own plugin to import/export
+data the way you need.
 
 
 Installation
