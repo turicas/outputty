@@ -21,7 +21,7 @@ import os
 
 
 TESTS_PATH = os.path.dirname(__file__)
-OUTPUTTY_EXECUTABLE = os.path.join(TESTS_PATH, '../outputty')
+OUTPUTTY_EXECUTABLE = os.path.join(TESTS_PATH, '../outputty-cli')
 
 def sh(command, finalize=True):
     process = subprocess.Popen(shlex.split(command), stderr=subprocess.PIPE,

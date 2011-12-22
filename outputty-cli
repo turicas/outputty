@@ -19,8 +19,8 @@ import os
 import sys
 import argparse
 import tempfile
-from outputty import Table
 from cStringIO import StringIO
+from outputty import Table
 
 
 parser = argparse.ArgumentParser(description='Show data in terminal in a '
@@ -42,8 +42,8 @@ if not args.table:
 else:
     input_filename = args.from_csv or sys.stdin
     try:
-        table = Table(from_csv=input_filename,
-                      input_encoding=args.input_encoding)
+        table = Table(input_encoding=args.input_encoding)
+        table.read('csv', input_filename)
     except IOError as exception:
         sys.stderr.write(str(exception) + '\n')
         exit(1)
@@ -51,7 +51,7 @@ else:
     if args.to_csv is None: #--to-csv without filename
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
-        table.to_csv(temp_fp.name)
+        table.write('csv', temp_fp.name)
         fp = open(temp_fp.name)
         contents = fp.read()
         fp.close()
@@ -60,7 +60,7 @@ else:
     elif args.to_csv:
         filename = args.to_csv
         try:
-            table.to_csv(filename)
+            table.write('csv', filename)
         except IOError as exception:
             sys.stderr.write(str(exception) + '\n')
             exit(2)

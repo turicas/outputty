@@ -108,7 +108,6 @@ class TestOutputtyCli(unittest.TestCase):
         process.stdin.write('a,b\n1,2')
         process.stdin.close()
         process.wait()
-
         self.assertEquals(process.returncode, 2)
         expected_error = "[Errno 13] Permission denied: '/root/test'\n"
         self.assertEquals(process.stderr.read(), expected_error)
