@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import csv
+from StringIO import StringIO
 
 
 class MyCSV(csv.Dialect):
@@ -33,18 +34,25 @@ def read(table, filename_or_pointer, convert_types=True):
     if close:
         fp.close()
 
-def write(table, filename_or_pointer):
+def write(table, filename_or_pointer=None):
     table.decode()
     table.encode()
-    if isinstance(filename_or_pointer, (str, unicode)):
-        fp = open(filename_or_pointer, 'w')
-        close = True
+    if filename_or_pointer is not None:
+        if isinstance(filename_or_pointer, (str, unicode)):
+            fp = open(filename_or_pointer, 'w')
+            close = True
+        else:
+            fp = filename_or_pointer
+            close = False
     else:
-        fp = filename_or_pointer
-        close = False
+        fp = StringIO()
     writer = csv.writer(fp, dialect=MyCSV)
     writer.writerow(table.headers)
     writer.writerows(table.rows)
     table.decode(table.output_encoding)
-    if close:
+    if filename_or_pointer is None:
+        contents = fp.getvalue()
+        fp.close()
+        return contents
+    elif close:
         fp.close()

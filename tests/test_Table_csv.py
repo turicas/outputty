@@ -260,3 +260,20 @@ class TestTableCsv(unittest.TestCase):
         os.remove(temp_fp.name)
         os.remove(temp_fp_2.name)
         self.assertEquals(contents, data)
+
+    def test_write_csv_without_filename_should_return_csv_data(self):
+        data = dedent('''
+        "spam","eggs","ham"
+        "42","3.0","2011-01-02"
+        "1","3.14","2012-01-11"
+        "21","6.28","2010-01-03"
+        "2","2.71","2"
+        ''').strip() + '\n'
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        my_table = Table()
+        my_table.read('csv', temp_fp.name)
+        contents = my_table.write('csv')
+        os.remove(temp_fp.name)
+        self.assertEquals(contents, data)
