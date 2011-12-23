@@ -36,8 +36,6 @@ def read(table, filename_or_pointer, convert_types=True):
 def write(table, filename_or_pointer):
     table.decode()
     table.encode()
-    encoded_data = [[str(x) for x in table.headers]] + \
-                   [[str(v) for v in row] for row in table.rows]
     if isinstance(filename_or_pointer, (str, unicode)):
         fp = open(filename_or_pointer, 'w')
         close = True
@@ -45,7 +43,8 @@ def write(table, filename_or_pointer):
         fp = filename_or_pointer
         close = False
     writer = csv.writer(fp, dialect=MyCSV)
-    writer.writerows(encoded_data)
+    writer.writerow(table.headers)
+    writer.writerows(table.rows)
     table.decode(table.output_encoding)
     if close:
         fp.close()

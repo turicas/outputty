@@ -29,8 +29,13 @@ parser = argparse.ArgumentParser(description='outputty: import, filter and '
 parser.add_argument('--input-encoding', dest='input_encoding',
                     help='Set new input encoding (default: %s)' % \
                     table.input_encoding,
-                    action='store', metavar='encoding', default='utf8',
-                    nargs='?')
+                    action='store', metavar='encoding',
+                    default=table.output_encoding, nargs='?')
+parser.add_argument('--output-encoding', dest='output_encoding',
+                    help='Set new output encoding (default: %s)' % \
+                    table.output_encoding,
+                    action='store', metavar='encoding',
+                    default=table.output_encoding, nargs='?')
 plugins = table.available_plugins()
 plugin_names = plugins.keys()
 plugin_names.sort()
@@ -48,6 +53,7 @@ for plugin in plugin_names:
 
 args = vars(parser.parse_args())
 table.input_encoding = args['input_encoding']
+table.output_encoding = args['output_encoding']
 read_parameter = sys.stdin
 write_parameter = sys.stdout
 read_plugin = 'csv'
@@ -60,7 +66,7 @@ for plugin in plugin_names:
         if args['read_' + plugin]:
             read_parameter = args['read_' + plugin]
     if 'write' in plugins[plugin] and 'write_' + plugin in args and \
-       args['write_' + plugin]:
+       (args['write_' + plugin] or args['write_' + plugin] is None):
         write_plugin = plugin
         if args['write_' + plugin]:
             write_parameter = args['write_' + plugin]

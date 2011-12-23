@@ -123,3 +123,9 @@ class TestOutputtyCli(unittest.TestCase):
         | testing |
         +---------+
         ''').strip() + '\n')
+
+    def test_output_encoding_should_work(self):
+        input_string = '"álvaro"\n"testing"\n'
+        out, err = execute('--write-csv --output-encoding iso-8859-1',
+                           input_string)
+        self.assertEquals(out, input_string.decode('utf8').encode('iso-8859-1'))

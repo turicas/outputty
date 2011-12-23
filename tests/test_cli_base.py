@@ -26,6 +26,4 @@ class TestOutputtyCli(unittest.TestCase):
         self.assertIn('usage', out)
         self.assertIn('optional arguments', out)
 
-    #TODO: add tests to --output-encoding
-    #TODO: add parameter to change `dash`, `pipe` and `plus`
     #TODO: create test_cli_txt.py
