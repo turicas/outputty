@@ -22,9 +22,9 @@ from textwrap import dedent
 from utils import execute, sh, OUTPUTTY_EXECUTABLE
 
 
-class TestOutputtyCli(unittest.TestCase):
+class TestOutputtyCliText(unittest.TestCase):
     def test_outputty_should_pretty_print_table_from_csv_data_in_stdin(self):
-        out, err = execute('', 'a,b\n1,2\n')
+        out, err = execute('--read-csv', 'a,b\n1,2\n')
         self.assertEquals(out, dedent('''
         +---+---+
         | a | b |
@@ -36,11 +36,11 @@ class TestOutputtyCli(unittest.TestCase):
     def test_receive_csv_data_in_stdin_and_save_in_a_text_file(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
-        out, err = execute('--write-text ' + temp_fp.name, 'a,b\n1,2\n')
+        out, err = execute('--read-csv --write-text ' + temp_fp.name, 'a,b\n1,2\n')
         temp_fp = open(temp_fp.name)
-        csv_contents = temp_fp.read()
+        contents = temp_fp.read()
         os.remove(temp_fp.name)
-        self.assertEquals(csv_contents, dedent('''
+        self.assertEquals(contents, dedent('''
         +---+---+
         | a | b |
         +---+---+
@@ -49,7 +49,7 @@ class TestOutputtyCli(unittest.TestCase):
         ''').strip() + '\n')
 
     def using_write_text_without_filename_should_print_to_stdout(self):
-        out, err = execute('--write-csv', 'a,b\n1,2\n')
+        out, err = execute('--read-csv --write-text', 'a,b\n1,2\n')
         self.assertEquals(out, dedent('''
         +---+---+
         | a | b |
@@ -59,7 +59,7 @@ class TestOutputtyCli(unittest.TestCase):
         ''').strip() + '\n')
 
     def test_write_text_with_wrong_filename_returns_2_and_stderr_not_empty(self):
-        process = sh(OUTPUTTY_EXECUTABLE  + ' --write-text /a/b/c',
+        process = sh(OUTPUTTY_EXECUTABLE  + ' --read-csv --write-text /a/b/c',
                      finalize=False)
         process.stdin.write('a\nb')
         process.stdin.close()
@@ -69,7 +69,7 @@ class TestOutputtyCli(unittest.TestCase):
         self.assertEquals(process.stderr.read(), expected_error)
 
     def test_write_text_without_permissions_returns_2_and_stderr_not_empty(self):
-        process = sh(OUTPUTTY_EXECUTABLE  + ' --write-text /root/test',
+        process = sh(OUTPUTTY_EXECUTABLE  + ' --read-csv --write-text /root/test',
                      finalize=False)
         process.stdin.write('a,b\n1,2')
         process.stdin.close()
@@ -80,7 +80,7 @@ class TestOutputtyCli(unittest.TestCase):
 
     def test_output_encoding_should_work(self):
         input_string = '"álvaro"\n"testing"\n'
-        out, err = execute('--write-text --output-encoding iso-8859-1',
+        out, err = execute('--read-csv --write-text --output-encoding iso-8859-1',
                            input_string)
         expected = dedent('''
         +---------+

@@ -56,12 +56,12 @@ table.input_encoding = args['input_encoding']
 table.output_encoding = args['output_encoding']
 read_parameter = sys.stdin
 write_parameter = sys.stdout
-read_plugin = 'csv'
+read_plugin = ''
 write_plugin = 'text'
 plugin_names.reverse()
 for plugin in plugin_names:
     if 'read' in plugins[plugin] and 'read_' + plugin in args and \
-       args['read_' + plugin]:
+       (args['read_' + plugin] or args['read_' + plugin] is None):
         read_plugin = plugin
         if args['read_' + plugin]:
             read_parameter = args['read_' + plugin]
@@ -70,6 +70,10 @@ for plugin in plugin_names:
         write_plugin = plugin
         if args['write_' + plugin]:
             write_parameter = args['write_' + plugin]
+
+if not read_plugin:
+    parser.print_help()
+    sys.exit(0)
 
 try:
     table.read(read_plugin, read_parameter)

@@ -19,11 +19,19 @@ import unittest
 from utils import sh, execute, OUTPUTTY_EXECUTABLE
 
 
-class TestOutputtyCli(unittest.TestCase):
-    def test_outputty_with_dash_h_should_return_help(self):
-        out, err = execute('-h')
+class TestOutputtyCliBase(unittest.TestCase):
+    def test_outputty_without_parameters_should_show_help(self):
+        out, err = execute('')
         self.assertIn('import, filter and export data easily', out)
         self.assertIn('usage', out)
         self.assertIn('optional arguments', out)
 
-    #TODO: create test_cli_txt.py
+    def test_outputty_with_dash_h_or_doubledash_help_should_return_help(self):
+        out, err = execute('-h')
+        out_2, err_2 = execute('--help')
+        self.assertIn('import, filter and export data easily', out)
+        self.assertIn('import, filter and export data easily', out_2)
+        self.assertIn('usage', out)
+        self.assertIn('usage', out_2)
+        self.assertIn('optional arguments', out)
+        self.assertIn('optional arguments', out_2)
