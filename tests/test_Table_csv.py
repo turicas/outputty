@@ -223,3 +223,43 @@ class TestTableCsv(unittest.TestCase):
         for row in my_table.rows:
             for value in row:
                 self.assertEquals(type(value), types.UnicodeType)
+
+    def test_read_csv_and_write_csv(self):
+        data = dedent('''
+        "spam","eggs","ham"
+        "42","3.0","2011-01-02"
+        "1","3.14","2012-01-11"
+        "21","6.28","2010-01-03"
+        "2","2.71","2"
+        ''').strip() + '\n'
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        temp_fp_2 = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp_2.close()
+        my_table = Table()
+        my_table.read('csv', temp_fp.name)
+        my_table.write('csv', temp_fp_2.name)
+        temp_fp_2 = open(temp_fp_2.name)
+        contents = temp_fp_2.read()
+        temp_fp_2.close()
+        os.remove(temp_fp.name)
+        os.remove(temp_fp_2.name)
+        self.assertEquals(contents, data)
+
+    def test_write_csv_without_filename_should_return_csv_data(self):
+        data = dedent('''
+        "spam","eggs","ham"
+        "42","3.0","2011-01-02"
+        "1","3.14","2012-01-11"
+        "21","6.28","2010-01-03"
+        "2","2.71","2"
+        ''').strip() + '\n'
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        my_table = Table()
+        my_table.read('csv', temp_fp.name)
+        contents = my_table.write('csv')
+        os.remove(temp_fp.name)
+        self.assertEquals(contents, data)
