@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-def _to_html_unicode(table):
+def _to_html_unicode(table, css_classes):
     table._organize_data()
     result = ['<table>', '  <thead>']
-    if table.css_classes:
+    if css_classes:
         result.append('    <tr class="header">')
     else:
         result.append('    <tr>')
@@ -15,7 +15,7 @@ def _to_html_unicode(table):
         result.append('  <tbody>')
     i = 1
     for row in table.rows:
-        if table.css_classes:
+        if css_classes:
             result.append('    <tr class="%s">' % \
                           ('odd' if i % 2 else 'even'))
         else:
@@ -31,12 +31,18 @@ def _to_html_unicode(table):
     result.append('</table>')
     return '\n'.join(result)
 
-def write(table, filename='', css_classes=True):
-    table.css_classes = css_classes
-    contents = _to_html_unicode(table).encode(table.output_encoding)
-    if not filename:
+def write(table, filename_or_pointer=None, css_classes=True):
+    contents = _to_html_unicode(table, css_classes) + '\n'
+    contents = contents.encode(table.output_encoding)
+    if not filename_or_pointer:
         return contents
     else:
-        fp = open(filename, 'w')
+        if isinstance(filename_or_pointer, (str, unicode)):
+            fp = open(filename_or_pointer, 'w')
+            close = True
+        else:
+            fp = filename_or_pointer
+            close = False
         fp.write(contents)
-        fp.close()
+        if close:
+            fp.close()

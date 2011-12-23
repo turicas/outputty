@@ -41,7 +41,7 @@ class TestTableHtml(unittest.TestCase):
             </tr>
           </thead>
         </table>
-        ''').strip()
+        ''').strip() + '\n'
         self.assertEquals(output, expected)
 
     def test_to_html_with_headers_and_some_rows(self):
@@ -71,7 +71,7 @@ class TestTableHtml(unittest.TestCase):
             </tr>
           </tbody>
         </table>
-        ''').strip()
+        ''').strip() + '\n'
         self.assertEquals(output, expected)
 
     def test_to_html_with_headers_and_rows_with_some_columns_empty(self):
@@ -107,7 +107,7 @@ class TestTableHtml(unittest.TestCase):
             </tr>
           </tbody>
         </table>
-        ''').strip()
+        ''').strip() + '\n'
         self.assertEquals(output, expected)
 
     def test_to_html_with_a_parameter_should_save_a_file(self):
@@ -143,7 +143,7 @@ class TestTableHtml(unittest.TestCase):
             </tr>
           </tbody>
         </table>
-        ''').strip()
+        ''').strip() + '\n'
         self.assertEquals(output, expected)
 
     def test_to_html_should_create_CSS_classes_for_odd_and_even_rows(self):
@@ -185,5 +185,33 @@ class TestTableHtml(unittest.TestCase):
             </tr>
           </tbody>
         </table>
-        ''').strip()
+        ''').strip() + '\n'
+        self.assertEquals(output, expected)
+
+    def test_write_html_should_accept_filepointer(self):
+        temp_fp = tempfile.NamedTemporaryFile()
+        my_table = Table(headers=['ham', 'spam', 'eggs'])
+        my_table.rows.append(['python', 'rules', '!'])
+        my_table.write('html', temp_fp)
+        temp_fp.seek(0)
+        output = temp_fp.read()
+        temp_fp.close()
+        expected = dedent('''
+        <table>
+          <thead>
+            <tr class="header">
+              <th>ham</th>
+              <th>spam</th>
+              <th>eggs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              <td>python</td>
+              <td>rules</td>
+              <td>!</td>
+            </tr>
+          </tbody>
+        </table>
+        ''').strip() + '\n'
         self.assertEquals(output, expected)
