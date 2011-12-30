@@ -57,13 +57,13 @@ for example_filename in examples:
                 body.append('and do you have the code below, like in '
                             '`examples/%s`: ' % example_filename)
             else:
-                body.append('If do you have this code, like in '
+                body.append('If you have this code, like in '
                             '`examples/%s`: ' % example_filename)
             body.append('    ' + code)
         else:
             input_ = input_.replace("'", '')
             body.append('')
-            body.append('If do you have the file `%s` with these contents:' % \
+            body.append('If you have the file `%s` with these contents:' % \
                         input_)
             body.append('')
             body.append(file_as_markdown(input_))

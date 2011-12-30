@@ -27,7 +27,7 @@ A `Table` is a list of rows. These rows can be represented with `dict`-like,
 `list`-like and `tuple`-like objects. Let's create one and prints it to
 stdout.
 
-If do you have this code, like in `examples/1_table.py`: 
+If you have this code, like in `examples/1_table.py`: 
         
     from outputty import Table
     my_table = Table(headers=['First Name', 'Last Name', 'Main Language'])
@@ -51,7 +51,7 @@ After executing it, you'll get this output:
 Using plugins we can import and export `Table` data to CSV (really, to and
 from a lot of formats). Let's export Python `list` and `dict` to a CSV file.
 
-If do you have this code, like in `examples/2_table_to_csv.py`: 
+If you have this code, like in `examples/2_table_to_csv.py`: 
         
     from outputty import Table
     
@@ -72,7 +72,7 @@ The file `my-data.csv` will be created with this content:
 We can also import data from a CSV file and export it to a text file (using
 plugins, again).
 
-If do you have the file `nice-software.csv` with these contents:
+If you have the file `nice-software.csv` with these contents:
 
     id,name,website
     1,Python,http://www.python.org/
@@ -104,7 +104,7 @@ You can order your table's data with the method `Table.order_by`.
 You need to specify a column in which the ordering will be based on and
 optionally specify if the ordering will be ascending (default) or descending.
 
-If do you have this code, like in `examples/4_order_by.py`: 
+If you have this code, like in `examples/4_order_by.py`: 
         
     from outputty import Table
     
@@ -134,7 +134,7 @@ will return a string (encoded with `output_encoding`, specified in
 `Table.__init__`). If it receives the filename, the contents will be saved
 into it and it'll return nothing.
 
-If do you have this code, like in `examples/5_table_to_html_file.py`: 
+If you have this code, like in `examples/5_table_to_html_file.py`: 
         
     from outputty import Table
     
@@ -177,7 +177,7 @@ There is a plugin called `histogram` that is shipped by default with
 `outputty` - it can create histograms of your table's columns (using `numpy`).
 The output will be the histogram represented as text.
 
-If do you have this code, like in `examples/6_histogram.py`: 
+If you have this code, like in `examples/6_histogram.py`: 
         
     from numpy.random import normal
     from numpy.random import seed
@@ -227,7 +227,7 @@ You can get a entire table columns just getting an item in table object. You
 can also delete an entire column (but you can't actually change an entire
 column).
 
-If do you have this code, like in `examples/7_table_columns.py`: 
+If you have this code, like in `examples/7_table_columns.py`: 
         
     from outputty import Table
     table = Table(headers=['spam', 'eggs', 'ham'])
@@ -284,10 +284,10 @@ You can also get the table string decoded, in unicode:
 
 ### Encoding and Decoding
 
-- __Decoding__: if do you need `table.headers` and `table.rows` in unicode,
+- __Decoding__: if you need `table.headers` and `table.rows` in unicode,
   just call `table.decode()` and it'll decode all data using
   `table.input_encoding` (you can pass an alternative codec as parameter).
-- __Encoding__: if do you need `table.headers` and `table.rows` encoded to some
+- __Encoding__: if you need `table.headers` and `table.rows` encoded to some
   codec, just call `table.decode()` and it'll encode all data using
   `table.output_encoding` (you can pass an alternative codec as parameter).
 
@@ -325,7 +325,7 @@ We have three kinds of normalization in `Table`:
 
 ### `to_list_of_dicts` and `to_dict`
 
-If do you want to access all table rows as dicts, just convert it using the
+If you want to access all table rows as dicts, just convert it using the
 method `to_list_of_dicts`. Using the same table from Example 1, if we execute:
 
     rows = my_table.to_list_of_dicts()
@@ -349,7 +349,7 @@ columns as values and filter which columns will go to the dictionary:
     {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio'), 'Main Language': (u'Python', u'Python')}
     {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio')}
 
-And if do you want to create a `dict` with some column value as key and other
+And if you want to create a `dict` with some column value as key and other
 column value as value you can specify `key` and `value` parameters, as in:
 
     other_table = Table(headers=['date', 'measure'])
@@ -368,7 +368,7 @@ column value as value you can specify `key` and `value` parameters, as in:
 New Features
 ------------
 
-Yes, there are a lot of features to add (it's just the begining). If do you
+Yes, there are a lot of features to add (it's just the begining). If you
 want to contribute, please see our
 [WISHLIST.markdown](https://github.com/turicas/outputty/blob/master/WISHLIST.markdown)
 file.
@@ -400,7 +400,7 @@ If you want to contribute to this project, please:
 
 ### New Plugins
 
-If do you want to create a new plugin to import/export from/to some new
+If you want to create a new plugin to import/export from/to some new
 resource, please see files `outputty/plugin_*.py` - they are simple: you just
 need to create `read` and/or `write` functions that will received the `Table`
 object and, optionally, the parameters you want. Save your file in

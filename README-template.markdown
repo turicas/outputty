@@ -53,10 +53,10 @@ You can also get the table string decoded, in unicode:
 
 ### Encoding and Decoding
 
-- __Decoding__: if do you need `table.headers` and `table.rows` in unicode,
+- __Decoding__: if you need `table.headers` and `table.rows` in unicode,
   just call `table.decode()` and it'll decode all data using
   `table.input_encoding` (you can pass an alternative codec as parameter).
-- __Encoding__: if do you need `table.headers` and `table.rows` encoded to some
+- __Encoding__: if you need `table.headers` and `table.rows` encoded to some
   codec, just call `table.decode()` and it'll encode all data using
   `table.output_encoding` (you can pass an alternative codec as parameter).
 
@@ -94,7 +94,7 @@ We have three kinds of normalization in `Table`:
 
 ### `to_list_of_dicts` and `to_dict`
 
-If do you want to access all table rows as dicts, just convert it using the
+If you want to access all table rows as dicts, just convert it using the
 method `to_list_of_dicts`. Using the same table from Example 1, if we execute:
 
     rows = my_table.to_list_of_dicts()
@@ -118,7 +118,7 @@ columns as values and filter which columns will go to the dictionary:
     {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio'), 'Main Language': (u'Python', u'Python')}
     {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio')}
 
-And if do you want to create a `dict` with some column value as key and other
+And if you want to create a `dict` with some column value as key and other
 column value as value you can specify `key` and `value` parameters, as in:
 
     other_table = Table(headers=['date', 'measure'])
@@ -137,7 +137,7 @@ column value as value you can specify `key` and `value` parameters, as in:
 New Features
 ------------
 
-Yes, there are a lot of features to add (it's just the begining). If do you
+Yes, there are a lot of features to add (it's just the begining). If you
 want to contribute, please see our
 [WISHLIST.markdown](https://github.com/turicas/outputty/blob/master/WISHLIST.markdown)
 file.
@@ -169,7 +169,7 @@ If you want to contribute to this project, please:
 
 ### New Plugins
 
-If do you want to create a new plugin to import/export from/to some new
+If you want to create a new plugin to import/export from/to some new
 resource, please see files `outputty/plugin_*.py` - they are simple: you just
 need to create `read` and/or `write` functions that will received the `Table`
 object and, optionally, the parameters you want. Save your file in
