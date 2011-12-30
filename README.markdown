@@ -221,6 +221,38 @@ After executing it, you'll get this output:
     2.13 :
     
 
+### Example 7: Using table columns
+
+You can get a entire table columns just getting an item in table object. You
+can also delete an entire column (but you can't actually change an entire
+column).
+
+If do you have this code, like in `examples/7_table_columns.py`: 
+        
+    from outputty import Table
+    table = Table(headers=['spam', 'eggs', 'ham'])
+    table.rows.append(['python', 3.14, 1 + 5j])
+    table.rows.append(['rules', 42, 3 + 4j])
+    del table['eggs']
+    print 'Table after deleting "eggs" column:'
+    print table
+    print '\nNow only column "spam":'
+    print table['spam']
+
+After executing it, you'll get this output:
+
+    Table after deleting "eggs" column:
+    +--------+--------+
+    |  spam  |  ham   |
+    +--------+--------+
+    | python | (1+5j) |
+    |  rules | (3+4j) |
+    +--------+--------+
+    
+    Now only column "spam":
+    [u'python', u'rules']
+    
+
 
 Type Of Data
 ------------

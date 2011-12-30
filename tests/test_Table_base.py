@@ -552,3 +552,20 @@ class TestTable(unittest.TestCase):
                       u'ham'.encode('utf16'): [2.71, u'yeh'.encode('utf16'),
                                                u'Justen'.encode('utf16')]}
         self.assertEqual(table_dict_2, expected_2)
+
+    def test_get_item_should_return_column_values(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.rows.append(['python', 3.14])
+        table.rows.append(['rules', 42])
+        spam_column = ['python', 'rules']
+        eggs_column = [3.14, 42]
+        self.assertEqual(table['spam'], spam_column)
+        self.assertEqual(table['eggs'], eggs_column)
+
+    def test_delete_item_should_delete_a_entire_column(self):
+        table = Table(headers=['spam', 'eggs', 'ham'])
+        table.rows.append(['python', 3.14, 1 + 5j])
+        table.rows.append(['rules', 42, 3 + 4j])
+        del table['eggs']
+        self.assertEquals(table.headers, ['spam', 'ham'])
+        self.assertEquals(table.rows, [['python', 1 + 5j], ['rules', 3 + 4j]])

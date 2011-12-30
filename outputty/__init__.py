@@ -36,6 +36,19 @@ class Table(object):
         self.order_by_column = order_by
         self.ordering = ordering
 
+    def __getitem__(self, column):
+        self.normalize_structure()
+        columns = zip(*self.rows)
+        return list(columns[self.headers.index(column)])
+
+    def __delitem__(self, column):
+        self.normalize_structure()
+        columns = zip(*self.rows)
+        header_index = self.headers.index(column)
+        del columns[header_index]
+        del self.headers[header_index]
+        self.rows = [list(row) for row in zip(*columns)]
+
     def order_by(self, column, ordering='asc'):
         self.normalize_structure()
         self.decode()
