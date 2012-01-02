@@ -223,9 +223,9 @@ After executing it, you'll get this output:
 
 ### Example 7: Using table columns
 
-You can get a entire table columns just getting an item in table object. You
-can also delete an entire column (but you can't actually change an entire
-column).
+You can get a entire table column just getting the item `column-name` in table
+object. You can also delete an entire column (but you can't actually change an
+entire column).
 
 If you have this code, like in `examples/7_table_columns.py`: 
         
@@ -437,3 +437,4 @@ Related Software
 - [clint](https://github.com/kennethreitz/clint)
 - [csvstudio](http://code.google.com/p/csvstudio/)
 - [PyTables](http://www.pytables.org/)
+- [pyspread](http://manns.github.com/pyspread/)

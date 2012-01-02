@@ -38,7 +38,9 @@ Packaging-related stuff
   so we can create a Python package. See
   [The Hitchhiker’s Guide to Packaging](http://guide.python-distribute.org/).
 - __[really-needed]__ Register the project on
-  [PyPi](http://pypi.python.org/pypi).
+  [PyPi](http://pypi.python.org/pypi). See
+  [this guide](http://guide.python-distribute.org/quickstart.html).
+- Get a better grade on [PyPants](http://pypants.org/projects/outputty/).
 
 
 Processing Input Data
