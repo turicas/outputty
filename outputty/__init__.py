@@ -42,18 +42,31 @@ class Table(object):
         self.order_by_column = order_by
         self.ordering = ordering
 
-    def __getitem__(self, column):
-        self.normalize_structure()
-        columns = zip(*self.rows)
-        return list(columns[self.headers.index(column)])
+    def __getitem__(self, item):
+        if isinstance(item, (str, unicode)):
+            if item not in self.headers:
+                raise KeyError
+            self.normalize_structure()
+            columns = zip(*self.rows)
+            if not columns:
+                return []
+            else:
+                return list(columns[self.headers.index(item)])
+        elif isinstance(item, int):
+            return self.rows[item]
+        else:
+            raise ValueError
 
-    def __delitem__(self, column):
-        self.normalize_structure()
-        columns = zip(*self.rows)
-        header_index = self.headers.index(column)
-        del columns[header_index]
-        del self.headers[header_index]
-        self.rows = [list(row) for row in zip(*columns)]
+    def __delitem__(self, item):
+        if isinstance(item, (str, unicode)):
+            self.normalize_structure()
+            columns = zip(*self.rows)
+            header_index = self.headers.index(item)
+            del columns[header_index]
+            del self.headers[header_index]
+            self.rows = [list(row) for row in zip(*columns)]
+        elif isinstance(item, int):
+            del self.rows[item]
 
     def order_by(self, column, ordering='asc'):
         self.normalize_structure()
@@ -277,3 +290,13 @@ class Table(object):
     def write(self, plugin_name, *args, **kwargs):
         plugin = self._load_plugin(plugin_name)
         return plugin.write(self, *args, **kwargs)
+
+    def append(self, item):
+        self.rows.append(item)
+
+    def extend(self, items):
+        for item in items:
+            self.rows.append(item)
+
+    def __len__(self):
+        return len(self.rows)

@@ -553,7 +553,7 @@ class TestTable(unittest.TestCase):
                                                u'Justen'.encode('utf16')]}
         self.assertEqual(table_dict_2, expected_2)
 
-    def test_get_item_should_return_column_values(self):
+    def test_get_item_should_return_column_values_when_passing_string(self):
         table = Table(headers=['spam', 'eggs'])
         table.rows.append(['python', 3.14])
         table.rows.append(['rules', 42])
@@ -562,10 +562,73 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table['spam'], spam_column)
         self.assertEqual(table['eggs'], eggs_column)
 
-    def test_delete_item_should_delete_a_entire_column(self):
+    def test_get_column_should_raises_KeyError_when_header_not_found(self):
+        table = Table(headers=['spam', 'eggs'])
+        with self.assertRaises(KeyError):
+            table['not found column']
+
+    def test_delete_item_passing_string_should_delete_a_entire_column(self):
         table = Table(headers=['spam', 'eggs', 'ham'])
         table.rows.append(['python', 3.14, 1 + 5j])
         table.rows.append(['rules', 42, 3 + 4j])
         del table['eggs']
         self.assertEquals(table.headers, ['spam', 'ham'])
         self.assertEquals(table.rows, [['python', 1 + 5j], ['rules', 3 + 4j]])
+
+    def test_table_append(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.append(['python', 'rules'])
+        table.append(['answer', 42])
+        self.assertEquals(table.rows[0], ['python', 'rules'])
+        self.assertEquals(table.rows[1], ['answer', 42])
+
+    def test_table_extend(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.extend([['python', 'rules'], ['answer', 42]])
+        self.assertEquals(table.rows[0], ['python', 'rules'])
+        self.assertEquals(table.rows[1], ['answer', 42])
+
+    def test_table_get_item(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.extend([['python', 'rules'], ['answer', 42]])
+        self.assertEquals(table[0], ['python', 'rules'])
+        self.assertEquals(table[1], ['answer', 42])
+
+    def test_table_get_item_should_raise_IndexError_when_row_not_found(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.extend([['python', 'rules'], ['answer', 42]])
+        with self.assertRaises(IndexError):
+            table[2]
+
+    def test_table_del_item_should_work_with_rows(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.extend([['python', 'rules'], ['answer', 42]])
+        del table[0]
+        self.assertEquals(table[0], ['answer', 42])
+
+    def test_should_raises_ValueError_when_item_is_not_int_str_or_unicode(self):
+        table = Table()
+        with self.assertRaises(ValueError):
+            table[(4, 3)]
+        with self.assertRaises(ValueError):
+            table[[4, 3]]
+        with self.assertRaises(ValueError):
+            table[{'answer': 43}]
+
+    def test_len_table_should_return_len_of_rows(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.extend([['python', 'rules'], ['answer', 42]])
+        self.assertEquals(len(table), 2)
+
+    def test_get_column_when_no_row_should_return_empty_list(self):
+        table = Table(['testing'])
+        self.assertEquals(table['testing'], [])
+
+    def test_table_should_be_a_sequence(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.extend([['python', 'rules'], ['answer', 42]])
+        items = []
+        for item in table:
+            items.append(item)
+        self.assertEquals(items[0], ['python', 'rules'])
+        self.assertEquals(items[1], ['answer', 42])
