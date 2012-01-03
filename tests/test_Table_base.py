@@ -582,11 +582,27 @@ class TestTable(unittest.TestCase):
         self.assertEquals(table.rows[0], ['python', 'rules'])
         self.assertEquals(table.rows[1], ['answer', 42])
 
+    def test_table_append_accept_list_tuple_and_dict_else_ValueError(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.append(set(['eggs', 'ham']))
+        table.append(('ham', 'eggs'))
+        table.append({'spam': 'python', 'eggs': 'rules'})
+        table.append(['answer', 42])
+        table.append({'eggs': 'ham'})
+        self.assertEquals(table.rows[0], ['eggs', 'ham'])
+        self.assertEquals(table.rows[1], ['ham', 'eggs'])
+        self.assertEquals(table.rows[2], ['python', 'rules'])
+        self.assertEquals(table.rows[3], ['answer', 42])
+        self.assertEquals(table.rows[4], [None, 'ham'])
+        with self.assertRaises(ValueError):
+            table.append(table)
+
     def test_table_extend(self):
         table = Table(headers=['spam', 'eggs'])
-        table.extend([['python', 'rules'], ['answer', 42]])
+        table.extend([['python', 'rules'], ['answer', 42], {'eggs': 123}])
         self.assertEquals(table.rows[0], ['python', 'rules'])
         self.assertEquals(table.rows[1], ['answer', 42])
+        self.assertEquals(table.rows[2], [None, 123])
 
     def test_table_get_item(self):
         table = Table(headers=['spam', 'eggs'])
