@@ -28,7 +28,7 @@ class TestTableHtml(unittest.TestCase):
         self.assertTrue(isinstance(my_table.write('html'), str))
 
     def test_to_html_with_only_headers(self):
-        my_table = Table(headers=['ham', 'spam', 'eggs', None])
+        my_table = Table(headers=['ham', 'spam', 'eggs', 'blah'])
         output = my_table.write('html', css_classes=False)
         expected = dedent('''
         <table>
@@ -37,7 +37,7 @@ class TestTableHtml(unittest.TestCase):
               <th>ham</th>
               <th>spam</th>
               <th>eggs</th>
-              <th>None</th>
+              <th>blah</th>
             </tr>
           </thead>
         </table>

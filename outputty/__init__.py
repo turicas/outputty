@@ -24,6 +24,12 @@ class Table(object):
                  input_encoding='utf8', output_encoding='utf8', order_by='',
                  ordering=''):
         self.headers = headers if headers is not None else []
+        for header in self.headers:
+            if not isinstance(header, (str, unicode)):
+                raise ValueError('Headers must be strings.')
+        else:
+            if len(self.headers) != len(set(self.headers)):
+                raise ValueError('Header names must be unique.')
         self.dash = dash
         self.pipe = pipe
         self.plus = plus

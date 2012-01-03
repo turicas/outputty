@@ -281,6 +281,8 @@ You can also get the table string decoded, in unicode:
 > Python](http://docs.python.org/library/codecs.html#standard-encodings) to get a
 > complete list of the supported encodings.
 
+> `headers` must be a list of strings.
+
 
 ### Encoding and Decoding
 

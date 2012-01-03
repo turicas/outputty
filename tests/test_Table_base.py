@@ -122,14 +122,14 @@ class TestTable(unittest.TestCase):
         +------+------+------+
         ''').strip())
 
-    def test_table_should_accept_headers_as_dict_list_tuple_int_or_float(self):
-        my_table = Table(headers=[42, 3.14, (4, 2), [3, 14], {'answer': 42},
-                                  None])
-        self.assertEqual(str(my_table), dedent('''
-        +----+------+--------+---------+----------------+------+
-        | 42 | 3.14 | (4, 2) | [3, 14] | {'answer': 42} | None |
-        +----+------+--------+---------+----------------+------+
-        ''').strip())
+    def test_table_headers_should_accept_only_strings(self):
+        with self.assertRaises(ValueError):
+            my_table = Table(headers=[42, 3.14, (4, 2), [3, 14],
+                                      {'answer': 42}, None])
+
+    def test_table_headers_should_be_unique(self):
+        with self.assertRaises(ValueError):
+            my_table = Table(headers=['a', 'a'])
 
     def test_None_in_rows(self):
         my_table = Table(headers=['a', 'b', 'c'])
