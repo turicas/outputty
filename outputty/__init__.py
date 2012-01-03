@@ -18,6 +18,18 @@
 import datetime
 import re
 
+def _str_decode(element, codec):
+    if isinstance(element, str):
+        return element.decode(codec)
+    else:
+        return element
+
+def _unicode_encode(element, codec):
+    if isinstance(element, unicode):
+        return element.encode(codec)
+    else:
+        return element
+
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
@@ -92,26 +104,14 @@ class Table(object):
             result.append(row_data)
         self.rows = result
 
-    def _str_decode(self, element, codec):
-        if isinstance(element, str):
-            return element.decode(codec)
-        else:
-            return element
-
-    def _unicode_encode(self, element, codec):
-        if isinstance(element, unicode):
-            return element.encode(codec)
-        else:
-            return element
-
     def encode(self, codec=None):
         self.normalize_structure()
         if codec is None:
             codec = self.output_encoding
-        self.headers = [self._unicode_encode(x, codec) for x in self.headers]
+        self.headers = [_unicode_encode(x, codec) for x in self.headers]
         rows = []
         for row in self.rows:
-            rows.append([self._unicode_encode(value, codec) for value in row])
+            rows.append([_unicode_encode(value, codec) for value in row])
         self.rows = rows
 
     def decode(self, codec=None):
@@ -120,9 +120,9 @@ class Table(object):
             codec = self.input_encoding
         rows = []
         for row in self.rows:
-            rows.append([self._str_decode(v, codec) for v in row])
+            rows.append([_str_decode(v, codec) for v in row])
         self.rows = rows
-        self.headers = [self._str_decode(h, codec) for h in self.headers]
+        self.headers = [_str_decode(h, codec) for h in self.headers]
 
     def _organize_data(self):
         self.normalize_structure()
@@ -130,19 +130,13 @@ class Table(object):
         if self.order_by_column:
             self.order_by(self.order_by_column, self.ordering)
 
-    def _define_maximum_column_sizes(self):
-        self.max_size = {}
-        for header in self.headers:
-            if not isinstance(header, unicode):
-                header = str(header)
-            self.max_size[header] = len(header)
-        for index, column in enumerate(zip(*self.rows)):
-            sizes = []
-            for value in column:
-                sizes.append(len(unicode(value)))
-            max_size = max(sizes)
-            if max_size > self.max_size[self.headers[index]]:
-                self.max_size[self.headers[index]] = max_size
+    def _max_column_sizes(self):
+        max_size = {}
+        for column in self.headers:
+            sizes = [len(unicode(value)) for value in self[column]]
+            max_column_size = max(sizes + [len(column)])
+            max_size[column] = max_column_size
+        return max_size
 
     def _make_line_from_row_data(self, row_data):
         return '%s %s %s' % (self.pipe, (' %s ' % self.pipe).join(row_data),
@@ -150,17 +144,15 @@ class Table(object):
 
     def __unicode__(self):
         self._organize_data()
-        self._define_maximum_column_sizes()
+        max_size = self._max_column_sizes()
         if not len(self.headers) and not len(self.rows):
             return unicode()
 
         dashes = []
         centered_headers = []
         for header in self.headers:
-            if not isinstance(header, unicode):
-                header = str(header)
-            centered_headers.append(header.center(self.max_size[header]))
-            dashes.append(self.dash * (self.max_size[header] + 2))
+            centered_headers.append(header.center(max_size[header]))
+            dashes.append(self.dash * (max_size[header] + 2))
         split_line = self.plus + self.plus.join(dashes) + self.plus
         header_line = self._make_line_from_row_data(centered_headers)
 
@@ -168,7 +160,7 @@ class Table(object):
         for row in self.rows:
             row_data = []
             for i, info in enumerate(row):
-                data = unicode(info).rjust(self.max_size[self.headers[i]])
+                data = unicode(info).rjust(max_size[self.headers[i]])
                 row_data.append(data)
             result.append(self._make_line_from_row_data(row_data))
         if self.rows:
