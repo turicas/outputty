@@ -191,8 +191,9 @@ My sincerely thanks to:
 - [Flávio Coelho](https://github.com/fccoelho) for creating `histogram` and
   giving a lot of suggestions.
 - [Renne Rocha](https://github.com/rennerocha) for creating `order_by`.
-- [Tatiana Al-Chueyr](https://github.com/tatiana) for helping me design the
-  simple yet powerful plugin API.
+- [Tatiana Al-Chueyr](https://github.com/tatiana) for designing and coding
+  architecture proposals and suggestions for the plugin API (including the
+  architecture we are using).
 - [Flávio Amieiro](https://github.com/flavioamieiro) for a lot of suggestions
   and interpretations about design.
 
