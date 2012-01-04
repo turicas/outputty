@@ -597,12 +597,25 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(ValueError):
             table.append(table)
 
+    def test_table_append_should_raises_ValueError_when_wrongly_row_size(self):
+        table = Table(headers=['spam', 'eggs'])
+        with self.assertRaises(ValueError):
+            table.append(['answer', 42, 3.14])
+
     def test_table_extend(self):
         table = Table(headers=['spam', 'eggs'])
         table.extend([['python', 'rules'], ['answer', 42], {'eggs': 123}])
         self.assertEquals(table.rows[0], ['python', 'rules'])
         self.assertEquals(table.rows[1], ['answer', 42])
         self.assertEquals(table.rows[2], [None, 123])
+
+    def test_table_extend_should_add_nothing_if_an_exception_is_raised(self):
+        table = Table(headers=['spam', 'eggs'])
+        table.append(['hello', 'world'])
+        with self.assertRaises(ValueError):
+            table.extend([['python', 'rules'], ['answer', 42], [1, 2, 3]])
+        self.assertEquals(table.rows[0], ['hello', 'world'])
+        self.assertEquals(len(table), 1)
 
     def test_table_get_item(self):
         table = Table(headers=['spam', 'eggs'])

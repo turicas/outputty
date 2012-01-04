@@ -284,6 +284,10 @@ class Table(object):
         return plugin.write(self, *args, **kwargs)
 
     def append(self, item):
+        item = self._prepare_to_append(item)
+        self.rows.append(item)
+
+    def _prepare_to_append(self, item):
         if isinstance(item, dict):
             row = []
             for column in self.headers:
@@ -292,16 +296,21 @@ class Table(object):
                 else:
                     value = None
                 row.append(value)
-            self.rows.append(row)
         elif isinstance(item, (tuple, set)):
-            self.rows.append(list(item))
+            row = list(item)
         elif isinstance(item, list):
-            self.rows.append(item)
+            row = item
         else:
             raise ValueError
+        if len(row) != len(self.headers):
+            raise ValueError
+        return row
 
     def extend(self, items):
+        new_items = []
         for item in items:
+            new_items.append(self._prepare_to_append(item))
+        for item in new_items:
             self.append(item)
 
     def __len__(self):
