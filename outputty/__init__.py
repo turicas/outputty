@@ -64,7 +64,7 @@ class Table(object):
                 return []
             else:
                 return list(columns[self.headers.index(item)])
-        elif isinstance(item, int):
+        elif isinstance(item, (int, slice)):
             return self.rows[item]
         else:
             raise ValueError
@@ -77,8 +77,10 @@ class Table(object):
             del columns[header_index]
             del self.headers[header_index]
             self.rows = [list(row) for row in zip(*columns)]
-        elif isinstance(item, int):
+        elif isinstance(item, (int, slice)):
             del self.rows[item]
+        else:
+            raise ValueError
 
     def order_by(self, column, ordering='asc'):
         self.normalize_structure()

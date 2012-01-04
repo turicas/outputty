@@ -575,7 +575,7 @@ class TestTable(unittest.TestCase):
         self.assertEquals(table.headers, ['spam', 'ham'])
         self.assertEquals(table.rows, [['python', 1 + 5j], ['rules', 3 + 4j]])
 
-    def test_table_append(self):
+    def test_table_append_should_add_a_row(self):
         table = Table(headers=['spam', 'eggs'])
         table.append(['python', 'rules'])
         table.append(['answer', 42])
@@ -643,6 +643,12 @@ class TestTable(unittest.TestCase):
             table[[4, 3]]
         with self.assertRaises(ValueError):
             table[{'answer': 43}]
+        with self.assertRaises(ValueError):
+            del table[(4, 3)]
+        with self.assertRaises(ValueError):
+            del table[[4, 3]]
+        with self.assertRaises(ValueError):
+            del table[{'answer': 43}]
 
     def test_len_table_should_return_len_of_rows(self):
         table = Table(headers=['spam', 'eggs'])
@@ -661,3 +667,14 @@ class TestTable(unittest.TestCase):
             items.append(item)
         self.assertEquals(items[0], ['python', 'rules'])
         self.assertEquals(items[1], ['answer', 42])
+
+    def test_get_slice(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6], [7, 8], [9, 0]])
+        self.assertEquals(table[1:3], [[3, 4], [5, 6]])
+
+    def test_del_slice(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6], [7, 8], [9, 0]])
+        del table[1:3]
+        self.assertEquals(table[:], [[1, 2], [7, 8], [9, 0]])
