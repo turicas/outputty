@@ -48,7 +48,7 @@ class Table(object):
         self.input_encoding = input_encoding
         self.output_encoding = output_encoding
         self.csv_filename = None
-        self.rows = []
+        self._rows = []
         self.types = {}
         self.plugins = {}
         self.order_by_column = order_by
@@ -58,25 +58,25 @@ class Table(object):
         if isinstance(item, (str, unicode)):
             if item not in self.headers:
                 raise KeyError
-            columns = zip(*self.rows)
+            columns = zip(*self._rows)
             if not columns:
                 return []
             else:
                 return list(columns[self.headers.index(item)])
         elif isinstance(item, (int, slice)):
-            return self.rows[item]
+            return self._rows[item]
         else:
             raise ValueError
 
     def __delitem__(self, item):
         if isinstance(item, (str, unicode)):
-            columns = zip(*self.rows)
+            columns = zip(*self._rows)
             header_index = self.headers.index(item)
             del columns[header_index]
             del self.headers[header_index]
-            self.rows = [list(row) for row in zip(*columns)]
+            self._rows = [list(row) for row in zip(*columns)]
         elif isinstance(item, (int, slice)):
-            del self.rows[item]
+            del self._rows[item]
         else:
             raise ValueError
 
@@ -87,24 +87,24 @@ class Table(object):
             sort_function = lambda x, y: cmp(y[index], x[index])
         else:
             sort_function = lambda x, y: cmp(x[index], y[index])
-        self.rows.sort(sort_function)
+        self._rows.sort(sort_function)
 
     def encode(self, codec=None):
         if codec is None:
             codec = self.output_encoding
         self.headers = [_unicode_encode(x, codec) for x in self.headers]
         rows = []
-        for row in self.rows:
+        for row in self._rows:
             rows.append([_unicode_encode(value, codec) for value in row])
-        self.rows = rows
+        self._rows = rows
 
     def decode(self, codec=None):
         if codec is None:
             codec = self.input_encoding
         rows = []
-        for row in self.rows:
+        for row in self._rows:
             rows.append([_str_decode(v, codec) for v in row])
-        self.rows = rows
+        self._rows = rows
         self.headers = [_str_decode(h, codec) for h in self.headers]
 
     def _organize_data(self):
@@ -127,7 +127,7 @@ class Table(object):
     def __unicode__(self):
         self._organize_data()
         max_size = self._max_column_sizes()
-        if not len(self.headers) and not len(self.rows):
+        if not len(self.headers) and not len(self._rows):
             return unicode()
 
         dashes = []
@@ -139,13 +139,13 @@ class Table(object):
         header_line = self._make_line_from_row_data(centered_headers)
 
         result = [split_line, header_line, split_line]
-        for row in self.rows:
+        for row in self._rows:
             row_data = []
             for i, info in enumerate(row):
                 data = unicode(info).rjust(max_size[self.headers[i]])
                 row_data.append(data)
             result.append(self._make_line_from_row_data(row_data))
-        if self.rows:
+        if self._rows:
             result.append(split_line)
         return '\n'.join(result)
 
@@ -155,12 +155,12 @@ class Table(object):
     def to_list_of_dicts(self):
         self._organize_data()
         self.encode()
-        rows = [dict(zip(self.headers, row)) for row in self.rows]
+        rows = [dict(zip(self.headers, row)) for row in self._rows]
         self.decode(self.output_encoding)
         return rows
 
     def _identify_type_of_data(self):
-        columns = zip(*self.rows)
+        columns = zip(*self._rows)
         date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
                                     '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
@@ -201,7 +201,7 @@ class Table(object):
     def normalize_types(self):
         self._identify_type_of_data()
         rows_converted = []
-        for row in self.rows:
+        for row in self._rows:
             row_data = []
             for index, value in enumerate(row):
                 type_ = self.types[self.headers[index]]
@@ -225,7 +225,7 @@ class Table(object):
                 else:
                     row_data.append(type_(value))
             rows_converted.append(row_data)
-        self.rows = rows_converted
+        self._rows = rows_converted
 
     def to_dict(self, only=None, key=None, value=None):
         self._organize_data()
@@ -240,10 +240,10 @@ class Table(object):
             value = value.encode(self.output_encoding)
             key_index = self.headers.index(key)
             value_index = self.headers.index(value)
-            for row in self.rows:
+            for row in self._rows:
                 table_dict[row[key_index]] = row[value_index]
         else:
-            for index, column in enumerate(zip(*self.rows)):
+            for index, column in enumerate(zip(*self._rows)):
                 header_name = self.headers[index]
                 if only is None or header_name in only:
                     table_dict[header_name] = list(column)
@@ -267,7 +267,7 @@ class Table(object):
 
     def append(self, item):
         item = self._prepare_to_append(item)
-        self.rows.append(item)
+        self._rows.append(item)
 
     def _prepare_to_append(self, item):
         if isinstance(item, dict):
@@ -304,13 +304,13 @@ class Table(object):
 
     def __len__(self):
         """Returns the number of rows. Same as `len(list)`."""
-        return len(self.rows)
+        return len(self._rows)
 
     def count(self, row):
         """Returns how many rows are equal to `row` in `Table`.
         Same as `list.count`.
         """
-        return self.rows.count(self._prepare_to_append(row))
+        return self._rows.count(self._prepare_to_append(row))
 
     def index(self, x, i=None, j=None):
         """Returns the index of row `x` in table (starting from zero).
@@ -318,36 +318,36 @@ class Table(object):
         """
         x = self._prepare_to_append(x)
         if i is None and j is None:
-            return self.rows.index(x)
+            return self._rows.index(x)
         elif j is None:
-            return self.rows.index(x, i)
+            return self._rows.index(x, i)
         else:
-            return self.rows.index(x, i, j)
+            return self._rows.index(x, i, j)
 
     def insert(self, index, row):
         """Insert `row` in the position `index` on `Table`.
         Same as `list.insert`.
         `row` can be `list`, `tuple` or `dict`.
         """
-        self.rows.insert(index, self._prepare_to_append(row))
+        self._rows.insert(index, self._prepare_to_append(row))
 
     def pop(self, index=-1):
         """Removes and returns row in position `index` on `Table`. `index`
         defaults to -1.
         Same as `list.pop`.
         """
-        return self.rows.pop(index)
+        return self._rows.pop(index)
 
     def remove(self, row):
         """Removes first occurrence of `row` on `Table`.
         Raises `ValueError` if `row` is not found.
         Same as `list.remove`.
         """
-        self.rows.remove(self._prepare_to_append(row))
+        self._rows.remove(self._prepare_to_append(row))
 
     def reverse(self):
         """Reverse the order of rows *in place* (does not return a new `Table`,
         change the rows in this instance of `Table`).
         Same as `list.reverse`.
         """
-        self.rows.reverse()
+        self._rows.reverse()
