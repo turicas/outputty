@@ -582,6 +582,11 @@ class TestTable(unittest.TestCase):
         self.assertEquals(table.rows[0], ['python', 'rules'])
         self.assertEquals(table.rows[1], ['answer', 42])
 
+    def test_table_append_should_convert_data_to_unicode_before(self):
+        table = Table(headers=['spam', 'eggs'], input_encoding='iso-8859-1')
+        table.append([u'Álvaro'.encode('iso-8859-1'), 'Justen'])
+        self.assertEquals(table.rows[0], [u'Álvaro', u'Justen'])
+
     def test_table_append_accept_list_tuple_and_dict_else_ValueError(self):
         table = Table(headers=['spam', 'eggs'])
         table.append(set(['eggs', 'ham']))
@@ -678,3 +683,50 @@ class TestTable(unittest.TestCase):
         table.extend([[1, 2], [3, 4], [5, 6], [7, 8], [9, 0]])
         del table[1:3]
         self.assertEquals(table[:], [[1, 2], [7, 8], [9, 0]])
+
+    def test_table_count(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6], [7, 8], [1, 2]])
+        self.assertEquals(table.count([1, 2]), 2)
+
+    def test_table_index(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6], [7, 8], [1, 2], [9, 0]])
+        self.assertEquals(table.index([1, 2]), 0)
+        self.assertEquals(table.index({'python': 1, 'rules': 2}), 0)
+        self.assertEquals(table.index([5, 6]), 2)
+        self.assertEquals(table.index([1, 2], 1), 4)
+        with self.assertRaises(ValueError):
+            non_ecxiste = table.index([1, 9])
+        with self.assertRaises(ValueError):
+            not_found = table.index([1, 2], 1, 3)
+
+    def test_table_insert(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6], [7, 8], [1, 2]])
+        table.insert(0, [4, 2])
+        table.insert(1, {'python': 9, 'rules': 9})
+        self.assertEquals(table[0], [4, 2])
+        self.assertEquals(table[1], [9, 9])
+        self.assertEquals(len(table), 7)
+
+    def test_table_pop(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        self.assertEquals(table.pop(), [5, 6])
+        self.assertEquals(table.pop(0), [1, 2])
+        self.assertEquals(len(table), 1)
+
+    def test_table_remove(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6], [1, 2]])
+        table.remove({'python': 3, 'rules': 4})
+        self.assertEquals(table[:], [[1, 2], [5, 6], [1, 2]])
+        table.remove([1, 2])
+        self.assertEquals(table[:], [[5, 6], [1, 2]])
+
+    def test_table_reverse(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        table.reverse()
+        self.assertEquals(table[:], [[5, 6], [3, 4], [1, 2]])

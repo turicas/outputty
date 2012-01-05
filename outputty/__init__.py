@@ -306,9 +306,16 @@ class Table(object):
             raise ValueError
         if len(row) != len(self.headers):
             raise ValueError
-        return row
+        return [_str_decode(value, self.input_encoding) for value in row]
 
     def extend(self, items):
+        """Append a lot of items.
+        `items` should be a list of new rows, each row can be represented as
+        `list`, `tuple` or `dict`.
+        If one of the rows causes a `ValueError` (for example, because it has
+        more or less elements than it should), then nothing will be appended to
+        `Table`.
+        """
         new_items = []
         for item in items:
             new_items.append(self._prepare_to_append(item))
@@ -316,4 +323,51 @@ class Table(object):
             self.append(item)
 
     def __len__(self):
+        """Returns the number of rows. Same as `len(list)`."""
         return len(self.rows)
+
+    def count(self, row):
+        """Returns how many rows are equal to `row` in `Table`.
+        Same as `list.count`.
+        """
+        return self.rows.count(self._prepare_to_append(row))
+
+    def index(self, x, i=None, j=None):
+        """Returns the index of row `x` in table (starting from zero).
+        Same as `list.index`.
+        """
+        x = self._prepare_to_append(x)
+        if i is None and j is None:
+            return self.rows.index(x)
+        elif j is None:
+            return self.rows.index(x, i)
+        else:
+            return self.rows.index(x, i, j)
+
+    def insert(self, index, row):
+        """Insert `row` in the position `index` on `Table`.
+        Same as `list.insert`.
+        `row` can be `list`, `tuple` or `dict`.
+        """
+        self.rows.insert(index, self._prepare_to_append(row))
+
+    def pop(self, index=-1):
+        """Removes and returns row in position `index` on `Table`. `index`
+        defaults to -1.
+        Same as `list.pop`.
+        """
+        return self.rows.pop(index)
+
+    def remove(self, row):
+        """Removes first occurrence of `row` on `Table`.
+        Raises `ValueError` if `row` is not found.
+        Same as `list.remove`.
+        """
+        self.rows.remove(self._prepare_to_append(row))
+
+    def reverse(self):
+        """Reverse the order of rows *in place* (does not return a new `Table`,
+        change the rows in this instance of `Table`).
+        Same as `list.reverse`.
+        """
+        self.rows.reverse()
