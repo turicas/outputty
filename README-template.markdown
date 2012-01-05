@@ -21,7 +21,7 @@ Installation
 Sorry for that - it'll be available in PyPI soon.
 
 
-Examples
+Examples:
 --------
 
 You can run all the examples below - see `examples` folder. You can also see
@@ -34,8 +34,7 @@ Type Of Data
 
 `outputty` will try to convert every element inside a row to `unicode`. In
 strings it'll use `string.decode(input_encoding)`, where `input_encoding` is
-specified in `Table.__init__`. For other types (integer, float etc.) it'll use
-`unicode(element)`.
+specified in `Table.__init__`.
 
 
 Character Encodings

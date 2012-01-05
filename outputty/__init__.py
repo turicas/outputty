@@ -54,6 +54,23 @@ class Table(object):
         self.order_by_column = order_by
         self.ordering = ordering
 
+    def __setitem__(self, item, value):
+        if isinstance(item, (str, unicode)):
+            if item not in self.headers:
+                raise KeyError
+            columns = zip(*self._rows)
+            if not columns or len(value) != len(self):
+                raise ValueError
+            else:
+                columns[self.headers.index(item)] = value
+                self._rows = [list(x) for x in zip(*columns)]
+        elif isinstance(item, int):
+            self._rows[item] = self._prepare_to_append(value)
+        elif isinstance(item, slice):
+            self._rows[item] = [self._prepare_to_append(v) for v in value]
+        else:
+            raise ValueError
+
     def __getitem__(self, item):
         if isinstance(item, (str, unicode)):
             if item not in self.headers:

@@ -21,7 +21,7 @@ Installation
 Sorry for that - it'll be available in PyPI soon.
 
 
-Examples
+Examples:
 --------
 
 You can run all the examples below - see `examples` folder. You can also see
@@ -281,15 +281,19 @@ After executing it, you'll get this output:
 
 ### Example 8: Other `Table` methods
 
-A `Table` is implemented as a list of rows, with some methods to use plugins
-, ordering and do other things. `Table` objects have all the methods other
-Python mutable objects
-have (except for `sort`), so you can use `Table.extend`, `Table.index`,
-`Table.count` and so on. You can also use slices and
+A `Table` is implemented as a list of rows, with some methods to use plugins,
+ordering and do other things. `Table` objects have all the methods other
+Python mutable objects have (except for `sort`), so you can use
+`Table.extend`, `Table.index`, `Table.count` and so on. You can also use
+slices (for getting and setting rows and columns) and
 [all mutable sequence operations](http://docs.python.org/library/stdtypes.html#mutable-sequence-types)
 (except for `sort`, because we have `Table.order_by`).
+
 > Note: all these methods support `tuple`, `list` or `dict` notations of row.
+Change the two last rows:
 Insert a row in the first position, using dict notation:
+Removing non-brazilian cities:
+Let's change an entire column:
 
 If you have this code, like in `examples/8_table_methods.py`: 
         
@@ -305,12 +309,18 @@ If you have this code, like in `examples/8_table_methods.py`:
     print 'First 3 rows:'
     for row in table[:3]:
         print row
+    
+    table[-2:] = [['Junín', 'Buenos Aires', 'Argentina'],
+                  ['Ciudad del Este', 'Alto Paraná', 'Paraguay']]
     table.insert(0, {'City': 'La Paz', 'State': 'La Paz', 'Country': 'Bolivia'})
     print 'New table:'
     print table
+    print
+    
     table.reverse()
     print 'And the table in the reversed order:'
     print table
+    print
     
     popped_row = table.pop()
     rio = ['Rio de Janeiro', 'Rio de Janeiro', 'Brazil']
@@ -324,6 +334,12 @@ If you have this code, like in `examples/8_table_methods.py`:
     print 'Count of Rios rows (before remove):', number_of_rios
     print 'Table after pop and remove:'
     print table
+    print
+    
+    del table[:2]
+    table['Country'] = ['Brasil', 'Brasil', 'Brasil']
+    print 'Column "Country" changed:'
+    print table
 
 After executing it, you'll get this output:
 
@@ -332,40 +348,51 @@ After executing it, you'll get this output:
     [u'Niter\xf3i', u'Rio de Janeiro', u'Brazil']
     [u'Rio de Janeiro', u'Rio de Janeiro', u'Brazil']
     New table:
-    +----------------+-------------------+---------+
-    |      City      |       State       | Country |
-    +----------------+-------------------+---------+
-    |         La Paz |            La Paz | Bolivia |
-    |      Três Rios |    Rio de Janeiro |  Brazil |
-    |        Niterói |    Rio de Janeiro |  Brazil |
-    | Rio de Janeiro |    Rio de Janeiro |  Brazil |
-    |   Porto Alegre | Rio Grande do Sul |  Brazil |
-    |      São Paulo |         São Paulo |  Brazil |
-    +----------------+-------------------+---------+
+    +-----------------+----------------+-----------+
+    |       City      |     State      |  Country  |
+    +-----------------+----------------+-----------+
+    |          La Paz |         La Paz |   Bolivia |
+    |       Três Rios | Rio de Janeiro |    Brazil |
+    |         Niterói | Rio de Janeiro |    Brazil |
+    |  Rio de Janeiro | Rio de Janeiro |    Brazil |
+    |           Junín |   Buenos Aires | Argentina |
+    | Ciudad del Este |    Alto Paraná |  Paraguay |
+    +-----------------+----------------+-----------+
+    
     And the table in the reversed order:
-    +----------------+-------------------+---------+
-    |      City      |       State       | Country |
-    +----------------+-------------------+---------+
-    |      São Paulo |         São Paulo |  Brazil |
-    |   Porto Alegre | Rio Grande do Sul |  Brazil |
-    | Rio de Janeiro |    Rio de Janeiro |  Brazil |
-    |        Niterói |    Rio de Janeiro |  Brazil |
-    |      Três Rios |    Rio de Janeiro |  Brazil |
-    |         La Paz |            La Paz | Bolivia |
-    +----------------+-------------------+---------+
+    +-----------------+----------------+-----------+
+    |       City      |     State      |  Country  |
+    +-----------------+----------------+-----------+
+    | Ciudad del Este |    Alto Paraná |  Paraguay |
+    |           Junín |   Buenos Aires | Argentina |
+    |  Rio de Janeiro | Rio de Janeiro |    Brazil |
+    |         Niterói | Rio de Janeiro |    Brazil |
+    |       Três Rios | Rio de Janeiro |    Brazil |
+    |          La Paz |         La Paz |   Bolivia |
+    +-----------------+----------------+-----------+
+    
     Popped row: [u'La Paz', u'La Paz', u'Bolivia']
     Number of rows: 5
     Count of Rios rows (before remove): 2
     Table after pop and remove:
-    +----------------+-------------------+---------+
-    |      City      |       State       | Country |
-    +----------------+-------------------+---------+
-    |      São Paulo |         São Paulo |  Brazil |
-    |   Porto Alegre | Rio Grande do Sul |  Brazil |
-    |        Niterói |    Rio de Janeiro |  Brazil |
-    |      Três Rios |    Rio de Janeiro |  Brazil |
-    | Rio de Janeiro |    Rio de Janeiro |  Brazil |
-    +----------------+-------------------+---------+
+    +-----------------+----------------+-----------+
+    |       City      |     State      |  Country  |
+    +-----------------+----------------+-----------+
+    | Ciudad del Este |    Alto Paraná |  Paraguay |
+    |           Junín |   Buenos Aires | Argentina |
+    |         Niterói | Rio de Janeiro |    Brazil |
+    |       Três Rios | Rio de Janeiro |    Brazil |
+    |  Rio de Janeiro | Rio de Janeiro |    Brazil |
+    +-----------------+----------------+-----------+
+    
+    Column "Country" changed:
+    +----------------+----------------+---------+
+    |      City      |     State      | Country |
+    +----------------+----------------+---------+
+    |        Niterói | Rio de Janeiro |  Brasil |
+    |      Três Rios | Rio de Janeiro |  Brasil |
+    | Rio de Janeiro | Rio de Janeiro |  Brasil |
+    +----------------+----------------+---------+
     
 
 
@@ -374,8 +401,7 @@ Type Of Data
 
 `outputty` will try to convert every element inside a row to `unicode`. In
 strings it'll use `string.decode(input_encoding)`, where `input_encoding` is
-specified in `Table.__init__`. For other types (integer, float etc.) it'll use
-`unicode(element)`.
+specified in `Table.__init__`.
 
 
 Character Encodings

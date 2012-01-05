@@ -729,3 +729,28 @@ class TestTable(unittest.TestCase):
         table.extend([[1, 2], [3, 4], [5, 6]])
         table.reverse()
         self.assertEquals(table[:], [[5, 6], [3, 4], [1, 2]])
+
+    def test_table_set_item_should_work_for_rows(self):
+        table = Table(headers=['python', 'rules'])
+        table.append([1, 2])
+        table[0] = [4, 2]
+        self.assertEquals(table[:], [[4, 2]])
+        table.extend([[3, 4], [5, 6]])
+        table[1:] = [[7, 8], [9, 0]]
+        self.assertEquals(table[:], [[4, 2], [7, 8], [9, 0]])
+        table[-3:] = [[5, 5], [7, 7], [9, 9]]
+        self.assertEquals(table[:], [[5, 5], [7, 7], [9, 9]])
+        with self.assertRaises(ValueError):
+            table[1] = [1, 2, 3]
+        with self.assertRaises(ValueError):
+            table[(1, 2)] = [1, 2]
+
+    def test_table_set_item_should_work_for_column(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        table['python'] = [2, 4, 6]
+        self.assertEquals(table[:], [[2, 2], [4, 4], [6, 6]])
+        with self.assertRaises(KeyError):
+            table['not-found'] = [1, 2, 3]
+        with self.assertRaises(ValueError):
+            table['rules'] = [1, 2, 3, 4]
