@@ -58,7 +58,6 @@ class Table(object):
         if isinstance(item, (str, unicode)):
             if item not in self.headers:
                 raise KeyError
-            self.normalize_structure()
             columns = zip(*self.rows)
             if not columns:
                 return []
@@ -71,7 +70,6 @@ class Table(object):
 
     def __delitem__(self, item):
         if isinstance(item, (str, unicode)):
-            self.normalize_structure()
             columns = zip(*self.rows)
             header_index = self.headers.index(item)
             del columns[header_index]
@@ -83,7 +81,6 @@ class Table(object):
             raise ValueError
 
     def order_by(self, column, ordering='asc'):
-        self.normalize_structure()
         self.decode()
         index = self.headers.index(column)
         if ordering.lower().startswith('desc'):
@@ -92,22 +89,7 @@ class Table(object):
             sort_function = lambda x, y: cmp(x[index], y[index])
         self.rows.sort(sort_function)
 
-    def normalize_structure(self):
-        result = []
-        for row in self.rows:
-            if isinstance(row, dict):
-                row_data = []
-                for header_name in self.headers:
-                    if header_name not in row:
-                        row[header_name] = None
-                    row_data.append(row[header_name])
-            else:
-                row_data = list(row)
-            result.append(row_data)
-        self.rows = result
-
     def encode(self, codec=None):
-        self.normalize_structure()
         if codec is None:
             codec = self.output_encoding
         self.headers = [_unicode_encode(x, codec) for x in self.headers]
@@ -117,7 +99,6 @@ class Table(object):
         self.rows = rows
 
     def decode(self, codec=None):
-        self.normalize_structure()
         if codec is None:
             codec = self.input_encoding
         rows = []
@@ -127,7 +108,6 @@ class Table(object):
         self.headers = [_str_decode(h, codec) for h in self.headers]
 
     def _organize_data(self):
-        self.normalize_structure()
         self.decode()
         if self.order_by_column:
             self.order_by(self.order_by_column, self.ordering)

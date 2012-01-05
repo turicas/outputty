@@ -15,7 +15,7 @@ class TestHistogram(unittest.TestCase):
         seed(1234) # Setting the seed to get repeatable results
         numbers = normal(size=1000)
         my_table = Table(headers=['values'])
-        my_table.rows.extend([[value] for value in numbers])
+        my_table.extend([[value] for value in numbers])
         output = my_table.write('histogram', column='values', height=5,
                                 orientation='vertical', bins=10)
         expected = dedent('''
@@ -32,7 +32,7 @@ class TestHistogram(unittest.TestCase):
         seed(1234) # Setting the seed to get repeatable results
         numbers = normal(size=1000)
         my_table = Table(headers=['values'])
-        my_table.rows.extend([[value] for value in numbers])
+        my_table.extend([[value] for value in numbers])
         output = my_table.write('histogram', column='values', height=15, bins=10,
                                 orientation='horizontal')
         expected = dedent('''\

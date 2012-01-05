@@ -7,8 +7,8 @@
 
 from outputty import Table
 table = Table(headers=['spam', 'eggs', 'ham'])
-table.rows.append(['python', 3.14, 1 + 5j])
-table.rows.append(['rules', 42, 3 + 4j])
+table.append(['python', 3.14, 1 + 5j])
+table.append(['rules', 42, 3 + 4j])
 del table['eggs']
 print 'Table after deleting "eggs" column:'
 print table

@@ -7,7 +7,7 @@
 
 from outputty import Table
 my_table = Table(headers=['First Name', 'Last Name', 'Main Language'])
-my_table.rows.append({'First Name': 'Álvaro', 'Last Name': 'Justen',
+my_table.append({'First Name': 'Álvaro', 'Last Name': 'Justen',
                       'Main Language': 'Python'})
-my_table.rows.append(('Flávio', 'Amieiro', 'Python'))
+my_table.append(('Flávio', 'Amieiro', 'Python'))
 print my_table

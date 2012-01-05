@@ -55,10 +55,10 @@ You can also get the table string decoded, in unicode:
 
 ### Encoding and Decoding
 
-- __Decoding__: if you need `table.headers` and `table.rows` in unicode,
+- __Decoding__: if you need `table.headers` and table rows in unicode,
   just call `table.decode()` and it'll decode all data using
   `table.input_encoding` (you can pass an alternative codec as parameter).
-- __Encoding__: if you need `table.headers` and `table.rows` encoded to some
+- __Encoding__: if you need `table.headers` and table and rows encoded to some
   codec, just call `table.decode()` and it'll encode all data using
   `table.output_encoding` (you can pass an alternative codec as parameter).
 
@@ -66,16 +66,7 @@ You can also get the table string decoded, in unicode:
 Notes About Data Normalization
 ------------------------------
 
-We have three kinds of normalization in `Table`:
-
-- `.normalize_structure()`: transform `table.rows` in a list of lists. __All__
-  output operations (like `Table.to_csv`, `Table.__str__`) and `Table.order_by`
-  need to normalize data structure, but we don't like to maintain a normalized
-  and a non-normalized copy of rows, so a side effect is that `table.rows` is
-  changed when you execute these operations.
-  An example, from the table in Example 1: `my_table.normalize_structure()`
-  will transform `table.rows` in `[[u'\xc1lvaro', u'Justen', u'Python'],
-  [u'Fl\xe1vio', u'Amieiro', u'Python']]`.
+We have two kinds of normalization in `Table`:
 
 - `.normalize_types()`: used by default when importing from CSV, this method
   convert table rows to the types it identify. All data that in first moment
@@ -124,10 +115,10 @@ And if you want to create a `dict` with some column value as key and other
 column value as value you can specify `key` and `value` parameters, as in:
 
     other_table = Table(headers=['date', 'measure'])
-    other_table.rows.append(('2011-12-01', 21))
-    other_table.rows.append(('2011-12-02', 42))
-    other_table.rows.append(('2011-12-03', 3.14))
-    other_table.rows.append(('2011-12-04', 2.71))
+    other_table.append(('2011-12-01', 21))
+    other_table.append(('2011-12-02', 42))
+    other_table.append(('2011-12-03', 3.14))
+    other_table.append(('2011-12-04', 2.71))
     values_as_dict = other_table.to_dict(key='date', value='measure')
     print values_as_dict
 

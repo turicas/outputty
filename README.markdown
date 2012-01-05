@@ -31,9 +31,9 @@ If you have this code, like in `examples/1_table.py`:
         
     from outputty import Table
     my_table = Table(headers=['First Name', 'Last Name', 'Main Language'])
-    my_table.rows.append({'First Name': 'Álvaro', 'Last Name': 'Justen',
+    my_table.append({'First Name': 'Álvaro', 'Last Name': 'Justen',
                           'Main Language': 'Python'})
-    my_table.rows.append(('Flávio', 'Amieiro', 'Python'))
+    my_table.append(('Flávio', 'Amieiro', 'Python'))
     print my_table
 
 After executing it, you'll get this output:
@@ -56,8 +56,8 @@ If you have this code, like in `examples/2_table_to_csv.py`:
     from outputty import Table
     
     my_table = Table(headers=['First name', 'Last name'])
-    my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-    my_table.rows.append(('Flávio', 'Amieiro'))
+    my_table.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+    my_table.append(('Flávio', 'Amieiro'))
     my_table.write('csv', 'my-data.csv')
 
 The file `my-data.csv` will be created with this content:
@@ -109,9 +109,9 @@ If you have this code, like in `examples/4_order_by.py`:
     from outputty import Table
     
     my_table = Table(headers=['First name', 'Last name'])
-    my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-    my_table.rows.append({'First name': 'Renne'})
-    my_table.rows.append(('Flávio', 'Amieiro'))
+    my_table.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+    my_table.append({'First name': 'Renne'})
+    my_table.append(('Flávio', 'Amieiro'))
     my_table.order_by('Last name')
     print my_table
 
@@ -186,7 +186,7 @@ If you have this code, like in `examples/6_histogram.py`:
     seed(1234)
     distribution = normal(size=1000)
     my_table = Table(headers=['numbers'])
-    my_table.rows.extend([[value] for value in distribution])
+    my_table.extend([[value] for value in distribution])
     print 'Vertical:'
     print my_table.write('histogram', 'numbers', 'vertical', bins=10, height=7)
     print
@@ -231,8 +231,8 @@ If you have this code, like in `examples/7_table_columns.py`:
         
     from outputty import Table
     table = Table(headers=['spam', 'eggs', 'ham'])
-    table.rows.append(['python', 3.14, 1 + 5j])
-    table.rows.append(['rules', 42, 3 + 4j])
+    table.append(['python', 3.14, 1 + 5j])
+    table.append(['rules', 42, 3 + 4j])
     del table['eggs']
     print 'Table after deleting "eggs" column:'
     print table
@@ -286,10 +286,10 @@ You can also get the table string decoded, in unicode:
 
 ### Encoding and Decoding
 
-- __Decoding__: if you need `table.headers` and `table.rows` in unicode,
+- __Decoding__: if you need `table.headers` and table rows in unicode,
   just call `table.decode()` and it'll decode all data using
   `table.input_encoding` (you can pass an alternative codec as parameter).
-- __Encoding__: if you need `table.headers` and `table.rows` encoded to some
+- __Encoding__: if you need `table.headers` and table and rows encoded to some
   codec, just call `table.decode()` and it'll encode all data using
   `table.output_encoding` (you can pass an alternative codec as parameter).
 
@@ -297,16 +297,7 @@ You can also get the table string decoded, in unicode:
 Notes About Data Normalization
 ------------------------------
 
-We have three kinds of normalization in `Table`:
-
-- `.normalize_structure()`: transform `table.rows` in a list of lists. __All__
-  output operations (like `Table.to_csv`, `Table.__str__`) and `Table.order_by`
-  need to normalize data structure, but we don't like to maintain a normalized
-  and a non-normalized copy of rows, so a side effect is that `table.rows` is
-  changed when you execute these operations.
-  An example, from the table in Example 1: `my_table.normalize_structure()`
-  will transform `table.rows` in `[[u'\xc1lvaro', u'Justen', u'Python'],
-  [u'Fl\xe1vio', u'Amieiro', u'Python']]`.
+We have two kinds of normalization in `Table`:
 
 - `.normalize_types()`: used by default when importing from CSV, this method
   convert table rows to the types it identify. All data that in first moment
@@ -355,10 +346,10 @@ And if you want to create a `dict` with some column value as key and other
 column value as value you can specify `key` and `value` parameters, as in:
 
     other_table = Table(headers=['date', 'measure'])
-    other_table.rows.append(('2011-12-01', 21))
-    other_table.rows.append(('2011-12-02', 42))
-    other_table.rows.append(('2011-12-03', 3.14))
-    other_table.rows.append(('2011-12-04', 2.71))
+    other_table.append(('2011-12-01', 21))
+    other_table.append(('2011-12-02', 42))
+    other_table.append(('2011-12-03', 3.14))
+    other_table.append(('2011-12-04', 2.71))
     values_as_dict = other_table.to_dict(key='date', value='measure')
     print values_as_dict
 

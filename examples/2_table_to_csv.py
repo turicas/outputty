@@ -8,6 +8,6 @@
 from outputty import Table
 
 my_table = Table(headers=['First name', 'Last name'])
-my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-my_table.rows.append(('Flávio', 'Amieiro'))
+my_table.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+my_table.append(('Flávio', 'Amieiro'))
 my_table.write('csv', 'my-data.csv')

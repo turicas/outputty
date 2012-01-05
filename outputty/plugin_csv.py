@@ -20,17 +20,15 @@ def read(table, file_name_or_pointer, convert_types=True):
         fp = open(file_name_or_pointer, 'r')
     else:
         fp = file_name_or_pointer
-    table.fp = fp
     info = fp.read().decode(table.input_encoding).encode('utf8')
     reader = csv.reader(info.split('\n'))
     table.data = [x for x in reader if x]
     if table.csv_filename:
         fp.close()
     table.headers = []
-    table.rows = []
     if table.data:
         table.headers = [x.decode('utf8') for x in table.data[0]]
-        table.rows = [[y.decode('utf8') for y in x] for x in table.data[1:]]
+        table.extend([[y.decode('utf8') for y in x] for x in table.data[1:]])
         if table.convert_types:
             table.normalize_types()
 
@@ -48,7 +46,7 @@ def write(table, filename_or_pointer=None):
         fp = StringIO()
     writer = csv.writer(fp, dialect=MyCSV)
     writer.writerow(table.headers)
-    writer.writerows(table.rows)
+    writer.writerows(table)
     table.decode(table.output_encoding)
     if filename_or_pointer is None:
         contents = fp.getvalue()

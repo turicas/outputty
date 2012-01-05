@@ -51,7 +51,7 @@ class TestTable(unittest.TestCase):
 
     def test_table_with_many_headers_and_one_row_same_size(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 123, 'spam': 4567, 'eggs': 8910})
+        my_table.append({'ham': 123, 'spam': 4567, 'eggs': 8910})
         self.assertEqual(str(my_table), dedent('''
         +-----+------+------+
         | ham | spam | eggs |
@@ -62,9 +62,9 @@ class TestTable(unittest.TestCase):
 
     def test_table_with_many_headers_and_rows_same_size(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 123, 'spam': 4567, 'eggs': 8910})
-        my_table.rows.append({'ham': 321, 'spam': 7654, 'eggs': 1098})
-        my_table.rows.append({'ham': 'abc', 'spam': 'defg', 'eggs': 'hijk'})
+        my_table.append({'ham': 123, 'spam': 4567, 'eggs': 8910})
+        my_table.append({'ham': 321, 'spam': 7654, 'eggs': 1098})
+        my_table.append({'ham': 'abc', 'spam': 'defg', 'eggs': 'hijk'})
         self.assertEqual(str(my_table), dedent('''
         +-----+------+------+
         | ham | spam | eggs |
@@ -77,9 +77,9 @@ class TestTable(unittest.TestCase):
 
     def test_table_with_many_headers_and_rows_missing_some_columns(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'spam': 4567, 'eggs': 8910})
-        my_table.rows.append({'ham': 321, 'eggs': 1098})
-        my_table.rows.append({'ham': 'abc', 'spam': 'defg'})
+        my_table.append({'spam': 4567, 'eggs': 8910})
+        my_table.append({'ham': 321, 'eggs': 1098})
+        my_table.append({'ham': 'abc', 'spam': 'defg'})
         self.assertEqual(str(my_table), dedent('''
         +------+------+------+
         | ham  | spam | eggs |
@@ -93,9 +93,9 @@ class TestTable(unittest.TestCase):
     def test_table_with_changed_separators(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], dash='=', pipe='-',
                          plus='*')
-        my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
-        my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
-        my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
+        my_table.append({'ham': '', 'spam': '', 'eggs': ''})
+        my_table.append({'ham': 1, 'spam': 2, 'eggs': 3})
+        my_table.append({'ham': 11, 'spam': 22, 'eggs': 33})
         self.assertEqual(str(my_table), dedent('''\
         *=====*======*======*
         - ham - spam - eggs -
@@ -107,10 +107,10 @@ class TestTable(unittest.TestCase):
 
     def test_table_should_accept_rows_as_dict_list_tuple_int_or_float(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
-        my_table.rows.append([1, 42, 3])
-        my_table.rows.append([3.14, 2.71, 0.0])
-        my_table.rows.append(('spam', 'eggs', 'ham'))
+        my_table.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
+        my_table.append([1, 42, 3])
+        my_table.append([3.14, 2.71, 0.0])
+        my_table.append(('spam', 'eggs', 'ham'))
         self.assertEqual(str(my_table), dedent('''
         +------+------+------+
         | ham  | spam | eggs |
@@ -133,7 +133,7 @@ class TestTable(unittest.TestCase):
 
     def test_None_in_rows(self):
         my_table = Table(headers=['a', 'b', 'c'])
-        my_table.rows.append([None, None, None])
+        my_table.append([None, None, None])
         self.assertEqual(str(my_table), dedent('''
         +------+------+------+
         |  a   |  b   |  c   |
@@ -144,9 +144,9 @@ class TestTable(unittest.TestCase):
 
     def test_table_with_many_headers_and_rows_right_aligned(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
-        my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
-        my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
+        my_table.append({'ham': '', 'spam': '', 'eggs': ''})
+        my_table.append({'ham': 1, 'spam': 2, 'eggs': 3})
+        my_table.append({'ham': 11, 'spam': 22, 'eggs': 33})
         self.assertEqual(str(my_table), dedent('''
         +-----+------+------+
         | ham | spam | eggs |
@@ -159,7 +159,7 @@ class TestTable(unittest.TestCase):
 
     def test_table_with_headers_little_than_rows(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
+        my_table.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
                               'eggs': 'eggs ham eggs'})
         self.assertEqual(str(my_table), dedent('''
         +--------------+----------------+---------------+
@@ -171,8 +171,8 @@ class TestTable(unittest.TestCase):
 
     def test_character_count_in_row_data_should_use_unicode(self):
         my_table = Table(headers=['First name', 'Last name'])
-        my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-        my_table.rows.append(('Flávio', 'Amieiro'))
+        my_table.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+        my_table.append(('Flávio', 'Amieiro'))
         self.assertEqual(str(my_table), dedent('''
         +------------+-----------+
         | First name | Last name |
@@ -184,8 +184,8 @@ class TestTable(unittest.TestCase):
 
     def test_character_count_in_headers_should_be_unicode(self):
         my_table = Table(headers=['ÁÀÃÂÇ', 'ÇÉÈẼÊ'])
-        my_table.rows.append(('spam', 'eggs'))
-        my_table.rows.append(('eggs', 'spam'))
+        my_table.append(('spam', 'eggs'))
+        my_table.append(('eggs', 'spam'))
         self.assertEqual(str(my_table), dedent('''
         +-------+-------+
         | ÁÀÃÂÇ | ÇÉÈẼÊ |
@@ -207,7 +207,7 @@ class TestTable(unittest.TestCase):
     def test_output_character_encoding_in_method___str__(self):
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
-        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+        my_table.append(['Píton'.decode('utf8').encode('utf16')])
 
         output = dedent('''
         +--------+
@@ -220,8 +220,8 @@ class TestTable(unittest.TestCase):
 
     def test___unicode__should_return_unicode_no_matter_the_input_encoding(self):
         my_table = Table(headers=['ÁÀÃÂÇ', 'ÇÉÈẼÊ'])
-        my_table.rows.append(('spam', 'eggs'))
-        my_table.rows.append(('eggs', 'spam'))
+        my_table.append(('spam', 'eggs'))
+        my_table.append(('eggs', 'spam'))
         self.assertEqual(unicode(my_table), dedent('''
         +-------+-------+
         | ÁÀÃÂÇ | ÇÉÈẼÊ |
@@ -245,30 +245,30 @@ class TestTable(unittest.TestCase):
                                   u'spam'.encode('utf16'),
                                   u'eggs'.encode('utf16')],
                          input_encoding='utf16')
-        my_table.rows.append((123, 456, 789))
-        my_table.rows.append((987, 654, u'python'.encode('utf16')))
+        my_table.append((123, 456, 789))
+        my_table.append((987, 654, u'python'.encode('utf16')))
         my_table.decode()
         my_table.encode()
-        self.assertEquals(my_table.rows[1][2], u'python')
+        self.assertEquals(my_table[1][2], u'python')
 
     def test_encode_method_should_normalize_and_use_output_encoding(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'],
                          output_encoding='utf16')
-        my_table.rows.append((123, 456, 789))
-        my_table.rows.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
-        my_table.rows.append((987, 654, 'python'))
+        my_table.append((123, 456, 789))
+        my_table.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
+        my_table.append((987, 654, 'python'))
         my_table.decode()
         my_table.encode()
-        self.assertEquals(my_table.rows[1][0], u'abc'.encode('utf16'))
-        self.assertEquals(my_table.rows[1][1], u'def'.encode('utf16'))
-        self.assertEquals(my_table.rows[1][2], u'ghi'.encode('utf16'))
-        self.assertEquals(my_table.rows[2][2], u'python'.encode('utf16'))
+        self.assertEquals(my_table[1][0], u'abc'.encode('utf16'))
+        self.assertEquals(my_table[1][1], u'def'.encode('utf16'))
+        self.assertEquals(my_table[1][2], u'ghi'.encode('utf16'))
+        self.assertEquals(my_table[2][2], u'python'.encode('utf16'))
 
     def test_to_dict_should_return_a_list_of_dict_with_headers_as_keys(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append((123, 456, 789))
-        my_table.rows.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
-        my_table.rows.append((987, 654, 321))
+        my_table.append((123, 456, 789))
+        my_table.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
+        my_table.append((987, 654, 321))
         my_dict = my_table.to_list_of_dicts()
         self.assertEquals(len(my_dict), 3)
         self.assertEquals(my_dict[0]['ham'], 123)
@@ -284,9 +284,9 @@ class TestTable(unittest.TestCase):
     def test_list_of_dicts_should_handle_output_encoding_correctly(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'],
                          output_encoding='utf16')
-        my_table.rows.append((123, 456, 789))
-        my_table.rows.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
-        my_table.rows.append((987, 654, 321))
+        my_table.append((123, 456, 789))
+        my_table.append({'ham': 'abc', 'spam': 'def', 'eggs': 'ghi'})
+        my_table.append((987, 654, 321))
         my_dicts = my_table.to_list_of_dicts()
         self.assertEquals(len(my_dicts), 3)
         self.assertEquals(my_dicts[1][u'ham'.encode('utf16')],
@@ -301,9 +301,9 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_table_with_one_column(self):
         my_table = Table(headers=['spam'], order_by='spam')
-        my_table.rows.append(('ham', ))
-        my_table.rows.append(('eggs', ))
-        my_table.rows.append(('idle', ))
+        my_table.append(('ham', ))
+        my_table.append(('eggs', ))
+        my_table.append(('idle', ))
         output = dedent('''
         +------+
         | spam |
@@ -317,9 +317,9 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_two_columns_table_by_second_header(self):
         my_table = Table(headers=['spam', 'ham'], order_by='ham')
-        my_table.rows.append(('eggs', 'ham'))
-        my_table.rows.append(('ham', 'eggs'))
-        my_table.rows.append(('ham', '123'))
+        my_table.append(('eggs', 'ham'))
+        my_table.append(('ham', 'eggs'))
+        my_table.append(('ham', '123'))
         output = dedent('''
         +------+------+
         | spam | ham  |
@@ -333,9 +333,9 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_table_with_missing_column_in_some_rows(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
-        my_table.rows.append({'spam': 'Eric', 'eggs': 'Idle'})
-        my_table.rows.append({'ham': 'John', 'eggs': 'Cleese'})
-        my_table.rows.append({'ham': 'Terry', 'spam': 'Jones'})
+        my_table.append({'spam': 'Eric', 'eggs': 'Idle'})
+        my_table.append({'ham': 'John', 'eggs': 'Cleese'})
+        my_table.append({'ham': 'Terry', 'spam': 'Jones'})
         self.assertEqual(str(my_table), dedent('''
         +-------+-------+--------+
         |  ham  |  spam |  eggs  |
@@ -348,11 +348,11 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_table_with_rows_as_dict_list_tuple(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'], order_by='spam')
-        my_table.rows.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
-        my_table.rows.append({'ham': 'eggs', 'spam': 'python', 'eggs': 'spam'})
-        my_table.rows.append([1, 42, 3])
-        my_table.rows.append([3.14, 2.71, 0.0])
-        my_table.rows.append(('spam', 'eggs', 'ham'))
+        my_table.append({'ham': 'eggs', 'spam': 'ham', 'eggs': 'spam'})
+        my_table.append({'ham': 'eggs', 'spam': 'python', 'eggs': 'spam'})
+        my_table.append([1, 42, 3])
+        my_table.append([3.14, 2.71, 0.0])
+        my_table.append(('spam', 'eggs', 'ham'))
         self.assertEqual(str(my_table), dedent('''
         +------+--------+------+
         | ham  |  spam  | eggs |
@@ -375,9 +375,9 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_numbers(self):
         my_table = Table(headers=['spam'], order_by='spam')
-        my_table.rows.append([5])
-        my_table.rows.append([42])
-        my_table.rows.append([3.14])
+        my_table.append([5])
+        my_table.append([42])
+        my_table.append([3.14])
         self.assertEqual(str(my_table), dedent('''
         +------+
         | spam |
@@ -390,9 +390,9 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_numbers_as_strings(self):
         my_table = Table(headers=['spam'], order_by='spam')
-        my_table.rows.append(['5'])
-        my_table.rows.append([31])
-        my_table.rows.append(['42'])
+        my_table.append(['5'])
+        my_table.append([31])
+        my_table.append(['42'])
         self.assertEqual(str(my_table), dedent('''
         +------+
         | spam |
@@ -405,8 +405,8 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_unicode(self):
         my_table = Table(headers=['spam'], order_by='spam')
-        my_table.rows.append(['á'])
-        my_table.rows.append(['Á'])
+        my_table.append(['á'])
+        my_table.append(['Á'])
         self.assertEqual(str(my_table), dedent('''
         +------+
         | spam |
@@ -418,14 +418,14 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_descending(self):
         table = Table(headers=['spam'], order_by='spam', ordering='descending')
-        table.rows.extend([[5], [3], [7], [10]])
+        table.extend([[5], [3], [7], [10]])
         table_2 = Table(headers=['spam'], order_by='spam', ordering='desc')
-        table_2.rows.extend([[5], [3], [7], [10]])
+        table_2.extend([[5], [3], [7], [10]])
         table_3 = Table(headers=['spam'], order_by='spam',
                         ordering='DESCENDING')
-        table_3.rows.extend([[5], [3], [7], [10]])
+        table_3.extend([[5], [3], [7], [10]])
         table_4 = Table(headers=['spam'], order_by='spam', ordering='DESC')
-        table_4.rows.extend([[5], [3], [7], [10]])
+        table_4.extend([[5], [3], [7], [10]])
         expected_output = dedent('''
         +------+
         | spam |
@@ -443,14 +443,14 @@ class TestTable(unittest.TestCase):
 
     def test_ordering_ascending(self):
         table = Table(headers=['spam'], order_by='spam', ordering='ascending')
-        table.rows.extend([[5], [3], [7], [10]])
+        table.extend([[5], [3], [7], [10]])
         table_2 = Table(headers=['spam'], order_by='spam', ordering='asc')
-        table_2.rows.extend([[5], [3], [7], [10]])
+        table_2.extend([[5], [3], [7], [10]])
         table_3 = Table(headers=['spam'], order_by='spam',
                         ordering='ASCENDING')
-        table_3.rows.extend([[5], [3], [7], [10]])
+        table_3.extend([[5], [3], [7], [10]])
         table_4 = Table(headers=['spam'], order_by='spam', ordering='ASC')
-        table_4.rows.extend([[5], [3], [7], [10]])
+        table_4.extend([[5], [3], [7], [10]])
         expected_output = dedent('''
         +------+
         | spam |
@@ -466,9 +466,9 @@ class TestTable(unittest.TestCase):
 
     def test_order_by_method_should_order_data_internally(self):
         my_table = Table(headers=['spam', 'ham', 'eggs'])
-        my_table.rows.append({'spam': 'Eric', 'eggs': 'Idle'})
-        my_table.rows.append({'ham': 'John', 'eggs': 'Cleese'})
-        my_table.rows.append({'ham': 'Terry', 'spam': 'Jones'})
+        my_table.append({'spam': 'Eric', 'eggs': 'Idle'})
+        my_table.append({'ham': 'John', 'eggs': 'Cleese'})
+        my_table.append({'ham': 'Terry', 'spam': 'Jones'})
         my_table.order_by('spam', 'asc')
         expected_output = dedent('''
         +-------+-------+--------+
@@ -483,7 +483,7 @@ class TestTable(unittest.TestCase):
 
     def test_order_by_method_should_order_ascending_by_default(self):
         table = Table(headers=['spam'])
-        table.rows.extend([[5], [3], [7], [10]])
+        table.extend([[5], [3], [7], [10]])
         table.order_by('spam')
         expected_output = dedent('''
         +------+
@@ -499,35 +499,34 @@ class TestTable(unittest.TestCase):
 
     def test_normalize_method_should_transform_all_rows_to_lists(self):
         table = Table(headers=['spam', 'eggs', 'ham'])
-        table.rows.append(['ham', 'eggs', 'spam'])
-        table.rows.append({'ham': 42})
-        table.rows.append({'eggs': 3.14, 'spam': 2.71})
-        table.normalize_structure()
+        table.append(['ham', 'eggs', 'spam'])
+        table.append({'ham': 42})
+        table.append({'eggs': 3.14, 'spam': 2.71})
         expected = [['ham', 'eggs', 'spam'],
                     [None, None, 42],
                     [2.71, 3.14, None]]
-        self.assertEqual(table.rows, expected)
+        self.assertEqual(table[:], expected)
 
     def test_to_dict_should_create_a_dict_with_column_names_and_values(self):
         table = Table(headers=['spam', 'eggs'])
-        table.rows.append([42, 3.14])
-        table.rows.append(['python', 'rules'])
+        table.append([42, 3.14])
+        table.append(['python', 'rules'])
         table_dict = table.to_dict()
         expected = {'spam': [42, 'python'], 'eggs': [3.14, 'rules']}
         self.assertEqual(table_dict, expected)
 
     def test_to_dict_should_filter_some_columns(self):
         table = Table(headers=['spam', 'eggs', 'ham'])
-        table.rows.append([42, 3.14, 2.71])
-        table.rows.append(['python', 'rules', 'yeh'])
+        table.append([42, 3.14, 2.71])
+        table.append(['python', 'rules', 'yeh'])
         table_dict = table.to_dict(only=('eggs', 'ham'))
         expected = {'eggs': [3.14, 'rules'], 'ham': [2.71, 'yeh']}
         self.assertEqual(table_dict, expected)
 
     def test_to_dict_should_filter_create_dict_from_values(self):
         table = Table(headers=['spam', 'eggs', 'ham'])
-        table.rows.append([42, 3.14, 2.71])
-        table.rows.append(['python', 'rules', 'yeh'])
+        table.append([42, 3.14, 2.71])
+        table.append(['python', 'rules', 'yeh'])
         table_dict = table.to_dict(key='spam', value='ham')
         expected = {42: 2.71, 'python': 'yeh'}
         self.assertEqual(table_dict, expected)
@@ -535,9 +534,9 @@ class TestTable(unittest.TestCase):
     def test_to_dict_should_handle_encodings_correctly(self):
         table = Table(headers=['spam', 'eggs', 'ham'],
                       input_encoding='iso-8859-1', output_encoding='utf16')
-        table.rows.append([42, 3.14, 2.71])
-        table.rows.append(['python', 'rules', 'yeh'])
-        table.rows.append([u'Álvaro'.encode('iso-8859-1'), '...', 'Justen'])
+        table.append([42, 3.14, 2.71])
+        table.append(['python', 'rules', 'yeh'])
+        table.append([u'Álvaro'.encode('iso-8859-1'), '...', 'Justen'])
         table_dict = table.to_dict(key='spam', value='ham')
         expected = {42: 2.71,
                     u'python'.encode('utf16'): u'yeh'.encode('utf16'),
@@ -555,8 +554,8 @@ class TestTable(unittest.TestCase):
 
     def test_get_item_should_return_column_values_when_passing_string(self):
         table = Table(headers=['spam', 'eggs'])
-        table.rows.append(['python', 3.14])
-        table.rows.append(['rules', 42])
+        table.append(['python', 3.14])
+        table.append(['rules', 42])
         spam_column = ['python', 'rules']
         eggs_column = [3.14, 42]
         self.assertEqual(table['spam'], spam_column)
@@ -569,23 +568,23 @@ class TestTable(unittest.TestCase):
 
     def test_delete_item_passing_string_should_delete_a_entire_column(self):
         table = Table(headers=['spam', 'eggs', 'ham'])
-        table.rows.append(['python', 3.14, 1 + 5j])
-        table.rows.append(['rules', 42, 3 + 4j])
+        table.append(['python', 3.14, 1 + 5j])
+        table.append(['rules', 42, 3 + 4j])
         del table['eggs']
         self.assertEquals(table.headers, ['spam', 'ham'])
-        self.assertEquals(table.rows, [['python', 1 + 5j], ['rules', 3 + 4j]])
+        self.assertEquals(table[:], [['python', 1 + 5j], ['rules', 3 + 4j]])
 
     def test_table_append_should_add_a_row(self):
         table = Table(headers=['spam', 'eggs'])
         table.append(['python', 'rules'])
         table.append(['answer', 42])
-        self.assertEquals(table.rows[0], ['python', 'rules'])
-        self.assertEquals(table.rows[1], ['answer', 42])
+        self.assertEquals(table[0], ['python', 'rules'])
+        self.assertEquals(table[1], ['answer', 42])
 
     def test_table_append_should_convert_data_to_unicode_before(self):
         table = Table(headers=['spam', 'eggs'], input_encoding='iso-8859-1')
         table.append([u'Álvaro'.encode('iso-8859-1'), 'Justen'])
-        self.assertEquals(table.rows[0], [u'Álvaro', u'Justen'])
+        self.assertEquals(table[0], [u'Álvaro', u'Justen'])
 
     def test_table_append_accept_list_tuple_and_dict_else_ValueError(self):
         table = Table(headers=['spam', 'eggs'])
@@ -594,11 +593,11 @@ class TestTable(unittest.TestCase):
         table.append({'spam': 'python', 'eggs': 'rules'})
         table.append(['answer', 42])
         table.append({'eggs': 'ham'})
-        self.assertEquals(table.rows[0], ['eggs', 'ham'])
-        self.assertEquals(table.rows[1], ['ham', 'eggs'])
-        self.assertEquals(table.rows[2], ['python', 'rules'])
-        self.assertEquals(table.rows[3], ['answer', 42])
-        self.assertEquals(table.rows[4], [None, 'ham'])
+        self.assertEquals(table[0], ['eggs', 'ham'])
+        self.assertEquals(table[1], ['ham', 'eggs'])
+        self.assertEquals(table[2], ['python', 'rules'])
+        self.assertEquals(table[3], ['answer', 42])
+        self.assertEquals(table[4], [None, 'ham'])
         with self.assertRaises(ValueError):
             table.append(table)
 
@@ -610,16 +609,16 @@ class TestTable(unittest.TestCase):
     def test_table_extend(self):
         table = Table(headers=['spam', 'eggs'])
         table.extend([['python', 'rules'], ['answer', 42], {'eggs': 123}])
-        self.assertEquals(table.rows[0], ['python', 'rules'])
-        self.assertEquals(table.rows[1], ['answer', 42])
-        self.assertEquals(table.rows[2], [None, 123])
+        self.assertEquals(table[0], ['python', 'rules'])
+        self.assertEquals(table[1], ['answer', 42])
+        self.assertEquals(table[2], [None, 123])
 
     def test_table_extend_should_add_nothing_if_an_exception_is_raised(self):
         table = Table(headers=['spam', 'eggs'])
         table.append(['hello', 'world'])
         with self.assertRaises(ValueError):
             table.extend([['python', 'rules'], ['answer', 42], [1, 2, 3]])
-        self.assertEquals(table.rows[0], ['hello', 'world'])
+        self.assertEquals(table[0], ['hello', 'world'])
         self.assertEquals(len(table), 1)
 
     def test_table_get_item(self):

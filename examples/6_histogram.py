@@ -12,7 +12,7 @@ from outputty import Table
 seed(1234)
 distribution = normal(size=1000)
 my_table = Table(headers=['numbers'])
-my_table.rows.extend([[value] for value in distribution])
+my_table.extend([[value] for value in distribution])
 print 'Vertical:'
 print my_table.write('histogram', 'numbers', 'vertical', bins=10, height=7)
 print
