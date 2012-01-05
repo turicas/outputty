@@ -1,18 +1,24 @@
 outputty
 ========
 
-`outputty` is just a Python library that helps you importing, filtering and
+`outputty` is a simple Python library that helps you importing, filtering and
 exporting data. It is composed by a main `Table` class and a lot of plugins
-that helps importing and exporting data to/from `Table`. You can write your own
-plugin easily (see `outputty/plugin_*.py` for examples).
+that helps importing and exporting data to/from `Table` (in future we'll have
+filtering plugins). You can write your own plugin easily (see
+`outputty/plugin_*.py` for examples).
 
 Some examples of plugins are: CSV, text, HTML and histogram.
 
 Installation
 ------------
 
-Just copy the file `outputty.py` in some path you can do `import outputty`
-(sorry for that - it'll be available in PyPI soon).
+- [Download the package](https://github.com/turicas/outputty/tarball/master)
+- Extract it
+- Copy the directory `outputty` (inside the extracted folder) to some folter
+  you can do `import outputty` (it can be your system's `site-packages` or even
+  your project's path).
+
+Sorry for that - it'll be available in PyPI soon.
 
 
 Examples
