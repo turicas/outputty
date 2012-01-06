@@ -29,6 +29,7 @@ clean:
 	rm -rf examples/my-data.csv
 	rm -rf examples/nice-software.html
 	rm -rf examples/nice-software.txt
+	rm -rf readme.html
 
 before-push:	clean test create-readme html-readme
 
