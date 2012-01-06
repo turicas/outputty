@@ -34,11 +34,13 @@ for example_filename in examples:
         info = contents[0].split(' = ', 1)
         config[info[0].split('#')[1].strip()] = info[1]
         contents = contents[1:]
+    in_code = False
     for line in contents:
         line = line[:-1]
-        if line.startswith('#'):
+        if line.startswith('#') and not in_code:
             body.append(line[1:])
         else:
+            in_code = True
             code.append('    ' + line)
     code = '\n'.join(code)
     if 'title' in config:
@@ -57,13 +59,13 @@ for example_filename in examples:
                 body.append('and do you have the code below, like in '
                             '`examples/%s`: ' % example_filename)
             else:
-                body.append('If do you have this code, like in '
+                body.append('If you have this code, like in '
                             '`examples/%s`: ' % example_filename)
             body.append('    ' + code)
         else:
             input_ = input_.replace("'", '')
             body.append('')
-            body.append('If do you have the file `%s` with these contents:' % \
+            body.append('If you have the file `%s` with these contents:' % \
                         input_)
             body.append('')
             body.append(file_as_markdown(input_))

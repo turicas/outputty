@@ -27,9 +27,9 @@ class TestTableTxt(unittest.TestCase):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
-        my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
-        my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
+        my_table.append({'ham': '', 'spam': '', 'eggs': ''})
+        my_table.append({'ham': 1, 'spam': 2, 'eggs': 3})
+        my_table.append({'ham': 11, 'spam': 22, 'eggs': 33})
         my_table.write('text', temp_fp.name)
         output = my_table.write('text')
         fp = open(temp_fp.name, 'r')
@@ -52,7 +52,7 @@ class TestTableTxt(unittest.TestCase):
         temp_fp.close()
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
-        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+        my_table.append(['Píton'.decode('utf8').encode('utf16')])
         my_table.write('text', temp_fp.name)
 
         fp = open(temp_fp.name)
@@ -72,7 +72,7 @@ class TestTableTxt(unittest.TestCase):
     def test_input_file_can_be_a_filepointer(self):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         my_table = Table(headers=['python'])
-        my_table.rows.append(['rules'])
+        my_table.append(['rules'])
         my_table.write('text', temp_fp)
         temp_fp.seek(0)
         file_contents = temp_fp.read()
@@ -86,3 +86,5 @@ class TestTableTxt(unittest.TestCase):
         +--------+
         ''').strip() + '\n'
         self.assertEqual(file_contents, output)
+
+        #TODO: test input and output encoding

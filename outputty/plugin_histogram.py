@@ -7,7 +7,7 @@ from numpy import histogram, ceil
 
 def write(table, column, orientation='vertical', height=4, character='|',
           bins=5):
-    values = zip(*table.rows)[table.headers.index(column)]
+    values = zip(*table)[table.headers.index(column)]
     table.histogram = histogram(values, bins)
     his = []
     bars = table.histogram[0] / max(table.histogram[0]) * height

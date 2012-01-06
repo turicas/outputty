@@ -1,21 +1,27 @@
 outputty
 ========
 
-`outputty` is just a Python library that helps you importing, filtering and
+`outputty` is a simple Python library that helps you importing, filtering and
 exporting data. It is composed by a main `Table` class and a lot of plugins
-that helps importing and exporting data to/from `Table`. You can write your own
-plugin easily (see `outputty/plugin_*.py` for examples).
+that helps importing and exporting data to/from `Table` (in future we'll have
+filtering plugins). You can write your own plugin easily (see
+`outputty/plugin_*.py` for examples).
 
 Some examples of plugins are: CSV, text, HTML and histogram.
 
 Installation
 ------------
 
-Just copy the file `outputty.py` in some path you can do `import outputty`
-(sorry for that - it'll be available in PyPI soon).
+- [Download the package](https://github.com/turicas/outputty/tarball/master)
+- Extract it
+- Copy the directory `outputty` (inside the extracted folder) to some folter
+  you can do `import outputty` (it can be your system's `site-packages` or even
+  your project's path).
+
+Sorry for that - it'll be available in PyPI soon.
 
 
-Examples
+Examples:
 --------
 
 You can run all the examples below - see `examples` folder. You can also see
@@ -23,17 +29,18 @@ the tests we have at `tests/test_*.py`.
 
 ### Example 1: Basics of `Table`
 
-A `Table` is a list of rows. These rows can be represented with `dict`-like,
-`list`-like and `tuple`-like objects. Let's create one and prints it to
-stdout.
+A `Table` is simply a list of rows. These rows can be represented as
+`dict`-like, `list`-like or `tuple`-like objects. Let's create one `Table`
+with some rows and print it to stdout.
 
-If do you have this code, like in `examples/1_table.py`: 
+If you have this code, like in `examples/1_table.py`: 
         
     from outputty import Table
     my_table = Table(headers=['First Name', 'Last Name', 'Main Language'])
-    my_table.rows.append({'First Name': 'Álvaro', 'Last Name': 'Justen',
-                          'Main Language': 'Python'})
-    my_table.rows.append(('Flávio', 'Amieiro', 'Python'))
+    my_table.append({'First Name': 'Álvaro', 'Last Name': 'Justen',
+                     'Main Language': 'Python'}) #appending row as dict
+    my_table.append(('Flávio', 'Amieiro', 'Python')) #appending row as tuple
+    my_table.append(['Flávio', 'Coelho', 'Python']) #appending row as list
     print my_table
 
 After executing it, you'll get this output:
@@ -43,21 +50,24 @@ After executing it, you'll get this output:
     +------------+-----------+---------------+
     |     Álvaro |    Justen |        Python |
     |     Flávio |   Amieiro |        Python |
+    |     Flávio |    Coelho |        Python |
     +------------+-----------+---------------+
     
 
 ### Example 2: Exporting to a CSV File
 
 Using plugins we can import and export `Table` data to CSV (really, to and
-from a lot of formats). Let's export Python `list` and `dict` to a CSV file.
+from a lot of formats). Let's create a simple table and export it to a CSV
+file.
 
-If do you have this code, like in `examples/2_table_to_csv.py`: 
+If you have this code, like in `examples/2_table_to_csv.py`: 
         
     from outputty import Table
     
     my_table = Table(headers=['First name', 'Last name'])
-    my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-    my_table.rows.append(('Flávio', 'Amieiro'))
+    my_table.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+    my_table.append(('Flávio', 'Amieiro'))
+    my_table.append(['Flávio', 'Coelho'])
     my_table.write('csv', 'my-data.csv')
 
 The file `my-data.csv` will be created with this content:
@@ -65,14 +75,16 @@ The file `my-data.csv` will be created with this content:
     "First name","Last name"
     "Álvaro","Justen"
     "Flávio","Amieiro"
+    "Flávio","Coelho"
 
 
 ### Example 3: Exporting to a Text File
 
 We can also import data from a CSV file and export it to a text file (using
-plugins, again).
+plugins, again). The data written to the text file will be the same we saw
+when executed `print my_table` in Example 1.
 
-If do you have the file `nice-software.csv` with these contents:
+If you have the file `nice-software.csv` with these contents:
 
     id,name,website
     1,Python,http://www.python.org/
@@ -105,14 +117,14 @@ You can order your table's data with the method `Table.order_by`.
 You need to specify a column in which the ordering will be based on and
 optionally specify if the ordering will be ascending (default) or descending.
 
-If do you have this code, like in `examples/4_order_by.py`: 
+If you have this code, like in `examples/4_order_by.py`: 
         
     from outputty import Table
     
     my_table = Table(headers=['First name', 'Last name'])
-    my_table.rows.append({'First name': 'Álvaro', 'Last name': 'Justen'})
-    my_table.rows.append({'First name': 'Renne'})
-    my_table.rows.append(('Flávio', 'Amieiro'))
+    my_table.append({'First name': 'Álvaro', 'Last name': 'Justen'})
+    my_table.append({'First name': 'Renne'})
+    my_table.append(('Flávio', 'Amieiro'))
     my_table.order_by('Last name')
     print my_table
 
@@ -135,7 +147,7 @@ will return a string (encoded with `output_encoding`, specified in
 `Table.__init__`). If it receives the filename, the contents will be saved
 into it and it'll return nothing.
 
-If do you have this code, like in `examples/5_table_to_html_file.py`: 
+If you have this code, like in `examples/5_table_to_html_file.py`: 
         
     from outputty import Table
     
@@ -172,13 +184,14 @@ The file `nice-software.html` will be created with this content:
       </tbody>
     </table>
 
+
 ### Example 6: Creating Histograms
 
 There is a plugin called `histogram` that is shipped by default with
 `outputty` - it can create histograms of your table's columns (using `numpy`).
 The output will be the histogram represented as text.
 
-If do you have this code, like in `examples/6_histogram.py`: 
+If you have this code, like in `examples/6_histogram.py`: 
         
     from numpy.random import normal
     from numpy.random import seed
@@ -187,7 +200,7 @@ If do you have this code, like in `examples/6_histogram.py`:
     seed(1234)
     distribution = normal(size=1000)
     my_table = Table(headers=['numbers'])
-    my_table.rows.extend([[value] for value in distribution])
+    my_table.extend([[value] for value in distribution])
     print 'Vertical:'
     print my_table.write('histogram', 'numbers', 'vertical', bins=10, height=7)
     print
@@ -222,14 +235,212 @@ After executing it, you'll get this output:
     2.13 :
     
 
+### Example 7: Using table columns and rows
+
+You can get an entire table column just getting the item `column-name` in
+your table object. You can also delete an entire column (but you can't
+actually change an entire column).
+If the item you get is a string, a column is returned. If it is an integer, a
+row is returned (starting from 0). `Table` objects are iterable, so you can
+navigate through the rows with a simple `for` loop.
+
+If you have this code, like in `examples/7_table_columns.py`: 
+        
+    from outputty import Table
+    
+    table = Table(headers=['spam', 'eggs', 'ham'])
+    table.append(['python', 3.14, 1 + 5j])
+    table.append(['rules', 42, 3 + 4j])
+    del table['eggs']
+    print 'Table after deleting "eggs" column:'
+    print table
+    print '\nNow only column "spam":'
+    print table['spam']
+    print 'First row:'
+    print table[0]
+    print 'All rows:'
+    for index, row in enumerate(table):
+        print '  Row #%d: %s' % (index, row)
+
+After executing it, you'll get this output:
+
+    Table after deleting "eggs" column:
+    +--------+--------+
+    |  spam  |  ham   |
+    +--------+--------+
+    | python | (1+5j) |
+    |  rules | (3+4j) |
+    +--------+--------+
+    
+    Now only column "spam":
+    [u'python', u'rules']
+    First row:
+    [u'python', (1+5j)]
+    All rows:
+      Row #0: [u'python', (1+5j)]
+      Row #1: [u'rules', (3+4j)]
+    
+
+### Example 8: Other `Table` methods
+
+A `Table` is implemented as a list of rows, with some methods to use plugins,
+ordering and do other things. `Table` objects have all the methods other
+Python mutable objects have (except for `sort`), so you can use
+`Table.extend`, `Table.index`, `Table.count` and so on. You can also use
+slices (for getting and setting rows and columns) and
+[all mutable sequence operations](http://docs.python.org/library/stdtypes.html#mutable-sequence-types)
+(except for `sort`, because we have `Table.order_by`).
+
+> Note: all these methods support `tuple`, `list` or `dict` notations of row.
+
+If you have this code, like in `examples/8_table_methods.py`: 
+        
+    from outputty import Table
+    
+    table = Table(headers=['City', 'State', 'Country'])
+    table.append(['Três Rios', 'Rio de Janeiro', 'Brazil'])
+    table.append(['Niterói', 'Rio de Janeiro', 'Brazil'])
+    table.append(['Rio de Janeiro', 'Rio de Janeiro', 'Brazil'])
+    table.append(['Porto Alegre', 'Rio Grande do Sul', 'Brazil'])
+    table.append(['São Paulo', 'São Paulo', 'Brazil'])
+    
+    print 'First 3 rows:'
+    for row in table[:3]:
+        print row
+    
+    #Change the two last rows:
+    table[-2:] = [['Junín', 'Buenos Aires', 'Argentina'],
+                  ['Ciudad del Este', 'Alto Paraná', 'Paraguay']]
+    #Insert a row in the first position, using dict notation:
+    table.insert(0, {'City': 'La Paz', 'State': 'La Paz', 'Country': 'Bolivia'})
+    print 'New table:'
+    print table
+    print
+    
+    table.reverse()
+    print 'And the table in the reversed order:'
+    print table
+    print
+    
+    popped_row = table.pop()
+    rio = ['Rio de Janeiro', 'Rio de Janeiro', 'Brazil']
+    table.append(rio) #repeated row
+    number_of_rios = table.count(rio)
+    index_of_first_rio = table.index(rio)
+    table.remove(rio) #remove the first occurrence of this row
+    number_of_rows = len(table)
+    print 'Popped row:', popped_row
+    print 'Number of rows:', number_of_rows
+    print 'Count of Rios rows (before remove):', number_of_rios
+    print 'Table after pop and remove:'
+    print table
+    print
+    
+    #Removing non-brazilian cities:
+    del table[:2]
+    #Let's change an entire column:
+    table['Country'] = ['Brasil', 'Brasil', 'Brasil']
+    print 'Column "Country" changed:'
+    print table
+
+After executing it, you'll get this output:
+
+    First 3 rows:
+    [u'Tr\xeas Rios', u'Rio de Janeiro', u'Brazil']
+    [u'Niter\xf3i', u'Rio de Janeiro', u'Brazil']
+    [u'Rio de Janeiro', u'Rio de Janeiro', u'Brazil']
+    New table:
+    +-----------------+----------------+-----------+
+    |       City      |     State      |  Country  |
+    +-----------------+----------------+-----------+
+    |          La Paz |         La Paz |   Bolivia |
+    |       Três Rios | Rio de Janeiro |    Brazil |
+    |         Niterói | Rio de Janeiro |    Brazil |
+    |  Rio de Janeiro | Rio de Janeiro |    Brazil |
+    |           Junín |   Buenos Aires | Argentina |
+    | Ciudad del Este |    Alto Paraná |  Paraguay |
+    +-----------------+----------------+-----------+
+    
+    And the table in the reversed order:
+    +-----------------+----------------+-----------+
+    |       City      |     State      |  Country  |
+    +-----------------+----------------+-----------+
+    | Ciudad del Este |    Alto Paraná |  Paraguay |
+    |           Junín |   Buenos Aires | Argentina |
+    |  Rio de Janeiro | Rio de Janeiro |    Brazil |
+    |         Niterói | Rio de Janeiro |    Brazil |
+    |       Três Rios | Rio de Janeiro |    Brazil |
+    |          La Paz |         La Paz |   Bolivia |
+    +-----------------+----------------+-----------+
+    
+    Popped row: [u'La Paz', u'La Paz', u'Bolivia']
+    Number of rows: 5
+    Count of Rios rows (before remove): 2
+    Table after pop and remove:
+    +-----------------+----------------+-----------+
+    |       City      |     State      |  Country  |
+    +-----------------+----------------+-----------+
+    | Ciudad del Este |    Alto Paraná |  Paraguay |
+    |           Junín |   Buenos Aires | Argentina |
+    |         Niterói | Rio de Janeiro |    Brazil |
+    |       Três Rios | Rio de Janeiro |    Brazil |
+    |  Rio de Janeiro | Rio de Janeiro |    Brazil |
+    +-----------------+----------------+-----------+
+    
+    Column "Country" changed:
+    +----------------+----------------+---------+
+    |      City      |     State      | Country |
+    +----------------+----------------+---------+
+    |        Niterói | Rio de Janeiro |  Brasil |
+    |      Três Rios | Rio de Janeiro |  Brasil |
+    | Rio de Janeiro | Rio de Janeiro |  Brasil |
+    +----------------+----------------+---------+
+    
+
+### Example 9: Appending a column
+
+You can append a column in your `Table` object using the `append_column`
+method. You can pass new column's values or a function to generate the value
+based on row data. Let's see how it works - it's simple.
+
+If you have this code, like in `examples/9_append_column.py`: 
+        
+    from outputty import Table
+    
+    
+    table = Table(headers=['Name', 'Creation Year'])
+    table.append(['Python', 1991])
+    table.append(['Unix', 1969])
+    
+    #We have the values, so we'll append it:
+    table.append_column('Category', ['Programming Language', 'Operating System'])
+    
+    #We can also generate the values:
+    table.append_column('Age', lambda row: 2012 - row[1]) #row is a list
+    #Our function can receive row as dict (with `row_as_dict` parameter) and we
+    #can insert the column where we want (with `position` parameter):
+    table.append_column('First Letter', lambda row: row['Name'][0],
+                        row_as_dict=True, position=0) #row is dict
+    #...and the result:
+    print table
+
+After executing it, you'll get this output:
+
+    +--------------+--------+---------------+----------------------+-----+
+    | First Letter |  Name  | Creation Year |       Category       | Age |
+    +--------------+--------+---------------+----------------------+-----+
+    |            P | Python |          1991 | Programming Language |  21 |
+    |            U |   Unix |          1969 |     Operating System |  43 |
+    +--------------+--------+---------------+----------------------+-----+
+    
+
 
 Type Of Data
 ------------
 
 `outputty` will try to convert every element inside a row to `unicode`. In
 strings it'll use `string.decode(input_encoding)`, where `input_encoding` is
-specified in `Table.__init__`. For other types (integer, float etc.) it'll use
-`unicode(element)`.
+specified in `Table.__init__`.
 
 
 Character Encodings
@@ -250,13 +461,15 @@ You can also get the table string decoded, in unicode:
 > Python](http://docs.python.org/library/codecs.html#standard-encodings) to get a
 > complete list of the supported encodings.
 
+> `headers` must be a list of strings.
+
 
 ### Encoding and Decoding
 
-- __Decoding__: if do you need `table.headers` and `table.rows` in unicode,
+- __Decoding__: if you need `table.headers` and table rows in unicode,
   just call `table.decode()` and it'll decode all data using
   `table.input_encoding` (you can pass an alternative codec as parameter).
-- __Encoding__: if do you need `table.headers` and `table.rows` encoded to some
+- __Encoding__: if you need `table.headers` and table and rows encoded to some
   codec, just call `table.decode()` and it'll encode all data using
   `table.output_encoding` (you can pass an alternative codec as parameter).
 
@@ -264,16 +477,7 @@ You can also get the table string decoded, in unicode:
 Notes About Data Normalization
 ------------------------------
 
-We have three kinds of normalization in `Table`:
-
-- `.normalize_structure()`: transform `table.rows` in a list of lists. __All__
-  output operations (like `Table.to_csv`, `Table.__str__`) and `Table.order_by`
-  need to normalize data structure, but we don't like to maintain a normalized
-  and a non-normalized copy of rows, so a side effect is that `table.rows` is
-  changed when you execute these operations.
-  An example, from the table in Example 1: `my_table.normalize_structure()`
-  will transform `table.rows` in `[[u'\xc1lvaro', u'Justen', u'Python'],
-  [u'Fl\xe1vio', u'Amieiro', u'Python']]`.
+We have two kinds of normalization in `Table`:
 
 - `.normalize_types()`: used by default when importing from CSV, this method
   convert table rows to the types it identify. All data that in first moment
@@ -294,7 +498,7 @@ We have three kinds of normalization in `Table`:
 
 ### `to_list_of_dicts` and `to_dict`
 
-If do you want to access all table rows as dicts, just convert it using the
+If you want to access all table rows as dicts, just convert it using the
 method `to_list_of_dicts`. Using the same table from Example 1, if we execute:
 
     rows = my_table.to_list_of_dicts()
@@ -318,14 +522,14 @@ columns as values and filter which columns will go to the dictionary:
     {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio'), 'Main Language': (u'Python', u'Python')}
     {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio')}
 
-And if do you want to create a `dict` with some column value as key and other
+And if you want to create a `dict` with some column value as key and other
 column value as value you can specify `key` and `value` parameters, as in:
 
     other_table = Table(headers=['date', 'measure'])
-    other_table.rows.append(('2011-12-01', 21))
-    other_table.rows.append(('2011-12-02', 42))
-    other_table.rows.append(('2011-12-03', 3.14))
-    other_table.rows.append(('2011-12-04', 2.71))
+    other_table.append(('2011-12-01', 21))
+    other_table.append(('2011-12-02', 42))
+    other_table.append(('2011-12-03', 3.14))
+    other_table.append(('2011-12-04', 2.71))
     values_as_dict = other_table.to_dict(key='date', value='measure')
     print values_as_dict
 
@@ -337,7 +541,7 @@ column value as value you can specify `key` and `value` parameters, as in:
 New Features
 ------------
 
-Yes, there are a lot of features to add (it's just the begining). If do you
+Yes, there are a lot of features to add (it's just the begining). If you
 want to contribute, please see our
 [WISHLIST.markdown](https://github.com/turicas/outputty/blob/master/WISHLIST.markdown)
 file.
@@ -369,7 +573,7 @@ If you want to contribute to this project, please:
 
 ### New Plugins
 
-If do you want to create a new plugin to import/export from/to some new
+If you want to create a new plugin to import/export from/to some new
 resource, please see files `outputty/plugin_*.py` - they are simple: you just
 need to create `read` and/or `write` functions that will received the `Table`
 object and, optionally, the parameters you want. Save your file in
@@ -391,8 +595,9 @@ My sincerely thanks to:
 - [Flávio Coelho](https://github.com/fccoelho) for creating `histogram` and
   giving a lot of suggestions.
 - [Renne Rocha](https://github.com/rennerocha) for creating `order_by`.
-- [Tatiana Al-Chueyr](https://github.com/tatiana) for helping me design the
-  simple yet powerful plugin API.
+- [Tatiana Al-Chueyr](https://github.com/tatiana) for designing and coding
+  architecture proposals and suggestions for the plugin API (including the
+  architecture we are using).
 - [Flávio Amieiro](https://github.com/flavioamieiro) for a lot of suggestions
   and interpretations about design.
 
@@ -406,3 +611,4 @@ Related Software
 - [clint](https://github.com/kennethreitz/clint)
 - [csvstudio](http://code.google.com/p/csvstudio/)
 - [PyTables](http://www.pytables.org/)
+- [pyspread](http://manns.github.com/pyspread/)

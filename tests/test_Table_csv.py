@@ -31,7 +31,7 @@ class TestTableCsv(unittest.TestCase):
         temp_fp.close()
 
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
+        my_table.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
                               'eggs': 'eggs ham eggs'})
         my_table.write('csv', temp_fp.name)
 
@@ -116,7 +116,7 @@ class TestTableCsv(unittest.TestCase):
         temp_fp.close()
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
-        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+        my_table.append(['Píton'.decode('utf8').encode('utf16')])
         my_table.write('csv', temp_fp.name)
         fp = open(temp_fp.name)
         file_contents = fp.read()
@@ -161,19 +161,15 @@ class TestTableCsv(unittest.TestCase):
         self.assertEqual(table_output, output)
 
     def test_write_csv_should_accept_filepointer(self):
-        data = '"Álvaro"\n"Píton"\n'
-        temp_fp_r = tempfile.NamedTemporaryFile()
-        temp_fp_w = tempfile.NamedTemporaryFile()
-        temp_fp_r.write(data)
-        temp_fp_r.seek(0)
-        my_table = Table()
-        my_table.read('csv', temp_fp_r)
-        my_table.write('csv', temp_fp_w)
-        temp_fp_w.seek(0)
-        contents = temp_fp_w.read()
-        temp_fp_r.close()
-        temp_fp_w.close()
-        self.assertEqual(contents, data)
+        temp_fp = tempfile.NamedTemporaryFile()
+        my_table = Table(headers=['Álvaro'])
+        my_table.append(['Píton'])
+        my_table.write('csv', temp_fp)
+        expected = '"Álvaro"\n"Píton"\n'
+        temp_fp.seek(0)
+        output = temp_fp.read()
+        temp_fp.close()
+        self.assertEqual(output, expected)
 
     def test_input_encoding_should_affect_read_csv_when_using_filepointer(self):
         data = '"Álvaro"\n"Píton"'
@@ -207,18 +203,18 @@ class TestTableCsv(unittest.TestCase):
         my_table = Table()
         my_table.read('csv', temp_fp.name)
         os.remove(temp_fp.name)
-        self.assertEquals(type(my_table.rows[0][0]), types.IntType)
-        self.assertEquals(type(my_table.rows[1][0]), types.NoneType)
-        self.assertEquals(type(my_table.rows[2][0]), types.IntType)
-        self.assertEquals(type(my_table.rows[3][0]), types.IntType)
-        self.assertEquals(type(my_table.rows[0][1]), types.FloatType)
-        self.assertEquals(type(my_table.rows[1][1]), types.FloatType)
-        self.assertEquals(type(my_table.rows[2][1]), types.NoneType)
-        self.assertEquals(type(my_table.rows[3][1]), types.FloatType)
-        self.assertEquals(type(my_table.rows[0][2]), datetime.date)
-        self.assertEquals(type(my_table.rows[1][2]), datetime.date)
-        self.assertEquals(type(my_table.rows[2][2]), datetime.date)
-        self.assertEquals(type(my_table.rows[3][2]), types.NoneType)
+        self.assertEquals(type(my_table[0][0]), types.IntType)
+        self.assertEquals(type(my_table[1][0]), types.NoneType)
+        self.assertEquals(type(my_table[2][0]), types.IntType)
+        self.assertEquals(type(my_table[3][0]), types.IntType)
+        self.assertEquals(type(my_table[0][1]), types.FloatType)
+        self.assertEquals(type(my_table[1][1]), types.FloatType)
+        self.assertEquals(type(my_table[2][1]), types.NoneType)
+        self.assertEquals(type(my_table[3][1]), types.FloatType)
+        self.assertEquals(type(my_table[0][2]), datetime.date)
+        self.assertEquals(type(my_table[1][2]), datetime.date)
+        self.assertEquals(type(my_table[2][2]), datetime.date)
+        self.assertEquals(type(my_table[3][2]), types.NoneType)
 
     def test_read_csv_shouldnt_convert_types_when_convert_types_is_False(self):
         data = dedent('''
@@ -234,7 +230,7 @@ class TestTableCsv(unittest.TestCase):
         my_table = Table()
         my_table.read('csv', temp_fp.name, convert_types=False)
         os.remove(temp_fp.name)
-        for row in my_table.rows:
+        for row in my_table:
             for value in row:
                 self.assertEquals(type(value), types.UnicodeType)
 

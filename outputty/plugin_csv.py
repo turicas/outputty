@@ -27,7 +27,7 @@ def read(table, filename_or_pointer, convert_types=True):
     table.rows = []
     if data:
         table.headers = data[0]
-        table.rows = data[1:]
+        table._rows = data[1:]
         table.decode('utf-8')
         if convert_types:
             table.normalize_types()
@@ -48,7 +48,7 @@ def write(table, filename_or_pointer=None):
         fp = StringIO()
     writer = csv.writer(fp, dialect=MyCSV)
     writer.writerow(table.headers)
-    writer.writerows(table.rows)
+    writer.writerows(table)
     table.decode(table.output_encoding)
     if filename_or_pointer is None:
         contents = fp.getvalue()

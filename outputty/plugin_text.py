@@ -12,7 +12,6 @@ def write(table, filename_or_pointer=None):
         else:
             fp = filename_or_pointer
             close = False
-        table._organize_data()
         fp.write(contents)
         if close:
             fp.close()
