@@ -290,10 +290,6 @@ slices (for getting and setting rows and columns) and
 (except for `sort`, because we have `Table.order_by`).
 
 > Note: all these methods support `tuple`, `list` or `dict` notations of row.
-Change the two last rows:
-Insert a row in the first position, using dict notation:
-Removing non-brazilian cities:
-Let's change an entire column:
 
 If you have this code, like in `examples/8_table_methods.py`: 
         
@@ -310,8 +306,10 @@ If you have this code, like in `examples/8_table_methods.py`:
     for row in table[:3]:
         print row
     
+    #Change the two last rows:
     table[-2:] = [['Junín', 'Buenos Aires', 'Argentina'],
                   ['Ciudad del Este', 'Alto Paraná', 'Paraguay']]
+    #Insert a row in the first position, using dict notation:
     table.insert(0, {'City': 'La Paz', 'State': 'La Paz', 'Country': 'Bolivia'})
     print 'New table:'
     print table
@@ -336,7 +334,9 @@ If you have this code, like in `examples/8_table_methods.py`:
     print table
     print
     
+    #Removing non-brazilian cities:
     del table[:2]
+    #Let's change an entire column:
     table['Country'] = ['Brasil', 'Brasil', 'Brasil']
     print 'Column "Country" changed:'
     print table
@@ -393,6 +393,43 @@ After executing it, you'll get this output:
     |      Três Rios | Rio de Janeiro |  Brasil |
     | Rio de Janeiro | Rio de Janeiro |  Brasil |
     +----------------+----------------+---------+
+    
+
+### Example 9: Appending a column
+
+You can append a column in your `Table` object using the `append_column`
+method. You can pass new column's values or a function to generate the value
+based on row data. Let's see how it works - it's simple.
+
+If you have this code, like in `examples/9_append_column.py`: 
+        
+    from outputty import Table
+    
+    
+    table = Table(headers=['Name', 'Creation Year'])
+    table.append(['Python', 1991])
+    table.append(['Unix', 1969])
+    
+    #We have the values, so we'll append it:
+    table.append_column('Category', ['Programming Language', 'Operating System'])
+    
+    #We can also generate the values:
+    table.append_column('Age', lambda row: 2012 - row[1]) #row is a list
+    #Our function can receive row as dict (with `row_as_dict` parameter) and we
+    #can insert the column where we want (with `position` parameter):
+    table.append_column('First Letter', lambda row: row['Name'][0],
+                        row_as_dict=True, position=0) #row is dict
+    #...and the result:
+    print table
+
+After executing it, you'll get this output:
+
+    +--------------+--------+---------------+----------------------+-----+
+    | First Letter |  Name  | Creation Year |       Category       | Age |
+    +--------------+--------+---------------+----------------------+-----+
+    |            P | Python |          1991 | Programming Language |  21 |
+    |            U |   Unix |          1969 |     Operating System |  43 |
+    +--------------+--------+---------------+----------------------+-----+
     
 
 
