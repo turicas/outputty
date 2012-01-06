@@ -17,6 +17,8 @@
 
 import datetime
 import re
+import types
+
 
 def _str_decode(element, codec):
     if isinstance(element, str):
@@ -368,3 +370,26 @@ class Table(object):
         Same as `list.reverse`.
         """
         self._rows.reverse()
+
+    def append_column(self, name, values, position=None, row_as_dict=False):
+        """Append a column in the end of table"""
+        if (type(values) != types.FunctionType and len(values) != len(self)) or \
+           name in self.headers:
+            raise ValueError
+        if position is None:
+            insert_header = lambda name: self.headers.append(name)
+            insert_data = lambda row, value: row.append(value)
+        else:
+            insert_header = lambda name: self.headers.insert(position, name)
+            insert_data = lambda row, value: row.insert(position, value)
+        for index, row in enumerate(self):
+            if type(values) == types.FunctionType:
+                if row_as_dict:
+                    value = values({header: row[index] \
+                                    for index, header in enumerate(self.headers)})
+                else:
+                    value = values(row)
+            else:
+                value = values[index]
+            insert_data(row, _str_decode(value, self.input_encoding))
+        insert_header(name)

@@ -754,3 +754,60 @@ class TestTable(unittest.TestCase):
             table['not-found'] = [1, 2, 3]
         with self.assertRaises(ValueError):
             table['rules'] = [1, 2, 3, 4]
+
+    def test_table_append_column_should_change_headers_and_rows(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        table.append_column('new column', [3, 5, 7])
+        self.assertEquals(table.headers, ['python', 'rules', 'new column'])
+        self.assertEquals(table[:], [[1, 2, 3], [3, 4, 5], [5, 6, 7]])
+
+    def test_table_append_column_should_raise_ValueError_when_wrong_size(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        with self.assertRaises(ValueError):
+            table.append_column('new column', [3, 5, 7, 8])
+        self.assertEquals(table.headers, ['python', 'rules'])
+        self.assertEquals(table[:], [[1, 2], [3, 4], [5, 6]])
+
+    def test_append_column_should_raise_ValueError_when_column_already_exists(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        with self.assertRaises(ValueError):
+            table.append_column('python', [3, 5, 7])
+        self.assertEquals(table.headers, ['python', 'rules'])
+        self.assertEquals(table[:], [[1, 2], [3, 4], [5, 6]])
+
+    def test_append_column_should_decode_strings(self):
+        table = Table(headers=['python', 'rules'], input_encoding='iso-8859-1')
+        table.extend([[1, 2], [3, 4]])
+        table.append_column('new column', [u'Álvaro'.encode('iso-8859-1'),
+                                           u'Píton'.encode('iso-8859-1')])
+        self.assertEquals(table.headers, ['python', 'rules', 'new column'])
+        self.assertEquals(table[:], [[1, 2, u'Álvaro'], [3, 4, u'Píton']])
+
+    def test_append_column_should_be_inserted_in_any_position(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4]])
+        table.append_column('new column', [3, 5], position=0)
+        self.assertEquals(table.headers, ['new column', 'python', 'rules'])
+        self.assertEquals(table[:], [[3, 1, 2], [5, 3, 4]])
+
+    def test_append_column_should_accept_a_function_to_create_new_column(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4]])
+        table.append_column('new column', lambda row: row[0] + row[1])
+        self.assertEquals(table.headers, ['python', 'rules', 'new column'])
+        self.assertEquals(table[:], [[1, 2, 3], [3, 4, 7]])
+        del table['new column']
+
+        table.append_column('other column', lambda row: row[0] + row[1],
+                            position=0)
+        self.assertEquals(table.headers, ['other column', 'python', 'rules'])
+        self.assertEquals(table[:], [[3, 1, 2], [7, 3, 4]])
+        del table['other column']
+
+        table.append_column('third column', lambda r: r['python'] * r['rules'],
+                            row_as_dict=True)
+        self.assertEquals(table.headers, ['python', 'rules', 'third column'])
+        self.assertEquals(table[:], [[1, 2, 2], [3, 4, 12]])
