@@ -1,21 +1,27 @@
 outputty
 ========
 
-`outputty` is just a Python library that helps you importing, filtering and
+`outputty` is a simple Python library that helps you importing, filtering and
 exporting data. It is composed by a main `Table` class and a lot of plugins
-that helps importing and exporting data to/from `Table`. You can write your own
-plugin easily (see `outputty/plugin_*.py` for examples).
+that helps importing and exporting data to/from `Table` (in future we'll have
+filtering plugins). You can write your own plugin easily (see
+`outputty/plugin_*.py` for examples).
 
 Some examples of plugins are: CSV, text, HTML and histogram.
 
 Installation
 ------------
 
-Just copy the file `outputty.py` in some path you can do `import outputty`
-(sorry for that - it'll be available in PyPI soon).
+- [Download the package](https://github.com/turicas/outputty/tarball/master)
+- Extract it
+- Copy the directory `outputty` (inside the extracted folder) to some folter
+  you can do `import outputty` (it can be your system's `site-packages` or even
+  your project's path).
+
+Sorry for that - it'll be available in PyPI soon.
 
 
-Examples
+Examples:
 --------
 
 You can run all the examples below - see `examples` folder. You can also see
@@ -28,8 +34,7 @@ Type Of Data
 
 `outputty` will try to convert every element inside a row to `unicode`. In
 strings it'll use `string.decode(input_encoding)`, where `input_encoding` is
-specified in `Table.__init__`. For other types (integer, float etc.) it'll use
-`unicode(element)`.
+specified in `Table.__init__`.
 
 
 Character Encodings
@@ -50,13 +55,15 @@ You can also get the table string decoded, in unicode:
 > Python](http://docs.python.org/library/codecs.html#standard-encodings) to get a
 > complete list of the supported encodings.
 
+> `headers` must be a list of strings.
+
 
 ### Encoding and Decoding
 
-- __Decoding__: if you need `table.headers` and `table.rows` in unicode,
+- __Decoding__: if you need `table.headers` and table rows in unicode,
   just call `table.decode()` and it'll decode all data using
   `table.input_encoding` (you can pass an alternative codec as parameter).
-- __Encoding__: if you need `table.headers` and `table.rows` encoded to some
+- __Encoding__: if you need `table.headers` and table and rows encoded to some
   codec, just call `table.decode()` and it'll encode all data using
   `table.output_encoding` (you can pass an alternative codec as parameter).
 
@@ -64,16 +71,7 @@ You can also get the table string decoded, in unicode:
 Notes About Data Normalization
 ------------------------------
 
-We have three kinds of normalization in `Table`:
-
-- `.normalize_structure()`: transform `table.rows` in a list of lists. __All__
-  output operations (like `Table.to_csv`, `Table.__str__`) and `Table.order_by`
-  need to normalize data structure, but we don't like to maintain a normalized
-  and a non-normalized copy of rows, so a side effect is that `table.rows` is
-  changed when you execute these operations.
-  An example, from the table in Example 1: `my_table.normalize_structure()`
-  will transform `table.rows` in `[[u'\xc1lvaro', u'Justen', u'Python'],
-  [u'Fl\xe1vio', u'Amieiro', u'Python']]`.
+We have two kinds of normalization in `Table`:
 
 - `.normalize_types()`: used by default when importing from CSV, this method
   convert table rows to the types it identify. All data that in first moment
@@ -122,10 +120,10 @@ And if you want to create a `dict` with some column value as key and other
 column value as value you can specify `key` and `value` parameters, as in:
 
     other_table = Table(headers=['date', 'measure'])
-    other_table.rows.append(('2011-12-01', 21))
-    other_table.rows.append(('2011-12-02', 42))
-    other_table.rows.append(('2011-12-03', 3.14))
-    other_table.rows.append(('2011-12-04', 2.71))
+    other_table.append(('2011-12-01', 21))
+    other_table.append(('2011-12-02', 42))
+    other_table.append(('2011-12-03', 3.14))
+    other_table.append(('2011-12-04', 2.71))
     values_as_dict = other_table.to_dict(key='date', value='measure')
     print values_as_dict
 

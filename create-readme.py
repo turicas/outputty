@@ -34,11 +34,13 @@ for example_filename in examples:
         info = contents[0].split(' = ', 1)
         config[info[0].split('#')[1].strip()] = info[1]
         contents = contents[1:]
+    in_code = False
     for line in contents:
         line = line[:-1]
-        if line.startswith('#'):
+        if line.startswith('#') and not in_code:
             body.append(line[1:])
         else:
+            in_code = True
             code.append('    ' + line)
     code = '\n'.join(code)
     if 'title' in config:

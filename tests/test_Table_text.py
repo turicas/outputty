@@ -28,9 +28,9 @@ class TestTableTxt(unittest.TestCase):
         temp_fp.close()
 
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': '', 'spam': '', 'eggs': ''})
-        my_table.rows.append({'ham': 1, 'spam': 2, 'eggs': 3})
-        my_table.rows.append({'ham': 11, 'spam': 22, 'eggs': 33})
+        my_table.append({'ham': '', 'spam': '', 'eggs': ''})
+        my_table.append({'ham': 1, 'spam': 2, 'eggs': 3})
+        my_table.append({'ham': 11, 'spam': 22, 'eggs': 33})
 
         my_table.write('text', temp_fp.name)
         output = my_table.write('text')
@@ -54,7 +54,7 @@ class TestTableTxt(unittest.TestCase):
         temp_fp.close()
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
-        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+        my_table.append(['Píton'.decode('utf8').encode('utf16')])
         my_table.write('text', temp_fp.name)
 
         fp = open(temp_fp.name)
