@@ -35,8 +35,7 @@ def _unicode_encode(element, codec):
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8', order_by='',
-                 ordering=''):
+                 input_encoding='utf8', output_encoding='utf8'):
         self.headers = headers if headers is not None else []
         for header in self.headers:
             if not isinstance(header, (str, unicode)):
@@ -44,6 +43,7 @@ class Table(object):
         else:
             if len(self.headers) != len(set(self.headers)):
                 raise ValueError('Header names must be unique.')
+        self.headers = [_str_decode(h, input_encoding) for h in self.headers]
         self.dash = dash
         self.pipe = pipe
         self.plus = plus
@@ -53,8 +53,6 @@ class Table(object):
         self._rows = []
         self.types = {}
         self.plugins = {}
-        self.order_by_column = order_by
-        self.ordering = ordering
 
     def __setitem__(self, item, value):
         if isinstance(item, (str, unicode)):
@@ -100,7 +98,6 @@ class Table(object):
             raise ValueError
 
     def order_by(self, column, ordering='asc'):
-        self.decode()
         index = self.headers.index(column)
         if ordering.lower().startswith('desc'):
             sort_function = lambda x, y: cmp(y[index], x[index])
@@ -126,11 +123,6 @@ class Table(object):
         self._rows = rows
         self.headers = [_str_decode(h, codec) for h in self.headers]
 
-    def _organize_data(self):
-        self.decode()
-        if self.order_by_column:
-            self.order_by(self.order_by_column, self.ordering)
-
     def _max_column_sizes(self):
         max_size = {}
         for column in self.headers:
@@ -144,7 +136,6 @@ class Table(object):
                              self.pipe)
 
     def __unicode__(self):
-        self._organize_data()
         max_size = self._max_column_sizes()
         if not len(self.headers) and not len(self._rows):
             return unicode()
@@ -172,7 +163,6 @@ class Table(object):
         return self.__unicode__().encode(self.output_encoding)
 
     def to_list_of_dicts(self):
-        self._organize_data()
         self.encode()
         rows = [dict(zip(self.headers, row)) for row in self._rows]
         self.decode(self.output_encoding)
@@ -247,7 +237,6 @@ class Table(object):
         self._rows = rows_converted
 
     def to_dict(self, only=None, key=None, value=None):
-        self._organize_data()
         self.encode()
         table_dict = {}
         if key is not None and value is not None:

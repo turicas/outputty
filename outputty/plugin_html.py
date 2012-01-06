@@ -2,7 +2,6 @@
 # coding: utf-8
 
 def _to_html_unicode(table):
-    table._organize_data()
     result = ['<table>', '  <thead>']
     if table.css_classes:
         result.append('    <tr class="header">')

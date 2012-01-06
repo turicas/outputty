@@ -69,3 +69,5 @@ class TestTableTxt(unittest.TestCase):
         +--------+
         ''').strip().decode('utf8').encode('iso-8859-1')
         self.assertEqual(file_contents, output)
+
+        #TODO: test input and output encoding

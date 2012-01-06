@@ -187,3 +187,5 @@ class TestTableHtml(unittest.TestCase):
         </table>
         ''').strip()
         self.assertEquals(output, expected)
+
+    #TODO: test input and output encoding
