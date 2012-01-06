@@ -30,6 +30,14 @@ API
 - Create `plugin_text.read`?
 
 
+Documentation
+-------------
+
+- Create a better documentation than `README.markdown` (maybe using something
+  like `create-readme.py` + sphinxdoc)
+- Add some "use cases" in `README.markdown`
+
+
 Packaging-related stuff
 -----------------------
 
@@ -55,23 +63,21 @@ Processing Input Data
 Plugins
 -------
 
-- `Table.from/to_mysql='username:password@host/database/table'`? Work started
-  at branch `feature/mysql`.
-- `Table.from/to_latex`?
+- MySQL.read/write: work started at branch `feature/mysql`.
+- LaTeX.write (?)
 
 
-Table Templates
----------------
+### Templates
 
-- Text-related:
-  - Should be able to change the space character and line feed (like `pipe`,
+- Plugin `text`:
+    - Should be able to change the space character and line feed (like `pipe`,
     `plus` etc.).
-  - Change the name of special characters (`pipe`, `plus` and `dash`) to
+    - Change the name of special characters (`pipe`, `plus` and `dash`) to
     something more intuitive.
-  - Create some kind of 'templates' with pre-defined `pipe`, `plus`, `dash`
+    - Create some kind of 'templates' with pre-defined `pipe`, `plus`, `dash`
     etc. See [sqlite's .mode column](http://www.sqlite.org/sqlite.html).
-  - The `dash` inside the line that split the table into header and data should
+    - The `dash` inside the line that split the table into header and data should
     be different from the "normal `dash`". All these "characters" should be
     generalised.
-- CSV-related:
-  - Create some way to change CSV dialect.
+- Plugin `csv`:
+    - Create some way to change CSV dialect.
