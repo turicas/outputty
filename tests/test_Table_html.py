@@ -28,7 +28,7 @@ class TestTableHtml(unittest.TestCase):
         self.assertTrue(isinstance(my_table.write('html'), str))
 
     def test_to_html_with_only_headers(self):
-        my_table = Table(headers=['ham', 'spam', 'eggs', None])
+        my_table = Table(headers=['ham', 'spam', 'eggs', 'blah'])
         output = my_table.write('html', css_classes=False)
         expected = dedent('''
         <table>
@@ -37,7 +37,7 @@ class TestTableHtml(unittest.TestCase):
               <th>ham</th>
               <th>spam</th>
               <th>eggs</th>
-              <th>None</th>
+              <th>blah</th>
             </tr>
           </thead>
         </table>
@@ -46,8 +46,8 @@ class TestTableHtml(unittest.TestCase):
 
     def test_to_html_with_headers_and_some_rows(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append(['python', 'rules', '!'])
-        my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
+        my_table.append(['python', 'rules', '!'])
+        my_table.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
         output = my_table.write('html', css_classes=False)
         expected = dedent('''
         <table>
@@ -76,9 +76,9 @@ class TestTableHtml(unittest.TestCase):
 
     def test_to_html_with_headers_and_rows_with_some_columns_empty(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 'spam'})
-        my_table.rows.append({'spam': 'eggs'})
-        my_table.rows.append({'eggs': 'ham'})
+        my_table.append({'ham': 'spam'})
+        my_table.append({'spam': 'eggs'})
+        my_table.append({'eggs': 'ham'})
         output = my_table.write('html', css_classes=False)
         expected = dedent('''
         <table>
@@ -114,8 +114,8 @@ class TestTableHtml(unittest.TestCase):
         temp_fp = tempfile.NamedTemporaryFile(delete=False)
         temp_fp.close()
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append(['python', 'rules', '!'])
-        my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
+        my_table.append(['python', 'rules', '!'])
+        my_table.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
         my_table.write('html', temp_fp.name, css_classes=False)
         temp_fp = open(temp_fp.name)
         output = temp_fp.read()
@@ -148,10 +148,10 @@ class TestTableHtml(unittest.TestCase):
 
     def test_to_html_should_create_CSS_classes_for_odd_and_even_rows(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append(['python', 'rules', '!'])
-        my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
-        my_table.rows.append(['python', 'rules', '!'])
-        my_table.rows.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
+        my_table.append(['python', 'rules', '!'])
+        my_table.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
+        my_table.append(['python', 'rules', '!'])
+        my_table.append({'ham': 'spam', 'spam': 'eggs', 'eggs': 'ham'})
         output = my_table.write('html', css_classes=True)
         expected = dedent('''
         <table>
@@ -187,3 +187,5 @@ class TestTableHtml(unittest.TestCase):
         </table>
         ''').strip()
         self.assertEquals(output, expected)
+
+    #TODO: test input and output encoding

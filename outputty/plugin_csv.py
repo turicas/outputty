@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import csv
+from StringIO import StringIO
 
 
 class MyCSV(csv.Dialect):
@@ -19,27 +20,37 @@ def read(table, file_name_or_pointer, convert_types=True):
         fp = open(file_name_or_pointer, 'r')
     else:
         fp = file_name_or_pointer
-    table.fp = fp
     info = fp.read().decode(table.input_encoding).encode('utf8')
     reader = csv.reader(info.split('\n'))
     table.data = [x for x in reader if x]
     if table.csv_filename:
         fp.close()
     table.headers = []
-    table.rows = []
     if table.data:
         table.headers = [x.decode('utf8') for x in table.data[0]]
-        table.rows = [[y.decode('utf8') for y in x] for x in table.data[1:]]
+        table.extend([[y.decode('utf8') for y in x] for x in table.data[1:]])
         if table.convert_types:
             table.normalize_types()
 
-def write(table, filename):
-    table._organize_data()
-    encoded_headers = [x.encode(table.output_encoding) for x in table.headers]
-    encoded_rows = [[info.encode(table.output_encoding) for info in row] \
-                    for row in table.rows]
-    encoded_data = [encoded_headers] + encoded_rows
-    fp = open(filename, 'w')
+def write(table, filename_or_pointer=None):
+    table.decode()
+    table.encode()
+    if filename_or_pointer is not None:
+        if isinstance(filename_or_pointer, (str, unicode)):
+            fp = open(filename_or_pointer, 'w')
+            close = True
+        else:
+            fp = filename_or_pointer
+            close = False
+    else:
+        fp = StringIO()
     writer = csv.writer(fp, dialect=MyCSV)
-    writer.writerows(encoded_data)
-    fp.close()
+    writer.writerow(table.headers)
+    writer.writerows(table)
+    table.decode(table.output_encoding)
+    if filename_or_pointer is None:
+        contents = fp.getvalue()
+        fp.close()
+        return contents
+    elif close:
+        fp.close()

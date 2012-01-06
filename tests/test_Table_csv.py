@@ -31,7 +31,7 @@ class TestTableCsv(unittest.TestCase):
         temp_fp.close()
 
         my_table = Table(headers=['ham', 'spam', 'eggs'])
-        my_table.rows.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
+        my_table.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
                               'eggs': 'eggs ham eggs'})
         my_table.write('csv', temp_fp.name)
 
@@ -116,7 +116,7 @@ class TestTableCsv(unittest.TestCase):
         temp_fp.close()
         my_table = Table(headers=['Álvaro'.decode('utf8').encode('utf16')],
                          input_encoding='utf16', output_encoding='iso-8859-1')
-        my_table.rows.append(['Píton'.decode('utf8').encode('utf16')])
+        my_table.append(['Píton'.decode('utf8').encode('utf16')])
         my_table.write('csv', temp_fp.name)
 
         fp = open(temp_fp.name)
@@ -161,6 +161,17 @@ class TestTableCsv(unittest.TestCase):
         temp_fp.close()
         self.assertEqual(table_output, output)
 
+    def test_write_csv_should_accept_filepointer(self):
+        temp_fp = tempfile.NamedTemporaryFile()
+        my_table = Table(headers=['Álvaro'])
+        my_table.append(['Píton'])
+        my_table.write('csv', temp_fp)
+        expected = '"Álvaro"\n"Píton"\n'
+        temp_fp.seek(0)
+        output = temp_fp.read()
+        temp_fp.close()
+        self.assertEqual(output, expected)
+
     def test_input_encoding_should_affect_read_csv_when_using_filepointer(self):
         data = '"Álvaro"\n"Píton"'
         temp_fp = tempfile.NamedTemporaryFile()
@@ -193,18 +204,18 @@ class TestTableCsv(unittest.TestCase):
         my_table = Table()
         my_table.read('csv', temp_fp.name)
         os.remove(temp_fp.name)
-        self.assertEquals(type(my_table.rows[0][0]), types.IntType)
-        self.assertEquals(type(my_table.rows[1][0]), types.NoneType)
-        self.assertEquals(type(my_table.rows[2][0]), types.IntType)
-        self.assertEquals(type(my_table.rows[3][0]), types.IntType)
-        self.assertEquals(type(my_table.rows[0][1]), types.FloatType)
-        self.assertEquals(type(my_table.rows[1][1]), types.FloatType)
-        self.assertEquals(type(my_table.rows[2][1]), types.NoneType)
-        self.assertEquals(type(my_table.rows[3][1]), types.FloatType)
-        self.assertEquals(type(my_table.rows[0][2]), datetime.date)
-        self.assertEquals(type(my_table.rows[1][2]), datetime.date)
-        self.assertEquals(type(my_table.rows[2][2]), datetime.date)
-        self.assertEquals(type(my_table.rows[3][2]), types.NoneType)
+        self.assertEquals(type(my_table[0][0]), types.IntType)
+        self.assertEquals(type(my_table[1][0]), types.NoneType)
+        self.assertEquals(type(my_table[2][0]), types.IntType)
+        self.assertEquals(type(my_table[3][0]), types.IntType)
+        self.assertEquals(type(my_table[0][1]), types.FloatType)
+        self.assertEquals(type(my_table[1][1]), types.FloatType)
+        self.assertEquals(type(my_table[2][1]), types.NoneType)
+        self.assertEquals(type(my_table[3][1]), types.FloatType)
+        self.assertEquals(type(my_table[0][2]), datetime.date)
+        self.assertEquals(type(my_table[1][2]), datetime.date)
+        self.assertEquals(type(my_table[2][2]), datetime.date)
+        self.assertEquals(type(my_table[3][2]), types.NoneType)
 
     def test_read_csv_shouldnt_convert_types_when_convert_types_is_False(self):
         data = dedent('''
@@ -220,6 +231,46 @@ class TestTableCsv(unittest.TestCase):
         my_table = Table()
         my_table.read('csv', temp_fp.name, convert_types=False)
         os.remove(temp_fp.name)
-        for row in my_table.rows:
+        for row in my_table:
             for value in row:
                 self.assertEquals(type(value), types.UnicodeType)
+
+    def test_read_csv_and_write_csv(self):
+        data = dedent('''
+        "spam","eggs","ham"
+        "42","3.0","2011-01-02"
+        "1","3.14","2012-01-11"
+        "21","6.28","2010-01-03"
+        "2","2.71","2"
+        ''').strip() + '\n'
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        temp_fp_2 = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp_2.close()
+        my_table = Table()
+        my_table.read('csv', temp_fp.name)
+        my_table.write('csv', temp_fp_2.name)
+        temp_fp_2 = open(temp_fp_2.name)
+        contents = temp_fp_2.read()
+        temp_fp_2.close()
+        os.remove(temp_fp.name)
+        os.remove(temp_fp_2.name)
+        self.assertEquals(contents, data)
+
+    def test_write_csv_without_filename_should_return_csv_data(self):
+        data = dedent('''
+        "spam","eggs","ham"
+        "42","3.0","2011-01-02"
+        "1","3.14","2012-01-11"
+        "21","6.28","2010-01-03"
+        "2","2.71","2"
+        ''').strip() + '\n'
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        my_table = Table()
+        my_table.read('csv', temp_fp.name)
+        contents = my_table.write('csv')
+        os.remove(temp_fp.name)
+        self.assertEquals(contents, data)

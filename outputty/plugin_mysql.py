@@ -36,7 +36,7 @@ def read(table, connection_string):
     _connect_to_mysql(table)
     table.cursor.execute('SELECT * FROM ' + table.mysql_table)
     table.headers = [x[0] for x in table.cursor.description]
-    table.rows = [row for row in table.cursor.fetchall()]
+    table._rows = [row for row in table.cursor.fetchall()]
     table.mysql_connection.close()
 
 def write(table, connection_string):
@@ -49,7 +49,7 @@ def write(table, connection_string):
         sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % \
               (table.mysql_table, ', '.join(columns_and_types))
         table.mysql_connection.query(sql)
-    for row in table.rows:
+    for row in table:
         values = []
         for value in row:
             if value is None:

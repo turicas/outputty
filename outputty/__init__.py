@@ -17,135 +17,145 @@
 
 import datetime
 import re
+import types
+
+
+def _str_decode(element, codec):
+    if isinstance(element, str):
+        return element.decode(codec)
+    else:
+        return element
+
+def _unicode_encode(element, codec):
+    if isinstance(element, unicode):
+        return element.encode(codec)
+    else:
+        return element
 
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8', order_by='',
-                 ordering=''):
+                 input_encoding='utf8', output_encoding='utf8'):
         self.headers = headers if headers is not None else []
+        for header in self.headers:
+            if not isinstance(header, (str, unicode)):
+                raise ValueError('Headers must be strings.')
+        else:
+            if len(self.headers) != len(set(self.headers)):
+                raise ValueError('Header names must be unique.')
+        self.headers = [_str_decode(h, input_encoding) for h in self.headers]
         self.dash = dash
         self.pipe = pipe
         self.plus = plus
         self.input_encoding = input_encoding
         self.output_encoding = output_encoding
         self.csv_filename = None
-        self.rows = []
+        self._rows = []
         self.types = {}
         self.plugins = {}
-        self.order_by_column = order_by
-        self.ordering = ordering
+
+    def __setitem__(self, item, value):
+        if isinstance(item, (str, unicode)):
+            if item not in self.headers:
+                raise KeyError
+            columns = zip(*self._rows)
+            if not columns or len(value) != len(self):
+                raise ValueError
+            else:
+                columns[self.headers.index(item)] = value
+                self._rows = [list(x) for x in zip(*columns)]
+        elif isinstance(item, int):
+            self._rows[item] = self._prepare_to_append(value)
+        elif isinstance(item, slice):
+            self._rows[item] = [self._prepare_to_append(v) for v in value]
+        else:
+            raise ValueError
+
+    def __getitem__(self, item):
+        if isinstance(item, (str, unicode)):
+            if item not in self.headers:
+                raise KeyError
+            columns = zip(*self._rows)
+            if not columns:
+                return []
+            else:
+                return list(columns[self.headers.index(item)])
+        elif isinstance(item, (int, slice)):
+            return self._rows[item]
+        else:
+            raise ValueError
+
+    def __delitem__(self, item):
+        if isinstance(item, (str, unicode)):
+            columns = zip(*self._rows)
+            header_index = self.headers.index(item)
+            del columns[header_index]
+            del self.headers[header_index]
+            self._rows = [list(row) for row in zip(*columns)]
+        elif isinstance(item, (int, slice)):
+            del self._rows[item]
+        else:
+            raise ValueError
 
     def order_by(self, column, ordering='asc'):
-        self.normalize_structure()
-        self.decode()
         index = self.headers.index(column)
         if ordering.lower().startswith('desc'):
             sort_function = lambda x, y: cmp(y[index], x[index])
         else:
             sort_function = lambda x, y: cmp(x[index], y[index])
-        self.rows.sort(sort_function)
-
-    def normalize_structure(self):
-        result = []
-        for row in self.rows:
-            if isinstance(row, dict):
-                row_data = []
-                for header_name in self.headers:
-                    if header_name not in row:
-                        row[header_name] = None
-                    row_data.append(row[header_name])
-            else:
-                row_data = list(row)
-            result.append(row_data)
-        self.rows = result
-
-    def _str_decode(self, element, codec):
-        if isinstance(element, str):
-            return element.decode(codec)
-        else:
-            return element
-
-    def _unicode_encode(self, element, codec):
-        if isinstance(element, unicode):
-            return element.encode(codec)
-        else:
-            return element
+        self._rows.sort(sort_function)
 
     def encode(self, codec=None):
-        self.normalize_structure()
         if codec is None:
             codec = self.output_encoding
-        self.headers = [self._unicode_encode(x, codec) for x in self.headers]
+        self.headers = [_unicode_encode(x, codec) for x in self.headers]
         rows = []
-        for row in self.rows:
-            rows.append([self._unicode_encode(value, codec) for value in row])
-        self.rows = rows
+        for row in self._rows:
+            rows.append([_unicode_encode(value, codec) for value in row])
+        self._rows = rows
 
     def decode(self, codec=None):
-        self.normalize_structure()
         if codec is None:
             codec = self.input_encoding
         rows = []
-        for row in self.rows:
-            rows.append([self._str_decode(v, codec) for v in row])
-        self.rows = rows
-        self.headers = [self._str_decode(h, codec) for h in self.headers]
+        for row in self._rows:
+            rows.append([_str_decode(v, codec) for v in row])
+        self._rows = rows
+        self.headers = [_str_decode(h, codec) for h in self.headers]
 
-    def _organize_data(self):
-        self.normalize_structure()
-        self.decode()
-        if self.order_by_column:
-            self.order_by(self.order_by_column, self.ordering)
-
-    def _define_maximum_column_sizes(self):
-        self.max_size = {}
-        for header in self.headers:
-            if not isinstance(header, unicode):
-                header = str(header)
-            self.max_size[header] = len(header)
-        for index, column in enumerate(zip(*self.rows)):
-            header = self.headers[index]
-            if not isinstance(header, unicode):
-                header = str(header)
-            sizes = []
-            for value in column:
-                sizes.append(len(unicode(value)))
-            max_size = max(sizes)
-            if max_size > self.max_size[header]:
-                self.max_size[header] = max_size
+    def _max_column_sizes(self):
+        max_size = {}
+        for column in self.headers:
+            sizes = [len(unicode(value)) for value in self[column]]
+            max_column_size = max(sizes + [len(column)])
+            max_size[column] = max_column_size
+        return max_size
 
     def _make_line_from_row_data(self, row_data):
         return '%s %s %s' % (self.pipe, (' %s ' % self.pipe).join(row_data),
                              self.pipe)
 
     def __unicode__(self):
-        self._organize_data()
-        self._define_maximum_column_sizes()
-        if not len(self.headers) and not len(self.rows):
+        max_size = self._max_column_sizes()
+        if not len(self.headers) and not len(self._rows):
             return unicode()
 
         dashes = []
         centered_headers = []
         for header in self.headers:
-            if not isinstance(header, unicode):
-                header = str(header)
-            centered_headers.append(header.center(self.max_size[header]))
-            dashes.append(self.dash * (self.max_size[header] + 2))
+            centered_headers.append(header.center(max_size[header]))
+            dashes.append(self.dash * (max_size[header] + 2))
         split_line = self.plus + self.plus.join(dashes) + self.plus
         header_line = self._make_line_from_row_data(centered_headers)
 
         result = [split_line, header_line, split_line]
-        for row in self.rows:
+        for row in self._rows:
             row_data = []
             for i, info in enumerate(row):
-                header = self.headers[i]
-                if not isinstance(header, unicode):
-                    header = str(header)
-                data = unicode(info).rjust(self.max_size[header])
+                data = unicode(info).rjust(max_size[self.headers[i]])
                 row_data.append(data)
             result.append(self._make_line_from_row_data(row_data))
-        if self.rows:
+        if self._rows:
             result.append(split_line)
         return '\n'.join(result)
 
@@ -153,14 +163,13 @@ class Table(object):
         return self.__unicode__().encode(self.output_encoding)
 
     def to_list_of_dicts(self):
-        self._organize_data()
         self.encode()
-        rows = [dict(zip(self.headers, row)) for row in self.rows]
+        rows = [dict(zip(self.headers, row)) for row in self._rows]
         self.decode(self.output_encoding)
         return rows
 
     def _identify_type_of_data(self):
-        columns = zip(*self.rows)
+        columns = zip(*self._rows)
         date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
                                     '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
@@ -201,7 +210,7 @@ class Table(object):
     def normalize_types(self):
         self._identify_type_of_data()
         rows_converted = []
-        for row in self.rows:
+        for row in self._rows:
             row_data = []
             for index, value in enumerate(row):
                 type_ = self.types[self.headers[index]]
@@ -225,10 +234,9 @@ class Table(object):
                 else:
                     row_data.append(type_(value))
             rows_converted.append(row_data)
-        self.rows = rows_converted
+        self._rows = rows_converted
 
     def to_dict(self, only=None, key=None, value=None):
-        self._organize_data()
         self.encode()
         table_dict = {}
         if key is not None and value is not None:
@@ -240,10 +248,10 @@ class Table(object):
             value = value.encode(self.output_encoding)
             key_index = self.headers.index(key)
             value_index = self.headers.index(value)
-            for row in self.rows:
+            for row in self._rows:
                 table_dict[row[key_index]] = row[value_index]
         else:
-            for index, column in enumerate(zip(*self.rows)):
+            for index, column in enumerate(zip(*self._rows)):
                 header_name = self.headers[index]
                 if only is None or header_name in only:
                     table_dict[header_name] = list(column)
@@ -264,3 +272,113 @@ class Table(object):
     def write(self, plugin_name, *args, **kwargs):
         plugin = self._load_plugin(plugin_name)
         return plugin.write(self, *args, **kwargs)
+
+    def append(self, item):
+        item = self._prepare_to_append(item)
+        self._rows.append(item)
+
+    def _prepare_to_append(self, item):
+        if isinstance(item, dict):
+            row = []
+            for column in self.headers:
+                if column in item:
+                    value = item[column]
+                else:
+                    value = None
+                row.append(value)
+        elif isinstance(item, (tuple, set)):
+            row = list(item)
+        elif isinstance(item, list):
+            row = item
+        else:
+            raise ValueError
+        if len(row) != len(self.headers):
+            raise ValueError
+        return [_str_decode(value, self.input_encoding) for value in row]
+
+    def extend(self, items):
+        """Append a lot of items.
+        `items` should be a list of new rows, each row can be represented as
+        `list`, `tuple` or `dict`.
+        If one of the rows causes a `ValueError` (for example, because it has
+        more or less elements than it should), then nothing will be appended to
+        `Table`.
+        """
+        new_items = []
+        for item in items:
+            new_items.append(self._prepare_to_append(item))
+        for item in new_items:
+            self.append(item)
+
+    def __len__(self):
+        """Returns the number of rows. Same as `len(list)`."""
+        return len(self._rows)
+
+    def count(self, row):
+        """Returns how many rows are equal to `row` in `Table`.
+        Same as `list.count`.
+        """
+        return self._rows.count(self._prepare_to_append(row))
+
+    def index(self, x, i=None, j=None):
+        """Returns the index of row `x` in table (starting from zero).
+        Same as `list.index`.
+        """
+        x = self._prepare_to_append(x)
+        if i is None and j is None:
+            return self._rows.index(x)
+        elif j is None:
+            return self._rows.index(x, i)
+        else:
+            return self._rows.index(x, i, j)
+
+    def insert(self, index, row):
+        """Insert `row` in the position `index` on `Table`.
+        Same as `list.insert`.
+        `row` can be `list`, `tuple` or `dict`.
+        """
+        self._rows.insert(index, self._prepare_to_append(row))
+
+    def pop(self, index=-1):
+        """Removes and returns row in position `index` on `Table`. `index`
+        defaults to -1.
+        Same as `list.pop`.
+        """
+        return self._rows.pop(index)
+
+    def remove(self, row):
+        """Removes first occurrence of `row` on `Table`.
+        Raises `ValueError` if `row` is not found.
+        Same as `list.remove`.
+        """
+        self._rows.remove(self._prepare_to_append(row))
+
+    def reverse(self):
+        """Reverse the order of rows *in place* (does not return a new `Table`,
+        change the rows in this instance of `Table`).
+        Same as `list.reverse`.
+        """
+        self._rows.reverse()
+
+    def append_column(self, name, values, position=None, row_as_dict=False):
+        """Append a column in the end of table"""
+        if (type(values) != types.FunctionType and len(values) != len(self)) or \
+           name in self.headers:
+            raise ValueError
+        if position is None:
+            insert_header = lambda name: self.headers.append(name)
+            insert_data = lambda row, value: row.append(value)
+        else:
+            insert_header = lambda name: self.headers.insert(position, name)
+            insert_data = lambda row, value: row.insert(position, value)
+        for index, row in enumerate(self):
+            if type(values) == types.FunctionType:
+                if row_as_dict:
+                    value = values({header: row[index] \
+                                    for index, header in enumerate(self.headers)})
+                else:
+                    value = values(row)
+            else:
+                value = values[index]
+            insert_data(row, _str_decode(value, self.input_encoding))
+        insert_header(name)

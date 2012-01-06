@@ -2,7 +2,6 @@
 # coding: utf-8
 
 def _to_html_unicode(table):
-    table._organize_data()
     result = ['<table>', '  <thead>']
     if table.css_classes:
         result.append('    <tr class="header">')
@@ -11,10 +10,10 @@ def _to_html_unicode(table):
     for header in table.headers:
         result.append('      <th>%s</th>' % header)
     result.extend(['    </tr>', '  </thead>'])
-    if len(table.rows):
+    if len(table):
         result.append('  <tbody>')
     i = 1
-    for row in table.rows:
+    for row in table:
         if table.css_classes:
             result.append('    <tr class="%s">' % \
                           ('odd' if i % 2 else 'even'))
@@ -26,7 +25,7 @@ def _to_html_unicode(table):
             result.append('      <td>%s</td>' % value)
         result.append('    </tr>')
         i += 1
-    if len(table.rows):
+    if len(table):
         result.append('  </tbody>')
     result.append('</table>')
     return '\n'.join(result)
