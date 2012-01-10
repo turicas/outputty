@@ -254,6 +254,21 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(table[1][0], 43)
         self.assertEquals(table[1][1], 'rules')
 
+    @unittest.skip('not implemented')
+    def test_should_deal_correctly_with_database_encoding(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        self.connection.query('CREATE TABLE %s (spam TEXT, eggs TEXT)' % \
+                              self.table)
+        table = Table(headers=['spam', 'eggs'], input_encoding='utf16')
+        table.rows.append([u'Álvaro'.encode('utf16'),
+                           u'álvaro'.encode('utf16')])
+        table.to_mysql(self.connection_string)
+        self.cursor.execute('SELECT * FROM ' + self.table)
+        rows = [x for x in self.cursor.fetchall()]
+        db_encoding = self.connection.character_set_name()
+        self.assertEquals(len(rows), 1)
+        self.assertEquals(rows[0][0].decode(db_encoding), u'Álvaro')
+        self.assertEquals(rows[0][1].decode(db_encoding), u'álvaro')
 
     #TODO:
     #deal with encodings
