@@ -15,6 +15,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""`outputty` is a simple Python library that helps you importing, filtering and
+exporting data. It is composed by a main `Table` class and a lot of plugins
+that helps importing and exporting data to/from `Table` (in future we'll have
+filtering plugins). You can write your own plugin easily (see
+`outputty/plugin_*.py` for examples).
+
+Some examples of plugins are: CSV, text, HTML and histogram.
+"""
+
 import datetime
 import re
 import types

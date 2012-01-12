@@ -9,6 +9,7 @@ filtering plugins). You can write your own plugin easily (see
 
 Some examples of plugins are: CSV, text, HTML and histogram.
 
+
 Installation
 ------------
 
