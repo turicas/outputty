@@ -765,7 +765,7 @@ class TestTable(unittest.TestCase):
         table['python'] = [2, 4, 6]
         self.assertEquals(table[:], [[2, 2], [4, 4], [6, 6]])
         with self.assertRaises(KeyError):
-            table['not-found'] = [1, 2, 3]
+            should_raise_exception = table['not-found']
         with self.assertRaises(ValueError):
             table['rules'] = [1, 2, 3, 4]
 
@@ -773,6 +773,13 @@ class TestTable(unittest.TestCase):
         table = Table(headers=['python', 'rules'])
         table.extend([[1, 2], [3, 4], [5, 6]])
         table.append_column('new column', [3, 5, 7])
+        self.assertEquals(table.headers, ['python', 'rules', 'new column'])
+        self.assertEquals(table[:], [[1, 2, 3], [3, 4, 5], [5, 6, 7]])
+
+    def test_table_append_column_should_work_as_item_assignment(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        table['new column'] = [3, 5, 7]
         self.assertEquals(table.headers, ['python', 'rules', 'new column'])
         self.assertEquals(table[:], [[1, 2, 3], [3, 4, 5], [5, 6, 7]])
 

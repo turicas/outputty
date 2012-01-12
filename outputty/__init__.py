@@ -26,6 +26,7 @@ def _str_decode(element, codec):
     else:
         return element
 
+
 def _unicode_encode(element, codec):
     if isinstance(element, unicode):
         return element.encode(codec)
@@ -57,7 +58,7 @@ class Table(object):
     def __setitem__(self, item, value):
         if isinstance(item, (str, unicode)):
             if item not in self.headers:
-                raise KeyError
+                self.append_column(item, value)
             columns = zip(*self._rows)
             if not columns or len(value) != len(self):
                 raise ValueError
@@ -191,13 +192,13 @@ class Table(object):
                     except ValueError:
                         cant_be.add(int)
                     except TypeError:
-                        pass #None should pass
+                        pass  # None should pass
                     try:
                         converted = float(value)
                     except ValueError:
                         cant_be.add(float)
                     except TypeError:
-                        pass #None should pass
+                        pass  # None should pass
                     if value is not None:
                         if datetime_regex.match(unicode(value)) is None:
                             cant_be.add(datetime.datetime)
@@ -362,7 +363,8 @@ class Table(object):
 
     def append_column(self, name, values, position=None, row_as_dict=False):
         """Append a column in the end of table"""
-        if (type(values) != types.FunctionType and len(values) != len(self)) or \
+        if (type(values) != types.FunctionType and \
+            len(values) != len(self)) or \
            name in self.headers:
             raise ValueError
         if position is None:
@@ -375,7 +377,8 @@ class Table(object):
             if type(values) == types.FunctionType:
                 if row_as_dict:
                     value = values({header: row[index] \
-                                    for index, header in enumerate(self.headers)})
+                                    for index, header in \
+                                        enumerate(self.headers)})
                 else:
                     value = values(row)
             else:
