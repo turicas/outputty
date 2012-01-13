@@ -172,10 +172,12 @@ class Table(object):
     def __str__(self):
         return self.__unicode__().encode(self.output_encoding)
 
-    def to_list_of_dicts(self):
-        self.encode()
+    def to_list_of_dicts(self, encoding=''):
+        if encoding is not None:
+            self.encode(encoding or self.output_encoding)
         rows = [dict(zip(self.headers, row)) for row in self._rows]
-        self.decode(self.output_encoding)
+        if encoding is not None:
+            self.decode(encoding or self.output_encoding)
         return rows
 
     def _identify_type_of_data(self):
