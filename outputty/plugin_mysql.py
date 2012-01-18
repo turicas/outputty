@@ -58,13 +58,13 @@ def write(table, connection_string):
     db_encoding = connection.character_set_name()
     escape_string = connection.escape_string
     table._identify_type_of_data()
-    if table.headers:
-        columns_and_types = ['{} {}'.format(header,
-                                            MYSQL_TYPE[table.types[header]]) \
-                             for header in table.headers]
-        sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % \
-              (table_name, ', '.join(columns_and_types))
-        connection.query(sql)
+    columns_and_types = []
+    for header in table.headers:
+        mysql_type = MYSQL_TYPE[table.types[header]]
+        columns_and_types.append(header + ' ' + mysql_type)
+    table_cols = ', '.join(columns_and_types)
+    sql = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(table_name, table_cols)
+    connection.query(sql)
     for row in table:
         values = []
         for value in row:

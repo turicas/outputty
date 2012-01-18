@@ -48,7 +48,7 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('DROP DATABASE IF EXISTS ' + self.database)
         self.connection.close()
 
-    def test_connection_parameters(self):
+    def test_should_identify_connection_parameters(self):
         table = Table()
         plugin_mysql = table._load_plugin('mysql')
         config, table_name = plugin_mysql._get_mysql_config('u:p@h/d/t')
@@ -59,7 +59,7 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(config['db'], 'd')
         self.assertEquals(table_name, 't')
 
-    def test_connection_parameters_with_changed_port(self):
+    def test_should_identify_connection_parameters_with_custom_port(self):
         table = Table()
         plugin_mysql = table._load_plugin('mysql')
         config, table_name = plugin_mysql._get_mysql_config('u:p@h:0/d/t')
@@ -70,7 +70,7 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(config['db'], 'd')
         self.assertEquals(table_name, 't')
 
-    def test_from_mysql_should_retrieve_data_from_table(self):
+    def test_read_should_retrieve_data_from_table(self):
         self.connection.query('INSERT INTO %s VALUES (123, "a")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (456, "b")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (789, "c")' % self.table)
@@ -86,7 +86,7 @@ class TestTableMySQL(unittest.TestCase):
         +--------+--------+
         ''').strip())
 
-    def test_from_mysql_should_get_data_with_correct_types(self):
+    def test_read_should_get_data_with_correct_types(self):
         self.connection.query('DROP TABLE ' + self.table)
         self.connection.query('CREATE TABLE %s (a INT(11), b FLOAT, c DATE, \
                                d DATETIME, e TEXT)' % self.table)
@@ -106,7 +106,7 @@ class TestTableMySQL(unittest.TestCase):
                           type(datetime.datetime(2011, 11, 11, 11, 11, 11)))
         self.assertEquals(type(text_value), type(''))
 
-    def test_to_mysql_should_create_table_even_if_only_headers_present(self):
+    def test_write_should_create_table_even_if_only_headers_present(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs'])
         table.write('mysql', self.connection_string)
@@ -114,14 +114,14 @@ class TestTableMySQL(unittest.TestCase):
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(set(cols), set(['spam', 'eggs']))
 
-    def test_to_mysql_should_not_create_table_if_it_exists(self):
-        table = Table()
+    def test_write_should_not_create_table_if_it_exists(self):
+        table = Table(headers=['monty', 'python'])
         table.write('mysql', self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
         cols = [x[0] for x in self.cursor.description]
         self.assertEquals(set(cols), set(['field1', 'field2']))
 
-    def test_to_mysql_should_add_rows_correctly(self):
+    def test_write_should_add_rows_correctly(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs'])
         table.append(['python', 'rules'])
@@ -196,7 +196,7 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(table.types['Monty'], datetime.datetime)
         self.assertEquals(table.types['Python'], str)
 
-    def test_to_mysql_should_create_the_table_with_correct_data_types(self):
+    def test_write_should_create_the_table_with_correct_data_types(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
