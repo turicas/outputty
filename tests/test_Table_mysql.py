@@ -254,7 +254,6 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(table[1][0], 43)
         self.assertEquals(table[1][1], 'rules')
 
-    @unittest.skip('not implemented')
     def test_should_deal_correctly_with_database_encoding(self):
         self.connection.query('DROP TABLE ' + self.table)
         self.connection.query('CREATE TABLE %s (spam TEXT, eggs TEXT)' % \
@@ -269,6 +268,8 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(len(rows), 1)
         self.assertEquals(rows[0][0].decode(db_encoding), u'Álvaro')
         self.assertEquals(rows[0][1].decode(db_encoding), u'álvaro')
+        self.assertEquals(table[0][0], u'Álvaro')
+        self.assertEquals(table[0][1], u'álvaro')
 
     def test_should_insert_data_in_correct_order(self):
         self.connection.query('DROP TABLE ' + self.table)
@@ -286,7 +287,6 @@ class TestTableMySQL(unittest.TestCase):
 
 
     #TODO:
-    # - read/write: Deal correctly with database encoding
     # - write: Raise ValueError if table._rows is not compatible with table
     #   structure (already created)
     # - read/write: Raise exception when cannot connect, wrong user/pass etc.

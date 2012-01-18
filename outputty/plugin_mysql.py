@@ -59,8 +59,8 @@ def write(table, connection_string):
             if value is None:
                 value = 'NULL'
             else:
-                print value, type(value)
-                value = u'"{}"'.format(escape_string(unicode(value)))
+                value = escape_string(unicode(value).encode(db_encoding))
+                value = '"' + value + '"'
             values.append(value)
         values_with_quotes = ', '.join(values)
         sql = 'INSERT INTO %s VALUES (%s)' % (table_name,
