@@ -292,6 +292,26 @@ class TestTable(unittest.TestCase):
         self.assertEquals(my_dict[2]['spam'], 654)
         self.assertEquals(my_dict[2]['eggs'], 321)
 
+    def test_to_dict_should_return_unicode_data_when_encoding_is_None(self):
+        my_table = Table(headers=['ham', 'spam', 'eggs'])
+        my_table.append({'ham': 'á', 'spam': 'ç', 'eggs': 'à'})
+        my_dict = my_table.to_list_of_dicts(encoding=None)
+        self.assertEquals(len(my_dict), 1)
+        self.assertTrue(isinstance(my_dict[0]['ham'], unicode))
+        self.assertTrue(isinstance(my_dict[0]['spam'], unicode))
+        self.assertTrue(isinstance(my_dict[0]['eggs'], unicode))
+        self.assertEquals(my_dict[0]['ham'], u'á')
+        self.assertEquals(my_dict[0]['spam'], u'ç')
+        self.assertEquals(my_dict[0]['eggs'], u'à')
+        my_table = Table(headers=['ham', 'spam', 'eggs'],
+                         output_encoding='utf16')
+        my_table.append({'ham': 'á', 'spam': 'ç', 'eggs': 'à'})
+        my_dict = my_table.to_list_of_dicts(encoding='iso-8859-1')
+        self.assertEquals(len(my_dict), 1)
+        self.assertEquals(my_dict[0]['ham'], u'á'.encode('iso-8859-1'))
+        self.assertEquals(my_dict[0]['spam'], u'ç'.encode('iso-8859-1'))
+        self.assertEquals(my_dict[0]['eggs'], u'à'.encode('iso-8859-1'))
+
     def test_list_of_dicts_should_handle_output_encoding_correctly(self):
         my_table = Table(headers=['ham', 'spam', 'eggs'],
                          output_encoding='utf16')
@@ -776,7 +796,7 @@ class TestTable(unittest.TestCase):
         table['python'] = [2, 4, 6]
         self.assertEquals(table[:], [[2, 2], [4, 4], [6, 6]])
         with self.assertRaises(KeyError):
-            table['not-found'] = [1, 2, 3]
+            should_raise_exception = table['not-found']
         with self.assertRaises(ValueError):
             table['rules'] = [1, 2, 3, 4]
 
@@ -784,6 +804,13 @@ class TestTable(unittest.TestCase):
         table = Table(headers=['python', 'rules'])
         table.extend([[1, 2], [3, 4], [5, 6]])
         table.append_column('new column', [3, 5, 7])
+        self.assertEquals(table.headers, ['python', 'rules', 'new column'])
+        self.assertEquals(table[:], [[1, 2, 3], [3, 4, 5], [5, 6, 7]])
+
+    def test_table_append_column_should_work_as_item_assignment(self):
+        table = Table(headers=['python', 'rules'])
+        table.extend([[1, 2], [3, 4], [5, 6]])
+        table['new column'] = [3, 5, 7]
         self.assertEquals(table.headers, ['python', 'rules', 'new column'])
         self.assertEquals(table[:], [[1, 2, 3], [3, 4, 5], [5, 6, 7]])
 

@@ -15,6 +15,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""`outputty` is a simple Python library that helps you importing, filtering and
+exporting data. It is composed by a main `Table` class and a lot of plugins
+that helps importing and exporting data to/from `Table` (in future we'll have
+filtering plugins). You can write your own plugin easily (see
+`outputty/plugin_*.py` for examples).
+
+Some examples of plugins are: CSV, text, HTML and histogram.
+"""
+
 import datetime
 import re
 import types
@@ -25,6 +34,7 @@ def _str_decode(element, codec):
         return element.decode(codec)
     else:
         return element
+
 
 def _unicode_encode(element, codec):
     if isinstance(element, unicode):
@@ -57,7 +67,7 @@ class Table(object):
     def __setitem__(self, item, value):
         if isinstance(item, (str, unicode)):
             if item not in self.headers:
-                raise KeyError
+                self.append_column(item, value)
             columns = zip(*self._rows)
             if not columns or len(value) != len(self):
                 raise ValueError
@@ -162,10 +172,12 @@ class Table(object):
     def __str__(self):
         return self.__unicode__().encode(self.output_encoding)
 
-    def to_list_of_dicts(self):
-        self.encode()
+    def to_list_of_dicts(self, encoding=''):
+        if encoding is not None:
+            self.encode(encoding or self.output_encoding)
         rows = [dict(zip(self.headers, row)) for row in self._rows]
-        self.decode(self.output_encoding)
+        if encoding is not None:
+            self.decode(encoding or self.output_encoding)
         return rows
 
     def _identify_type_of_data(self):
@@ -191,13 +203,13 @@ class Table(object):
                     except ValueError:
                         cant_be.add(int)
                     except TypeError:
-                        pass #None should pass
+                        pass  # None should pass
                     try:
                         converted = float(value)
                     except ValueError:
                         cant_be.add(float)
                     except TypeError:
-                        pass #None should pass
+                        pass  # None should pass
                     if value is not None:
                         if datetime_regex.match(unicode(value)) is None:
                             cant_be.add(datetime.datetime)
@@ -362,7 +374,8 @@ class Table(object):
 
     def append_column(self, name, values, position=None, row_as_dict=False):
         """Append a column in the end of table"""
-        if (type(values) != types.FunctionType and len(values) != len(self)) or \
+        if (type(values) != types.FunctionType and \
+            len(values) != len(self)) or \
            name in self.headers:
             raise ValueError
         if position is None:
@@ -375,7 +388,8 @@ class Table(object):
             if type(values) == types.FunctionType:
                 if row_as_dict:
                     value = values({header: row[index] \
-                                    for index, header in enumerate(self.headers)})
+                                    for index, header in \
+                                        enumerate(self.headers)})
                 else:
                     value = values(row)
             else:

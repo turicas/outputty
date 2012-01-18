@@ -5,6 +5,7 @@ import os
 from glob import glob
 import shlex
 import subprocess
+import outputty
 
 
 os.chdir('examples')
@@ -93,8 +94,10 @@ for example_filename in examples:
     example_list.append(title + '\n' + body + '\n')
 
 fp = open('../README-template.markdown')
-readme = fp.read()
+text = fp.read()
 fp.close()
 new_readme = open('../README.markdown', 'w')
-new_readme.write(readme.replace('{{EXAMPLES}}', '\n'.join(example_list)))
+text = text.replace('{{INTRO}}', outputty.__doc__)
+text = text.replace('{{EXAMPLES}}', '\n'.join(example_list))
+new_readme.write(text)
 new_readme.close()
