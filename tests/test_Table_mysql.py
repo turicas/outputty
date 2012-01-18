@@ -286,9 +286,11 @@ class TestTableMySQL(unittest.TestCase):
 
 
     #TODO:
-    #deal with encodings
-    #from/to_mysql with exception (cannot connect, wrong user/pass etc.)
-    #to_mysql overrides data from from_mysql. what to do?
-    #what if incompatible data types (self.rows vs table structure)?
-    #what if MySQLdb is not installed?
-    #should be lazy (don't put things in memory until needed)
+    # - read/write: Deal correctly with database encoding
+    # - write: Raise ValueError if table._rows is not compatible with table
+    #   structure (already created)
+    # - read/write: Raise exception when cannot connect, wrong user/pass etc.
+    # - read/write: Option to do not close the connection so we can re-use it
+    # - read: Option to configure limit
+    # - read: Option to configure order by
+    # - read: Option to provide a SQL
