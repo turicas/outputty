@@ -27,6 +27,7 @@ Some examples of plugins are: CSV, text, HTML and histogram.
 import datetime
 import re
 import types
+from collections import Counter
 
 
 def _str_decode(element, codec):
@@ -181,43 +182,47 @@ class Table(object):
         return rows
 
     def _identify_type_of_data(self):
-        columns = zip(*self._rows)
+        """Create `self.types`, a `dict` in which each key is a table header
+        (from `self.headers`) and value is a type in:
+        `(int, float, datetime.date, datetime.datetime, str)`.
+
+        The types are identified trying to convert each column value to each
+        type.
+        """
         date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
                                     '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
-        for i, header in enumerate(self.headers):
-            column_types = [int, float, datetime.date, datetime.datetime, str]
-            cant_be = set()
-            try:
-                column = columns[i]
-            except IndexError:
-                self.types[header] = str
+        types = [int, float, datetime.date, datetime.datetime, str]
+        for header in self.headers:
+            column = self[header]
+            possible_types = Counter()
+            for value in column:
+                if value is None or value == '':
+                    continue # None and empty string don't affect type
+                possible_types[str] += 1
+                try:
+                    int_value = int(value)
+                    if unicode(int_value) == unicode(value):
+                        possible_types[int] += 1
+                except ValueError:
+                    pass
+                try:
+                    float_value = float(value)
+                    possible_types[float] += 1
+                except ValueError:
+                    pass
+                if datetime_regex.match(unicode(value)):
+                    possible_types[datetime.datetime] += 1
+                if date_regex.match(unicode(value)):
+                    possible_types[datetime.date] += 1
+            str_count = possible_types[str]
+            result = [type_ for type_, count in possible_types.items() \
+                            if count == str_count and type_ != str]
+            if not len(result):
+                type_ = str
             else:
-                for value in column:
-                    if value == '':
-                        value = None
-                    try:
-                        converted = int(value)
-                        if str(converted) != str(value):
-                            raise ValueError('It is float')
-                    except ValueError:
-                        cant_be.add(int)
-                    except TypeError:
-                        pass  # None should pass
-                    try:
-                        converted = float(value)
-                    except ValueError:
-                        cant_be.add(float)
-                    except TypeError:
-                        pass  # None should pass
-                    if value is not None:
-                        if datetime_regex.match(unicode(value)) is None:
-                            cant_be.add(datetime.datetime)
-                        if date_regex.match(unicode(value)) is None:
-                            cant_be.add(datetime.date)
-                for removed_type in cant_be:
-                    column_types.remove(removed_type)
-                self.types[header] = column_types[0]
+                type_ = result[-1]
+            self.types[header] = type_
 
     def normalize_types(self):
         self._identify_type_of_data()

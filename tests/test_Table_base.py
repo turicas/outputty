@@ -852,3 +852,6 @@ class TestTable(unittest.TestCase):
                             row_as_dict=True)
         self.assertEquals(table.headers, ['python', 'rules', 'third column'])
         self.assertEquals(table[:], [[1, 2, 2], [3, 4, 12]])
+
+    #TODO:
+    # - Plugins: before call `write`, verify if `table.headers` exists
