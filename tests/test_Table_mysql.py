@@ -296,10 +296,20 @@ class TestTableMySQL(unittest.TestCase):
         new_table.read('mysql', self.connection_string, limit=(10, 100))
         self.assertEquals(new_table[:], [[x] for x in numbers[10:110]])
 
+    def test_read_should_accept_order_by(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['number'])
+        numbers = range(1000)
+        for i in numbers:
+            table.append([i])
+        table.write('mysql', self.connection_string)
+        new_table = Table()
+        new_table.read('mysql', self.connection_string, order_by='number desc')
+        self.assertEquals(new_table[:], [[x] for x in numbers[::-1]])
+
     #TODO:
     # - write: Raise ValueError if table._rows is not compatible with table
     #   structure (already created)
     # - read/write: Raise exception when cannot connect, wrong user/pass etc.
     # - read/write: Option to do not close the connection so we can re-use it
-    # - read: Option to configure order by
     # - read: Option to provide a SQL

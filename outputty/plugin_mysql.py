@@ -30,15 +30,15 @@ def _get_mysql_config(connection_str):
 def _connect_to_mysql(config):
     return MySQLdb.connect(**config)
 
-def read(table, connection_string, limit=None):
+def read(table, connection_string, limit=None, order_by=None):
     config, table_name = _get_mysql_config(connection_string)
     connection = _connect_to_mysql(config)
     cursor = connection.cursor()
-    if limit is None:
-        sql = 'SELECT * FROM ' + table_name
-    else:
-        sql = 'SELECT * FROM {0} LIMIT {1[0]}, {1[1]}'.format(table_name,
-                                                              limit)
+    sql = 'SELECT * FROM ' + table_name
+    if limit is not None:
+        sql += ' LIMIT {0[0]}, {0[1]}'.format(limit)
+    if order_by is not None:
+        sql += ' ORDER BY ' + order_by
     cursor.execute(sql)
     table.headers = [x[0] for x in cursor.description]
     table._rows = [list(row) for row in cursor.fetchall()]
