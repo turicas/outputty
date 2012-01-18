@@ -270,6 +270,21 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(rows[0][0].decode(db_encoding), u'Álvaro')
         self.assertEquals(rows[0][1].decode(db_encoding), u'álvaro')
 
+    def test_should_insert_data_in_correct_order(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['name', 'age'])
+        table.append(['Justen', 24])
+        table.append(['Someone', 99])
+        table.write('mysql', self.connection_string)
+        self.cursor.execute('SELECT * FROM ' + self.table)
+        rows = [x for x in self.cursor.fetchall()]
+        self.assertEquals(len(rows), 2)
+        self.assertEquals(rows[0][0], 'Justen')
+        self.assertEquals(rows[0][1], 24)
+        self.assertEquals(rows[1][0], 'Someone')
+        self.assertEquals(rows[1][1], 99)
+
+
     #TODO:
     #deal with encodings
     #from/to_mysql with exception (cannot connect, wrong user/pass etc.)

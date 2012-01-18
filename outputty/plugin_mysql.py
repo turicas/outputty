@@ -44,8 +44,9 @@ def write(table, connection_string):
     table._identify_type_of_data()
     _connect_to_mysql(table)
     if table.headers:
-        columns_and_types = ['%s %s' % (k, MYSQL_TYPE[v]) \
-                             for k, v in table.types.iteritems()]
+        columns_and_types = ['{} {}'.format(header,
+                                            MYSQL_TYPE[table.types[header]]) \
+                             for header in table.headers]
         sql = 'CREATE TABLE IF NOT EXISTS %s (%s)' % \
               (table.mysql_table, ', '.join(columns_and_types))
         table.mysql_connection.query(sql)
