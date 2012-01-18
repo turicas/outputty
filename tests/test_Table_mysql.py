@@ -51,24 +51,24 @@ class TestTableMySQL(unittest.TestCase):
     def test_connection_parameters(self):
         table = Table()
         plugin_mysql = table._load_plugin('mysql')
-        plugin_mysql._get_mysql_config(table, 'u:p@h/d/t')
-        self.assertEquals(table.mysql_username, 'u')
-        self.assertEquals(table.mysql_password, 'p')
-        self.assertEquals(table.mysql_hostname, 'h')
-        self.assertEquals(table.mysql_port, 3306)
-        self.assertEquals(table.mysql_database, 'd')
-        self.assertEquals(table.mysql_table, 't')
+        config, table_name = plugin_mysql._get_mysql_config('u:p@h/d/t')
+        self.assertEquals(config['user'], 'u')
+        self.assertEquals(config['passwd'], 'p')
+        self.assertEquals(config['host'], 'h')
+        self.assertEquals(config['port'], 3306)
+        self.assertEquals(config['db'], 'd')
+        self.assertEquals(table_name, 't')
 
     def test_connection_parameters_with_changed_port(self):
         table = Table()
         plugin_mysql = table._load_plugin('mysql')
-        plugin_mysql._get_mysql_config(table, 'u:p@h:0/d/t')
-        self.assertEquals(table.mysql_username, 'u')
-        self.assertEquals(table.mysql_password, 'p')
-        self.assertEquals(table.mysql_hostname, 'h')
-        self.assertEquals(table.mysql_port, 0)
-        self.assertEquals(table.mysql_database, 'd')
-        self.assertEquals(table.mysql_table, 't')
+        config, table_name = plugin_mysql._get_mysql_config('u:p@h:0/d/t')
+        self.assertEquals(config['user'], 'u')
+        self.assertEquals(config['passwd'], 'p')
+        self.assertEquals(config['host'], 'h')
+        self.assertEquals(config['port'], 0)
+        self.assertEquals(config['db'], 'd')
+        self.assertEquals(table_name, 't')
 
     def test_from_mysql_should_retrieve_data_from_table(self):
         self.connection.query('INSERT INTO %s VALUES (123, "a")' % self.table)
@@ -259,10 +259,10 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('DROP TABLE ' + self.table)
         self.connection.query('CREATE TABLE %s (spam TEXT, eggs TEXT)' % \
                               self.table)
-        table = Table(headers=['spam', 'eggs'], input_encoding='utf16')
-        table.rows.append([u'Álvaro'.encode('utf16'),
-                           u'álvaro'.encode('utf16')])
-        table.to_mysql(self.connection_string)
+        table = Table(headers=[u'spam', u'eggs'], input_encoding='utf16')
+        table.append([u'Álvaro'.encode('utf16'),
+                      u'álvaro'.encode('utf16')])
+        table.write('mysql', self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
         rows = [x for x in self.cursor.fetchall()]
         db_encoding = self.connection.character_set_name()
