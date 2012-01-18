@@ -13,7 +13,6 @@ def _get_mysql_config(connection_str):
     colon_index = connection_str.index(':')
     at_index = connection_str.index('@')
     slash_index = connection_str.index('/')
-    second_slash_index = connection_str.index('/', slash_index + 1)
     config = {}
     config['user'] = connection_str[:colon_index]
     config['passwd'] = connection_str[colon_index + 1:at_index]
@@ -23,22 +22,30 @@ def _get_mysql_config(connection_str):
         data = config['host'].split(':')
         config['host'] = data[0]
         config['port'] = int(data[1])
-    config['db'] = connection_str[slash_index + 1:second_slash_index]
-    table_name = connection_str[second_slash_index + 1:]
+    if connection_str.count('/') == 1:
+        table_name = None
+        config['db'] = connection_str[slash_index + 1:]
+    else:
+        second_slash_index = connection_str.index('/', slash_index + 1)
+        config['db'] = connection_str[slash_index + 1:second_slash_index]
+        table_name = connection_str[second_slash_index + 1:]
     return config, table_name
 
 def _connect_to_mysql(config):
     return MySQLdb.connect(**config)
 
-def read(table, connection_string, limit=None, order_by=None):
+def read(table, connection_string, limit=None, order_by=None, query=''):
     config, table_name = _get_mysql_config(connection_string)
     connection = _connect_to_mysql(config)
     cursor = connection.cursor()
-    sql = 'SELECT * FROM ' + table_name
-    if limit is not None:
-        sql += ' LIMIT {0[0]}, {0[1]}'.format(limit)
-    if order_by is not None:
-        sql += ' ORDER BY ' + order_by
+    if query:
+        sql = query
+    else:
+        sql = 'SELECT * FROM ' + table_name
+        if limit is not None:
+            sql += ' LIMIT {0[0]}, {0[1]}'.format(limit)
+        if order_by is not None:
+            sql += ' ORDER BY ' + order_by
     cursor.execute(sql)
     table.headers = [x[0] for x in cursor.description]
     table._rows = [list(row) for row in cursor.fetchall()]
