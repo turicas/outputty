@@ -237,8 +237,7 @@ After executing it, you'll get this output:
 ### Example 7: Using table columns and rows
 
 You can get an entire table column just getting the item `column-name` in
-your table object. You can also delete an entire column (but you can't
-actually change an entire column).
+your table object. You can also change and delete an entire column.
 If the item you get is a string, a column is returned. If it is an integer, a
 row is returned (starting from 0). `Table` objects are iterable, so you can
 navigate through the rows with a simple `for` loop.
@@ -260,6 +259,9 @@ If you have this code, like in `examples/7_table_columns.py`:
     print 'All rows:'
     for index, row in enumerate(table):
         print '  Row #%d: %s' % (index, row)
+    table['ham'] = [1, 2] # Setting new values for this column
+    print 'Table after chaning an entire column:'
+    print table
 
 After executing it, you'll get this output:
 
@@ -278,17 +280,24 @@ After executing it, you'll get this output:
     All rows:
       Row #0: [u'python', (1+5j)]
       Row #1: [u'rules', (3+4j)]
+    Table after chaning an entire column:
+    +--------+-----+
+    |  spam  | ham |
+    +--------+-----+
+    | python |   1 |
+    |  rules |   2 |
+    +--------+-----+
     
 
 ### Example 8: Other `Table` methods
 
-A `Table` is implemented as a list of rows, with some methods to use plugins,
-ordering and do other things. `Table` objects have all the methods other
-Python mutable objects have (except for `sort`), so you can use
-`Table.extend`, `Table.index`, `Table.count` and so on. You can also use
-slices (for getting and setting rows and columns) and
-[all mutable sequence operations](http://docs.python.org/library/stdtypes.html#mutable-sequence-types)
-(except for `sort`, because we have `Table.order_by`).
+A `Table` is implemented as a list of rows with some methods to use plugins,
+ordering and do other things. `Table` have all operations/methods other
+Python mutable sequence objects have so you can use slicing,
+`Table.extend`, `Table.index`, `Table.count` and so on. The exception is
+`sort` (`Table` have `order_by` instead).
+Read more:
+[mutable sequence operations](http://docs.python.org/library/stdtypes.html#mutable-sequence-types).
 
 > Note: all these methods support `tuple`, `list` or `dict` notations of row.
 
@@ -304,7 +313,7 @@ If you have this code, like in `examples/8_table_methods.py`:
     table.append(['São Paulo', 'São Paulo', 'Brazil'])
     
     print 'First 3 rows:'
-    for row in table[:3]:
+    for row in table[:3]: # Slicing
         print row
     
     #Change the two last rows:
@@ -399,8 +408,9 @@ After executing it, you'll get this output:
 ### Example 9: Appending a column
 
 You can append a column in your `Table` object using the `append_column`
-method. You can pass new column's values or a function to generate the value
-based on row data. Let's see how it works - it's simple.
+method or just setting an item (`my_table['new-column'] = ...`). You can pass
+a list of values or a function to generate the values based on row data.
+Let's see how it works - it's quite simple.
 
 If you have this code, like in `examples/9_append_column.py`: 
         
@@ -413,6 +423,8 @@ If you have this code, like in `examples/9_append_column.py`:
     
     #We have the values, so we'll append it:
     table.append_column('Category', ['Programming Language', 'Operating System'])
+    #Same effect for this line:
+    #table['Category'] = ['Programming Language', 'Operating System']
     
     #We can also generate the values:
     table.append_column('Age', lambda row: 2012 - row[1]) #row is a list
@@ -506,6 +518,9 @@ method `to_list_of_dicts`. Using the same table from Example 1, if we execute:
 ...it'll print:
 
     Flávio
+
+You'll receive this data encoded with `output_encoding`. If you need it as
+unicode just pass `unicode=True` to this method.
 
 You can also convert your table to a `dict`, with header names as keys and
 columns as values and filter which columns will go to the dictionary:

@@ -96,6 +96,9 @@ method `to_list_of_dicts`. Using the same table from Example 1, if we execute:
 
     Flávio
 
+You'll receive this data encoded with `output_encoding`. If you need it as
+unicode just pass `unicode=True` to this method.
+
 You can also convert your table to a `dict`, with header names as keys and
 columns as values and filter which columns will go to the dictionary:
 
