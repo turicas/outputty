@@ -286,7 +286,6 @@ class TestTableMySQL(unittest.TestCase):
 
     #TODO:
     # - read: add 'ignore' parameter (to ignore columns)
-    # - read: save only columns returned by query when using query='...'
     # - write: Raise ValueError if table._rows is not compatible with table
     #   structure (already created)
     # - read/write: Raise exception when cannot connect, wrong user/pass etc.
