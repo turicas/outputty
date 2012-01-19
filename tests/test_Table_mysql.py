@@ -286,6 +286,8 @@ class TestTableMySQL(unittest.TestCase):
 
     #TODO:
     # - read: add 'ignore' parameter (to ignore columns)
+    # - write: 'slugfy' (with underscores) table and column names before
+    #   creating it
     # - write: Raise ValueError if table._rows is not compatible with table
     #   structure (already created)
     # - read/write: Raise exception when cannot connect, wrong user/pass etc.
