@@ -7,7 +7,28 @@ import MySQLdb
 
 MYSQL_TYPE = {str: 'TEXT', int: 'INT', float: 'FLOAT', datetime.date: 'DATE',
               datetime.datetime: 'DATETIME'}
-
+MYSQLDB_TYPE = {getattr(MySQLdb.FIELD_TYPE, x): x \
+                for x in dir(MySQLdb.FIELD_TYPE) if not x.startswith('_')}
+MYSQLDB_TO_PYTHON = {'ENUM': str,
+                     'STRING': str,
+                     'VAR_STRING': str,
+                     'BLOB': bytes,
+                     'LONG_BLOB': bytes,
+                     'MEDIUM_BLOB': bytes,
+                     'TINY_BLOB': bytes,
+                     'DECIMAL': float,
+                     'DOUBLE': float,
+                     'FLOAT': float,
+                     'INT24': int,
+                     'LONG': int,
+                     'LONGLONG': int,
+                     'TINY': int,
+                     'YEAR': int,
+                     'DATE': datetime.date,
+                     'NEWDATE': datetime.date,
+                     'TIME': int,
+                     'TIMESTAMP': int,
+                     'DATETIME': datetime.datetime}
 
 def _get_mysql_config(connection_str):
     colon_index = connection_str.index(':')
@@ -47,7 +68,10 @@ def read(table, connection_string, limit=None, order_by=None, query=''):
         if order_by is not None:
             sql += ' ORDER BY ' + order_by
     cursor.execute(sql)
+    column_info = [(x[0], x[1]) for x in cursor.description]
     table.headers = [x[0] for x in cursor.description]
+    table.types = {name: MYSQLDB_TO_PYTHON[MYSQLDB_TYPE[type_]] \
+                   for name, type_ in column_info}
     table._rows = [list(row) for row in cursor.fetchall()]
     cursor.close()
     connection.close()

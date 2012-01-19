@@ -18,10 +18,10 @@
 import unittest
 import datetime
 from textwrap import dedent
-import tempfile
 import os
 from outputty import Table
 import MySQLdb
+import tempfile
 import sqlite3
 
 
@@ -99,12 +99,11 @@ class TestTableMySQL(unittest.TestCase):
         date_value = table[0][2]
         datetime_value = table[0][3]
         text_value = table[0][4]
-        self.assertIn(type(int_value), (type(1), type(1L)))
-        self.assertEquals(type(float_value), type(1.0))
-        self.assertEquals(type(date_value), type(datetime.date(2011, 11, 11)))
-        self.assertEquals(type(datetime_value),
-                          type(datetime.datetime(2011, 11, 11, 11, 11, 11)))
-        self.assertEquals(type(text_value), type(''))
+        self.assertIn(type(int_value), (int, long))
+        self.assertEquals(type(float_value), float)
+        self.assertEquals(type(date_value), datetime.date)
+        self.assertEquals(type(datetime_value),datetime.datetime)
+        self.assertEquals(type(text_value), str)
 
     def test_write_should_create_table_even_if_only_headers_present(self):
         self.connection.query('DROP TABLE ' + self.table)
@@ -321,6 +320,33 @@ class TestTableMySQL(unittest.TestCase):
         new_table.read('mysql', connection_string,
                        query=sql.format(self.table))
         self.assertEquals(new_table[:], [[x] for x in range(507, 500, -1)])
+
+    def test_read_should_automatically_identify_data_types(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['spam', 'eggs', 'ham', 'monty', 'python'])
+        numbers = range(1000)
+        for i in numbers:
+            table.append([i, i + 0.1, 'some string', '2012-01-01',
+                          '2011-12-31 23:59:59'])
+        table.write('mysql', self.connection_string)
+        new_table = Table()
+        new_table.read('mysql', self.connection_string)
+        self.assertEquals(len(new_table), 1000)
+        self.assertEquals(new_table.types['spam'], int)
+        self.assertEquals(new_table.types['eggs'], float)
+        self.assertEquals(new_table.types['ham'], str)
+        self.assertEquals(new_table.types['monty'], datetime.date)
+        self.assertEquals(new_table.types['python'], datetime.datetime)
+
+        connection_string = '/'.join(self.connection_string.split('/')[:-1])
+        other_table = Table()
+        other_table.read('mysql', connection_string,
+                         query='SELECT spam, ham, python FROM ' + self.table)
+        self.assertEquals(len(other_table), 1000)
+        self.assertEquals(len(other_table.types), 3)
+        self.assertEquals(other_table.types['spam'], int)
+        self.assertEquals(other_table.types['ham'], str)
+        self.assertEquals(other_table.types['python'], datetime.datetime)
 
     #TODO:
     # - write: Raise ValueError if table._rows is not compatible with table
