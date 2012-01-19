@@ -192,7 +192,6 @@ class Table(object):
         date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
                                     '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
-        types = [int, float, datetime.date, datetime.datetime, str]
         for header in self.headers:
             column = self[header]
             possible_types = Counter()
@@ -216,8 +215,10 @@ class Table(object):
                 if date_regex.match(unicode(value)):
                     possible_types[datetime.date] += 1
             str_count = possible_types[str]
-            result = [type_ for type_, count in possible_types.items() \
-                            if count == str_count and type_ != str]
+            types = [float, int, datetime.datetime, datetime.date]
+            result = [type_ for type_ in types
+                            if type_ in possible_types and \
+                               possible_types[type_] == str_count]
             if not len(result):
                 type_ = str
             else:
