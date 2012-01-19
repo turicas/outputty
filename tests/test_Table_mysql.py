@@ -131,70 +131,6 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(rows, [('python', 'rules'),
                                  ('free software', 'ownz')])
 
-    def test_should_indentify_type_str_when_only_headers_present(self):
-        table = Table(headers=['eggs', 'ham'])
-        table._identify_type_of_data()
-        self.assertEqual(table.types['eggs'], str)
-        self.assertEqual(table.types['ham'], str)
-
-    def test_should_indentify_type_str_correctly(self):
-        table = Table(headers=['eggs', 'ham'])
-        table.append(['spam eggs', 1])
-        table.append(['spam spam', 3.14])
-        table.append(['eggs spam', 'testing'])
-        table.append(['spam spam', '2011-11-23'])
-        table.append(['spam  ham', '2011-11-23 02:00:17'])
-        table._identify_type_of_data()
-        self.assertEqual(table.types['eggs'], str)
-        self.assertEqual(table.types['ham'], str)
-
-    def test_should_indentify_type_int_correctly(self):
-        table = Table(headers=['spam'])
-        table.append([1])
-        table.append([2])
-        table._identify_type_of_data()
-        self.assertEqual(table.types['spam'], int)
-
-    def test_should_not_indentify_non_fractional_floats_as_int(self):
-        table = Table(headers=['ham'])
-        table.append([1.0])
-        table.append([2.0])
-        table.append([3.0])
-        table._identify_type_of_data()
-        self.assertEqual(table.types['ham'], float)
-
-    def test_should_indentify_type_float_correctly(self):
-        table = Table(headers=['ham'])
-        table.append([1.0])
-        table.append([3.14])
-        table._identify_type_of_data()
-        self.assertEqual(table.types['ham'], float)
-
-    def test_should_indentify_type_date_correctly(self):
-        table = Table(headers=['Python'])
-        table.append(['2010-11-15'])
-        table.append(['2011-11-20'])
-        table._identify_type_of_data()
-        self.assertEqual(table.types['Python'], datetime.date)
-
-    def test_should_indentify_type_datetime_correctly(self):
-        table = Table(headers=['Monty'])
-        table.append(['2010-11-15 02:42:01'])
-        table.append(['2011-11-20 21:05:59'])
-        table._identify_type_of_data()
-        self.assertEqual(table.types['Monty'], datetime.datetime)
-
-    def test_None_should_not_affect_data_type(self):
-        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
-        table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
-        table.append([None, None, None, None, None])
-        table._identify_type_of_data()
-        self.assertEquals(table.types['spam'], int)
-        self.assertEquals(table.types['eggs'], float)
-        self.assertEquals(table.types['ham'], datetime.date)
-        self.assertEquals(table.types['Monty'], datetime.datetime)
-        self.assertEquals(table.types['Python'], str)
-
     def test_write_should_create_the_table_with_correct_data_types(self):
         self.connection.query('DROP TABLE ' + self.table)
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
@@ -349,7 +285,10 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(other_table.types['python'], datetime.datetime)
 
     #TODO:
+    # - read: add 'ignore' parameter (to ignore columns)
+    # - read: save only columns returned by query when using query='...'
     # - write: Raise ValueError if table._rows is not compatible with table
     #   structure (already created)
     # - read/write: Raise exception when cannot connect, wrong user/pass etc.
     # - read/write: Option to do not close the connection so we can re-use it
+    # - be lazy?
