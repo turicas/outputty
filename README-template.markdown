@@ -203,3 +203,4 @@ Related Software
 - [csvstudio](http://code.google.com/p/csvstudio/)
 - [PyTables](http://www.pytables.org/)
 - [pyspread](http://manns.github.com/pyspread/)
+- [dbf](http://pypi.python.org/pypi/dbf/0.90.0)

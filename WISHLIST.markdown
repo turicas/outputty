@@ -65,8 +65,14 @@ Processing Input Data
 Plugins
 -------
 
-- MySQL.read/write: work started at branch `feature/mysql`.
-- LaTeX.write (?)
+- __mysql__.read/write: work started at branch `feature/mysql`.
+- __html__.read (write is done)
+- __dbf__.read/write. See [dbf](http://pypi.python.org/pypi/dbf/0.90.0),
+  [dbfpy](http://pypi.python.org/pypi/dbfpy/2.2.5) and [this code
+  snippet](http://code.activestate.com/recipes/362715/)
+- __xls__.read/write. See [xlrd](http://pypi.python.org/pypi/xlrd) and
+  [xlwt](http://pypi.python.org/pypi/xlwt)
+- __LaTeX__.write (?)
 
 
 ### Templates
