@@ -285,6 +285,7 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(other_table.types['python'], datetime.datetime)
 
     #TODO:
+    # - write: use only one INSERT for all rows (before: check performance)
     # - read: add 'ignore' parameter (to ignore columns)
     # - write: 'slugfy' (with underscores) table and column names before
     #   creating it
