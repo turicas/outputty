@@ -15,118 +15,61 @@ Installation
 Sorry for that - it'll be available in PyPI soon.
 
 
-Examples:
---------
+Example
+-------
 
-You can run all the examples below - see `examples` folder. You can also see
-the tests we have at `tests/test_*.py`.
+Code time!
 
-{{EXAMPLES}}
+    >>> from outputty import Table
+    >>> my_table = Table(headers=['name', 'age']) # headers are the columns
+    >>> my_table.append(('Álvaro Justen', 24)) # a row as tuple
+    >>> my_table.append({'name': 'Other User', 'age': 99}) # a row as dict
+    >>> print my_table # a text representation of Table
+    +---------------+-----+
+    |      name     | age |
+    +---------------+-----+
+    | Álvaro Justen |  24 |
+    |    Other User |  99 |
+    +---------------+-----+
 
-Type Of Data
-------------
+    >>> print 'First row:', my_table[0] # Table is indexable
+    First row: [u'\xc1lvaro Justen', 24]
 
-`outputty` will try to convert every element inside a row to `unicode`. In
-strings it'll use `string.decode(input_encoding)`, where `input_encoding` is
-specified in `Table.__init__`.
+    >>> print 'Sum of ages:', sum(my_table['age']) # you can get columns too
+    Sum of ages: 123
 
+    >>> my_table.write('csv', 'my-table.csv') # CSV plugin will save its contents in a file
+    >>> # let's see what's in the file...
+    >>> print open('my-table.csv').read()
+    "name","age"
+    "Álvaro Justen","24"
+    "Other User","99"
 
-Character Encodings
--------------------
-
-Received strings are decoded using __UTF-8__ and output is encoded also using
-__UTF-8__ by default. You can change this behaviour with the parameters
-`input_encoding` and `output_encoding` to `Table`, for example:
-
-    my_table = Table(headers=['Column 1', 'Column 2'], input_encoding='iso-8859-1',
-                     output_encoding='utf16')
-
-You can also get the table string decoded, in unicode:
-
-    table_in_unicode = unicode(my_table)
-
-> See [Standard Encodings in
-> Python](http://docs.python.org/library/codecs.html#standard-encodings) to get a
-> complete list of the supported encodings.
-
-> `headers` must be a list of strings.
-
-
-### Encoding and Decoding
-
-- __Decoding__: if you need `table.headers` and table rows in unicode,
-  just call `table.decode()` and it'll decode all data using
-  `table.input_encoding` (you can pass an alternative codec as parameter).
-- __Encoding__: if you need `table.headers` and table and rows encoded to some
-  codec, just call `table.decode()` and it'll encode all data using
-  `table.output_encoding` (you can pass an alternative codec as parameter).
-
-
-Notes About Data Normalization
-------------------------------
-
-We have two kinds of normalization in `Table`:
-
-- `.normalize_types()`: used by default when importing from CSV, this method
-  convert table rows to the types it identify. All data that in first moment
-  are strings will be converted to `unicode`, `int`, `float`, `datetime.date`
-  or `datetime.datetime` when identified.
-
-> If you want all your data as `unicode` when importing from CSV you can pass
-> `convert_types=False` to `Table` so it won't use `normalize_types` after
-> importing data (it'll just decode your strings using `input_encoding`).
-
-- `unicode` normalization: all operations in `Table` (import from some format,
-  output table in some format, normalization and ordering) will convert data
-  internally to `unicode` using `input_encoding` as codec (passed in
-  `Table.__init__`). When `convert_types=False`, all row's values will be
-  `unicode`, otherwise only types identified as string will be converted to
-  `unicode`.
+    >>> # let's use HTML plugin!
+    >>> print my_table.write('html') # without filename `write` will return a string
+    <table>
+      <thead>
+        <tr class="header">
+          <th>name</th>
+          <th>age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td>Álvaro Justen</td>
+          <td>24</td>
+        </tr>
+        <tr class="even">
+          <td>Other User</td>
+          <td>99</td>
+        </tr>
+      </tbody>
+    </table>
 
 
-### `to_list_of_dicts` and `to_dict`
-
-If you want to access all table rows as dicts, just convert it using the
-method `to_list_of_dicts`. Using the same table from Example 1, if we execute:
-
-    rows = my_table.to_list_of_dicts()
-    print rows[1]['First Name']
-
-...it'll print:
-
-    Flávio
-
-You'll receive this data encoded with `output_encoding`. If you need it as
-unicode just pass `unicode=True` to this method.
-
-You can also convert your table to a `dict`, with header names as keys and
-columns as values and filter which columns will go to the dictionary:
-
-    table_dict = my_table.to_dict()
-    print table_dict
-
-    table_dict_filtered = my_table.to_dict(only=['First Name', 'Last Name'])
-    print table_dict_filtered
-
-...will print:
-
-    {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio'), 'Main Language': (u'Python', u'Python')}
-    {'Last Name': (u'Justen', u'Amieiro'), 'First Name': (u'\xc1lvaro', u'Fl\xe1vio')}
-
-And if you want to create a `dict` with some column value as key and other
-column value as value you can specify `key` and `value` parameters, as in:
-
-    other_table = Table(headers=['date', 'measure'])
-    other_table.append(('2011-12-01', 21))
-    other_table.append(('2011-12-02', 42))
-    other_table.append(('2011-12-03', 3.14))
-    other_table.append(('2011-12-04', 2.71))
-    values_as_dict = other_table.to_dict(key='date', value='measure')
-    print values_as_dict
-
-...that produces:
-
-    {'2011-12-04': 2.71, '2011-12-03': 3.14, '2011-12-02': 42, '2011-12-01': 21}
+`Table` have __a lot__ of other features. To learn more (by examples), read [outputty
+tutorial](https://github.com/turicas/outputty/blob/master/tutorial.markdown)
+and see `examples` folder. Enjoy!
 
 
 New Features
@@ -134,11 +77,10 @@ New Features
 
 Yes, there are a lot of features to add (it's just the begining). If you
 want to contribute, please see our
-[WISHLIST.markdown](https://github.com/turicas/outputty/blob/master/WISHLIST.markdown)
-file.
+[outputty wishlist](https://github.com/turicas/outputty/blob/master/WISHLIST.markdown).
 
-You can also use the [Github Issue Tracking
-System](https://github.com/turicas/outputty/issues) to report bugs.
+You can also use the [outputty Issue Tracking
+System on GitHub](https://github.com/turicas/outputty/issues) to report bugs.
 
 
 Contributing
@@ -149,31 +91,50 @@ If you want to contribute to this project, please:
 - Use [Test-driven
   development](http://en.wikipedia.org/wiki/Test-driven_development)
 - Create your new feature in branch `feature/name-of-the-new-feature`
-  (`git checkout -b feature/new-feature`)
+  (`git checkout -b feature/new-feature`). You should know how to use git - I
+  try to use [this git
+  flow](http://nvie.com/posts/a-successful-git-branching-model/)
 - Run __all tests__ (`make test`) _before_ pushing
   - To run just one test file, execute: `nosetests --with-coverage --cover-package outputty  tests/test_your-test-file.py`
   - Try to have a test-coverage of 100%
-- To run tests, execute `make test`. I use some `nose` plugins -- to install
+- `make test` will call nosetests with some plugin options - to install
   it, execute: `pip install nose coverage ipdbplugin yanc`
-- Create/update documentation (README/docstrings/man page)
-  - __Do NOT edit `README.markdown`.__ Edit `README-template.markdown` and run
-  `make create-readme` to create the new `README.markdown` based on
-  `README-template.markdown` and files on `examples/` (the "Examples" section
-  is created automatically).
+  Create/update documentation (README/docstrings/man page)
+  - __Do NOT edit `README.markdown` and `tutorial.markdown`.__ Edit
+  `README-template.markdown` or `tutorial-template.markdown` instead and run
+  `make create-docs` to create the new `README.markdown` and
+  `tutorial.markdown`. The tutorial will be created based on files in
+  `examples` folder.
 
 
 ### New Plugins
 
 If you want to create a new plugin to import/export from/to some new
-resource, please see files `outputty/plugin_*.py` - they are simple: you just
-need to create `read` and/or `write` functions that will received the `Table`
-object and, optionally, the parameters you want. Save your file in
-`outputty/plugin_name.py`, where `name` is the name of your plugin.
+resource, please see files `outputty/plugin_*.py` as examples. They are so
+simple, please follow these steps:
 
-To call your plugin, just execute: `my_table.write('name', optional_parameters)`
-or `my_table.read('name', optional_parameters)` (where `name` is the name of
-your plugin), then `outputty` will call `outputty.plugin_name.read` or
-`outputty.plugin_name.write`.
+- Create a file named `outputty/plugin_name.py`, where `name` is the name of
+  your plugin.
+- Create `read` and/or `write` functions in this file. These functions receive
+  the `Table` object and optional parameters.
+  - `read`: should read data from the resource specified in parameters and put
+    this data in `Table` (using `Table.append` or `Table.extend`).
+  - `write`: should read data from `Table` (iterating over it, using slicing
+    etc.) and write this data to the resource specified in parameters.
+- Call your plugin executing `my_table.write('name', optional_parameters...)`
+  or `my_table.read('name', optional_parameters...)` (where `name` is your
+  plugin's name) - when you execute it `outputty` will call
+  `outputty.plugin_name.read`/`outputty.plugin_name.write`.
+
+
+#### Encoding and Decoding
+
+Your plugin's `read` function __must__ put all data inside in unicode and your
+plugin's `write` function will receive a `Table` object with all data in
+unicode (it should not change this). But if you need to decode/encode
+before/after doing some actions in your plugin, you can use `Table.decode()`
+and `Table.encode()`.
+
 
 ### Contributors
 

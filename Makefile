@@ -31,13 +31,14 @@ clean:
 	rm -rf examples/nice-software.txt
 	rm -rf readme.html
 
-before-push:	clean test create-readme html-readme
+before-push:	clean test create-docs html-docs
 
-create-readme:
-	./create-readme.py
+create-docs:
+	./create-docs.py
 
-html-readme:
+html-docs:
 	markdown README.markdown > readme.html
+	markdown tutorial.markdown > tutorial.html
 
 .PHONY: test clear-screen nosetest unittest clean run-unittest run-nosetest \
         test-failures nosetest-ipdb-failures run-nosetest-ipdb-failures \
