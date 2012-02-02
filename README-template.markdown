@@ -177,47 +177,44 @@ your plugin), then `outputty` will call `outputty.plugin_name.read` or
 
 ### Contributors
 
-My sincerely thanks to:
-
-- [Fundação Getúlio Vargas](http://www.fgv.br/) for letting me invest my time
-  on it.
-- [Douglas Andrade](https://github.com/douglas) for showing me
-  `textwrap.dedent` and writting more legible tests.
-- [Flávio Coelho](https://github.com/fccoelho) for creating `histogram` and
-  giving a lot of suggestions.
-- [Renne Rocha](https://github.com/rennerocha) for creating `order_by`.
-- [Tatiana Al-Chueyr](https://github.com/tatiana) for designing and coding
-  architecture proposals and suggestions for the plugin API (including the
-  architecture we are using).
-- [Flávio Amieiro](https://github.com/flavioamieiro) for a lot of suggestions
-  and interpretations about design.
+{{AUTHORS}}
 
 
 Related Software
 ----------------
 
-- [fabulous](http://lobstertech.com/fabulous.html): library designed to make
-  the output of terminal applications look fabulous.
-- [termcolor](http://pypi.python.org/pypi/termcolor): ANSII Color formatting
-  for output in terminal.
-- [tablib](https://github.com/kennethreitz/tablib): format-agnostic tabular
-  dataset library.
-- [clint](https://github.com/kennethreitz/clint): Python Command-line
-  Application Tools.
-- [csvstudio](http://code.google.com/p/csvstudio/): Python tool to analyze csv
-  files.
-- [PyTables](http://www.pytables.org/): package for managing hierarchical
-  datasets and designed to efficiently and easily cope with extremely large
-  amounts of data.
-- [pyspread](http://manns.github.com/pyspread/): non-traditional spreadsheet
-  application.
-- [pyf](http://pyfproject.org/): framework and platform dedicated to large data
-  processing, mining, transforming, reporting and more.
-- [Ruffus](http://ruffus.org.uk/): lightweight python module to run
-  computational pipelines.
-- [pygrametl](http://pygrametl.org/): Python framework which offers
-  commonly used functionality for development of Extract-Transform-Load
-  (ETL) processes.
-- [orange](http://orange.biolab.si/): data visualization and analysis for
-  novice and experts.
-- [etlpy](http://sourceforge.net/projects/etlpy) (seems to be a dead project).
+- outputty-like:
+
+    - [tablib](https://github.com/kennethreitz/tablib): format-agnostic tabular
+      dataset library.
+    - [PyTables](http://www.pytables.org/): package for managing hierarchical
+      datasets and designed to efficiently and easily cope with extremely large
+      amounts of data.
+    - [csvstudio](http://code.google.com/p/csvstudio/): Python tool to analyze
+      csv files.
+
+- Data analysis:
+
+    - [pyf](http://pyfproject.org/): framework and platform dedicated to large
+      data processing, mining, transforming, reporting and more.
+    - [pygrametl](http://pygrametl.org/): Python framework which offers
+      commonly used functionality for development of Extract-Transform-Load
+      (ETL) processes.
+    - [etlpy](http://sourceforge.net/projects/etlpy) seems to be a dead project.
+    - [orange](http://orange.biolab.si/): data visualization and analysis for
+      novice and experts.
+    - [Ruffus](http://ruffus.org.uk/): lightweight python module to run
+      computational pipelines.
+
+- Command-line tools:
+
+    - [fabulous](http://lobstertech.com/fabulous.html): library designed to
+      make the output of terminal applications look fabulous.
+    - [termcolor](http://pypi.python.org/pypi/termcolor): ANSII Color
+      formatting for output in terminal.
+    - [clint](https://github.com/kennethreitz/clint): Python Command-line
+      Application Tools.
+
+- Other:
+    - [pyspread](http://manns.github.com/pyspread/): non-traditional
+      spreadsheet application.
