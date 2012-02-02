@@ -29,7 +29,7 @@ clean:
 	rm -rf examples/my-data.csv
 	rm -rf examples/nice-software.html
 	rm -rf examples/nice-software.txt
-	rm -rf readme.html
+	rm -rf readme.html tutorial.html
 
 before-push:	clean test create-docs html-docs
 
