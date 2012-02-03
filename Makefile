@@ -40,6 +40,9 @@ html-docs:
 	markdown README.markdown > readme.html
 	markdown tutorial.markdown > tutorial.html
 
+pack:
+	python setup.py sdist
+
 .PHONY: test clear-screen nosetest unittest clean run-unittest run-nosetest \
         test-failures nosetest-ipdb-failures run-nosetest-ipdb-failures \
-	before-push create-readme html-readme
+	before-push create-docs html-docs pack
