@@ -10,7 +10,6 @@ setup(name='outputty',
       author='Álvaro Justen'.decode('utf-8'),
       author_email='alvarojusten@gmail.com',
       url='https://github.com/turicas/outputty/',
-      download_url='https://github.com/turicas/outputty/tarball/0.2.0a',
       packages=['outputty'],
       keywords=['data processing', 'data exchange', 'etl'],
       classifiers = [

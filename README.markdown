@@ -175,6 +175,8 @@ Related Software
       amounts of data.
     - [csvstudio](http://code.google.com/p/csvstudio/): Python tool to analyze
       csv files.
+    - [buzhug](http://buzhug.sourceforge.net/): a fast, pure-Python
+      database engine.
 
 - Data analysis:
 
