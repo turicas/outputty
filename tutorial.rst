@@ -73,7 +73,7 @@ We can also import data from a CSV file and export it to a text file (using
 plugins, again). The data written to the text file will be the same we saw
 when executed ``print my_table`` in Example 1.
 
-If you have the file `nice-software.csv` with these contents:
+If you have the file ``nice-software.csv`` with these contents::
 
     id,name,website
     1,Python,http://www.python.org/
@@ -488,7 +488,8 @@ We have two kinds of normalization in ``Table``:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to access all table rows as dicts, just convert it using the
-method ``to_list_of_dicts``. Using the same table from Example 1, if we execute:
+method ``to_list_of_dicts``. Using the same table from Example 1, if we
+execute::
 
     rows = my_table.to_list_of_dicts()
     print rows[1]['First Name']
@@ -501,7 +502,7 @@ You'll receive this data encoded with ``output_encoding``. If you need it as
 unicode just pass ``unicode=True`` to this method.
 
 You can also convert your table to a ``dict``, with header names as keys and
-columns as values and filter which columns will go to the dictionary:
+columns as values and filter which columns will go to the dictionary::
 
     table_dict = my_table.to_dict()
     print table_dict

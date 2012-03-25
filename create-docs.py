@@ -10,7 +10,7 @@ import outputty
 
 os.chdir('examples')
 
-def file_as_markdown(filename):
+def file_contents_indented(filename):
     fp = open(filename)
     file_lines = fp.readlines()
     fp.close()
@@ -67,10 +67,10 @@ for example_filename in examples:
         else:
             input_ = input_.replace("'", '')
             body.append('')
-            body.append('If you have the file `%s` with these contents:' % \
+            body.append('If you have the file ``%s`` with these contents::' % \
                         input_)
             body.append('')
-            body.append(file_as_markdown(input_))
+            body.append(file_contents_indented(input_))
         have_input = True
 
     output_lines = execute('python ' + example_filename)
@@ -89,7 +89,7 @@ for example_filename in examples:
             body.append('The file `%s` will be created with this content::' % \
                         output)
             body.append('')
-            body.append(file_as_markdown(output))
+            body.append(file_contents_indented(output))
         have_output = True
     body = '\n'.join(body)
     example_list.append(title + '\n' + body + '\n')
