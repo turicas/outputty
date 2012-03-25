@@ -36,8 +36,8 @@ create-docs:
 	./create-docs.py
 
 html-docs:
-	markdown README.markdown > readme.html
-	markdown tutorial.markdown > tutorial.html
+	rst2html README.rst > readme.html
+	rst2html tutorial.rst > tutorial.html
 
 pack:
 	python setup.py sdist

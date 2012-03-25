@@ -2,7 +2,7 @@
 # coding: utf-8
 # title = Exporting to a CSV File
 # output = 'my-data.csv'
-#Using plugins we can import and export `Table` data to CSV (really, to and
+#Using plugins we can import and export ``Table`` data to CSV (really, to and
 #from a lot of formats). Let's create a simple table and export it to a CSV
 #file.
 

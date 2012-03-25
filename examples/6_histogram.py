@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 # title = Creating Histograms
-#There is a plugin called `histogram` that is shipped by default with
-#`outputty` - it can create histograms of your table's columns (using `numpy`).
-#The output will be the histogram represented as text.
+#There is a plugin called ``histogram`` that is shipped by default with
+#``outputty`` - it can create histograms of your table's columns (using
+#``numpy``). The output will be the histogram represented as text.
 
 from numpy.random import normal
 from numpy.random import seed

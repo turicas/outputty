@@ -1,4 +1,4 @@
-include README.markdown
-include tutorial.markdown
-include AUTHORS.markdown
+include README.rst
+include tutorial.rst
+include AUTHORS.rst
 include LICENSE

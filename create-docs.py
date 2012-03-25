@@ -27,7 +27,7 @@ examples.sort()
 example_list = []
 for example_filename in examples:
     contents = open(example_filename).readlines()[2:]
-    title = '### Example ' + example_filename.split('_')[0]
+    title = 'Example ' + example_filename.split('_')[0]
     config = {}
     body = []
     code = []
@@ -46,6 +46,7 @@ for example_filename in examples:
     code = '\n'.join(code)
     if 'title' in config:
         title += ': ' + config['title']
+    title += '~' * len(title) + '\n'
     if 'input' not in config:
         config['input'] = 'code'
     if 'output' not in config:
@@ -58,10 +59,10 @@ for example_filename in examples:
             body.append('')
             if have_input:
                 body.append('and do you have the code below, like in '
-                            '`examples/%s`: ' % example_filename)
+                            '``examples/%s``::' % example_filename)
             else:
                 body.append('If you have this code, like in '
-                            '`examples/%s`: ' % example_filename)
+                            '`examples/%s`::' % example_filename)
             body.append('    ' + code)
         else:
             input_ = input_.replace("'", '')
@@ -78,14 +79,14 @@ for example_filename in examples:
         output = output.strip()
         if output == 'stdout':
             body.append('')
-            body.append("After executing it, you'll get this output:")
+            body.append("After executing it, you'll get this output::")
             body.append('')
             fmt = '\n'.join(['    ' + x for x in output_lines.split('\n')])
             body.append(fmt)
         else:
             output = output.replace("'", '')
             body.append('')
-            body.append('The file `%s` will be created with this content:' % \
+            body.append('The file `%s` will be created with this content::' % \
                         output)
             body.append('')
             body.append(file_as_markdown(output))
@@ -93,18 +94,18 @@ for example_filename in examples:
     body = '\n'.join(body)
     example_list.append(title + '\n' + body + '\n')
 
-fp = open('../README-template.markdown')
+fp = open('../README-template.rst')
 text = fp.read()
 fp.close()
-new_readme = open('../README.markdown', 'w')
+new_readme = open('../README.rst', 'w')
 text = text.replace('{{INTRO}}', outputty.__doc__)
-text = text.replace('{{AUTHORS}}', open('../AUTHORS.markdown').read())
+text = text.replace('{{AUTHORS}}', open('../AUTHORS.rst').read())
 new_readme.write(text)
 new_readme.close()
 
-tutorial_template = open('../tutorial-template.markdown').read()
+tutorial_template = open('../tutorial-template.rst').read()
 tutorial_content = tutorial_template.replace('{{EXAMPLES}}',
                                              '\n'.join(example_list))
-tutorial = open('../tutorial.markdown', 'w')
+tutorial = open('../tutorial.rst', 'w')
 tutorial.write(tutorial_content)
 tutorial.close()

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 # title = Using table columns and rows
-#You can get an entire table column just getting the item `column-name` in
+#You can get an entire table column just getting the item ``column-name`` in
 #your table object. You can also change and delete an entire column.
 #If the item you get is a string, a column is returned. If it is an integer, a
-#row is returned (starting from 0). `Table` objects are iterable, so you can
-#navigate through the rows with a simple `for` loop.
+#row is returned (starting from 0). ``Table`` objects are iterable, so you can
+#navigate through the rows with a simple ``for`` loop.
 
 from outputty import Table
 

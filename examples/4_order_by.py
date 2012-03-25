@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 # title = Ordering `Table` Data
-#You can order your table's data with the method `Table.order_by`.
+#You can order your table's data with the method ``Table.order_by``.
 #You need to specify a column in which the ordering will be based on and
 #optionally specify if the ordering will be ascending (default) or descending.
 

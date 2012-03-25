@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(name='outputty',
       description='Import, filter and export tabular data with Python easily',
-      long_description=open('long_description.txt').read(),
+      long_description=open('README.rst').read(),
       version='0.2.0a',
       author='Álvaro Justen'.decode('utf-8'),
       author_email='alvarojusten@gmail.com',
