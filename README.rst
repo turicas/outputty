@@ -192,6 +192,8 @@ Related Software
       novice and experts.
     - `Ruffus <http://ruffus.org.uk/>`_: lightweight python module to run
       computational pipelines.
+    - `webstore <https://github.com/okfn/webstore>`_: web-api enabled datastore
+      backed onto sql databases
 
 - Command-line tools:
 
