@@ -6,7 +6,7 @@ from distutils.core import setup
 setup(name='outputty',
       description='Import, filter and export tabular data with Python easily',
       long_description=open('README.rst').read(),
-      version='0.2.0',
+      version='0.2.1',
       author=u'Álvaro Justen',
       author_email='alvarojusten@gmail.com',
       url='https://github.com/turicas/outputty/',
