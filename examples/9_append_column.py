@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 # title = Appending a column
-#You can append a column in your `Table` object using the `append_column`
-#method. You can pass new column's values or a function to generate the value
-#based on row data. Let's see how it works - it's simple.
+#You can append a column in your ``Table`` object using the ``append_column``
+#method or just setting an item (``my_table['new-column'] = ...``). You can
+#pass a list of values or a function to generate the values based on row data.
+#Let's see how it works - it's quite simple.
 
 from outputty import Table
 
@@ -14,6 +15,8 @@ table.append(['Unix', 1969])
 
 #We have the values, so we'll append it:
 table.append_column('Category', ['Programming Language', 'Operating System'])
+#Same effect for this line:
+#table['Category'] = ['Programming Language', 'Operating System']
 
 #We can also generate the values:
 table.append_column('Age', lambda row: 2012 - row[1]) #row is a list

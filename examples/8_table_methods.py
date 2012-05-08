@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 # title = Other `Table` methods
-#A `Table` is implemented as a list of rows, with some methods to use plugins,
-#ordering and do other things. `Table` objects have all the methods other
-#Python mutable objects have (except for `sort`), so you can use
-#`Table.extend`, `Table.index`, `Table.count` and so on. You can also use
-#slices (for getting and setting rows and columns) and
-#[all mutable sequence operations](http://docs.python.org/library/stdtypes.html#mutable-sequence-types)
-#(except for `sort`, because we have `Table.order_by`).
+#A ``Table`` is implemented as a list of rows with some methods to use plugins,
+#ordering and do other things. ``Table`` have all operations/methods other
+#Python mutable sequence objects have so you can use slicing,
+#``Table.extend``, ``Table.index``, ``Table.count`` and so on. The exception is
+#``sort`` (``Table`` have ``order_by`` instead).
+#Read more:
+#`mutable sequence operations <http://docs.python.org/library/stdtypes.html#mutable-sequence-types>`_.
 #
-#> Note: all these methods support `tuple`, `list` or `dict` notations of row.
+#.. Note: all these methods support `tuple`, `list` or `dict` notations of row.
 
 from outputty import Table
 
@@ -21,7 +21,7 @@ table.append(['Porto Alegre', 'Rio Grande do Sul', 'Brazil'])
 table.append(['São Paulo', 'São Paulo', 'Brazil'])
 
 print 'First 3 rows:'
-for row in table[:3]:
+for row in table[:3]: # Slicing
     print row
 
 #Change the two last rows:

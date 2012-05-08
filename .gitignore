@@ -3,3 +3,4 @@
 *.pyc
 .coverage
 reg_settings.py
+MANIFEST

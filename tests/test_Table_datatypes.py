@@ -28,12 +28,13 @@ class TestTableDataTypes(unittest.TestCase):
         self.assertEqual(table.types['ham'], str)
 
     def test_should_indentify_type_str_correctly(self):
-        table = Table(headers=['eggs', 'ham'])
+        table = Table(headers=['eggs', 'ham'], input_encoding='iso-8859-1')
         table.append(['spam eggs', 1])
         table.append(['spam spam', 3.14])
         table.append(['eggs spam', 'testing'])
         table.append(['spam spam', '2011-11-23'])
         table.append(['spam  ham', '2011-11-23 02:00:17'])
+        table.append([u'álvaro'.encode('iso-8859-1'), '2011-11-23 02:00:17'])
         table._identify_type_of_data()
         self.assertEqual(table.types['eggs'], str)
         self.assertEqual(table.types['ham'], str)
@@ -55,8 +56,10 @@ class TestTableDataTypes(unittest.TestCase):
 
     def test_should_indentify_type_float_correctly(self):
         table = Table(headers=['ham'])
-        table.append([1.0])
-        table.append([3.14])
+        table.append(["3"])
+        table.append(["3.14"])
+        table.append([""])
+        table.append(["2.71"])
         table._identify_type_of_data()
         self.assertEqual(table.types['ham'], float)
 
