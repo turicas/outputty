@@ -26,9 +26,9 @@ clean:
 	find -regex '.*\.pyc' -exec rm {} \;
 	find -regex '.*~' -exec rm {} \;
 	rm -rf reg-settings.py
-	rm -rf examples/my-data.csv examples/nice-software.html examples/nice-software.txt
+	rm -rf examples/my-data.csv examples/nice-software.html examples/nice-software.txt examples/my-data.dsv
 	rm -rf readme.html tutorial.html
-	rm -rf MANIFEST dist
+	rm -rf MANIFEST dist build
 
 before-push:	clean test create-docs html-docs
 
