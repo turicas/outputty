@@ -112,3 +112,16 @@ class TestTableDataTypes(unittest.TestCase):
         self.assertEquals(table[0][3],
                           datetime.datetime(2011, 1, 1, 2, 3, 4))
         self.assertEquals(table[0][4], 'asd')
+
+    def test_running_identify_data_type_with_normalized_types_should_return_correct_results(self):
+        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
+        table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
+        table.append(['', '', '', '', ''])
+        table.normalize_types()
+        table._identify_type_of_data()
+        self.assertEquals(table.types['spam'], int)
+        self.assertEquals(table.types['eggs'], float)
+        self.assertEquals(table.types['ham'], datetime.date)
+        self.assertEquals(table.types['Monty'], datetime.datetime)
+        self.assertEquals(table.types['Python'], str)
+

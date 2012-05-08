@@ -231,6 +231,17 @@ class TestTable(unittest.TestCase):
         +-------+-------+
         ''').strip().decode('utf8'))
 
+    def test_should_accept_None_in_rows(self):
+        my_table = Table(headers=['spam'])
+        my_table.append([None])
+        self.assertEqual(unicode(my_table), dedent('''
+        +------+
+        | spam |
+        +------+
+        | None |
+        +------+
+        ''').strip())
+
     def test_headers_of_one_table_should_not_affect_other(self):
         table_1 = Table()
         table_1.headers.append('spam')
