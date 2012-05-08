@@ -8,11 +8,13 @@
 #Note: you need to change ``connection_string`` before run it.
 
 from outputty import Table
+from random import randint
 
 
 # The connection string should be in the format:
 #  'username:password@server[:port]/database/table_name'
-connection_string = 'root:r00t@localhost/testing/test_table'
+connection_string = 'root:r00t@localhost/testing/test_table_' + \
+                    str(randint(0, 99999))
 my_table = Table(headers=['ID', 'First name', 'Last name'])
 my_table.append({'First name': 'Álvaro', 'Last name': 'Justen', 'ID': '123'})
 my_table.append((456, 'Flávio', 'Amieiro'))

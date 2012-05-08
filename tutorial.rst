@@ -47,6 +47,9 @@ Example 02: Exporting to a CSV File
 Using plugins we can import and export ``Table`` data to CSV (really, to and
 from a lot of formats). Let's create a simple table and export it to a CSV
 file.
+You can also create any kind of DSV (delimiter-separeted value) files, just
+passing ``delimiter``, ``quote_char`` and ``line_terminator`` to ``write`` (the
+same parameters apply to ``read``).
 
 If you have this code, like in `examples/02_table_to_csv.py`::
         
@@ -57,6 +60,10 @@ If you have this code, like in `examples/02_table_to_csv.py`::
     my_table.append(('Flávio', 'Amieiro'))
     my_table.append(['Flávio', 'Coelho'])
     my_table.write('csv', 'my-data.csv')
+    
+    #Let's create a other kind of DSV:
+    my_table.write('csv', 'my-data.dsv', delimiter=';', quote_char="'",
+            line_terminator='\r\n')
 
 The file `my-data.csv` will be created with this content::
 
@@ -64,6 +71,14 @@ The file `my-data.csv` will be created with this content::
     "Álvaro","Justen"
     "Flávio","Amieiro"
     "Flávio","Coelho"
+
+
+The file `my-data.dsv` will be created with this content::
+
+    'First name';'Last name'
+    'Álvaro';'Justen'
+    'Flávio';'Amieiro'
+    'Flávio';'Coelho'
 
 
 Example 03: Exporting to a Text File
@@ -451,11 +466,13 @@ Note: you need to change ``connection_string`` before run it.
 If you have this code, like in `examples/10_plugin_mysql.py`::
         
     from outputty import Table
+    from random import randint
     
     
     # The connection string should be in the format:
     #  'username:password@server[:port]/database/table_name'
-    connection_string = 'root:r00t@localhost/testing/test_table'
+    connection_string = 'root:r00t@localhost/testing/test_table_' + \
+                        str(randint(0, 99999))
     my_table = Table(headers=['ID', 'First name', 'Last name'])
     my_table.append({'First name': 'Álvaro', 'Last name': 'Justen', 'ID': '123'})
     my_table.append((456, 'Flávio', 'Amieiro'))
