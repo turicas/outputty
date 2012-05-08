@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import datetime
+from unicodedata import normalize
 import MySQLdb
 
 
@@ -29,6 +30,21 @@ MYSQLDB_TO_PYTHON = {'ENUM': str,
                      'TIME': int,
                      'TIMESTAMP': int,
                      'DATETIME': datetime.datetime}
+
+def slug(text, encoding=None, separator='_',
+         permitted_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_',
+         replace_with_separator=[' ', '-', '_']):
+    if isinstance(text, str):
+        text = text.decode(encoding or 'ascii')
+    clean_text = text.strip()
+    for char in replace_with_separator:
+        clean_text = clean_text.replace(char, separator)
+    double_separator = separator + separator
+    while double_separator in clean_text:
+        clean_text = clean_text.replace(double_separator, separator)
+    ascii_text = normalize('NFKD', clean_text).encode('ascii', 'ignore')
+    strict_text = [x for x in ascii_text if x in permitted_chars]
+    return ''.join(strict_text)
 
 def _get_mysql_config(connection_str):
     colon_index = connection_str.index(':')
@@ -76,30 +92,42 @@ def read(table, connection_string, limit=None, order_by=None, query=''):
     cursor.close()
     connection.close()
 
-def write(table, connection_string):
+def write(table, connection_string, encoding=None):
     config, table_name = _get_mysql_config(connection_string)
     connection = _connect_to_mysql(config)
-    db_encoding = connection.character_set_name()
+    if encoding is None:
+        db_encoding = connection.character_set_name()
+    else:
+        db_encoding = encoding
     escape_string = connection.escape_string
+
+    # Create table
     table._identify_type_of_data()
     columns_and_types = []
+    slug_headers = []
     for header in table.headers:
+        slug_header = slug(header)
+        slug_headers.append(slug_header)
         mysql_type = MYSQL_TYPE[table.types[header]]
-        columns_and_types.append(header + ' ' + mysql_type)
+        columns_and_types.append(slug_header + ' ' + mysql_type)
     table_cols = ', '.join(columns_and_types)
     sql = 'CREATE TABLE IF NOT EXISTS {} ({})'.format(table_name, table_cols)
     connection.query(sql)
+
+    # Insert items
+    columns = ', '.join(slug_headers)
     for row in table:
         values = []
-        for value in row:
+        for index, value in enumerate(row):
             if value is None:
                 value = 'NULL'
             else:
                 value = escape_string(unicode(value).encode(db_encoding))
                 value = '"' + value + '"'
             values.append(value)
-        values_with_quotes = ', '.join(values)
-        sql = 'INSERT INTO %s VALUES (%s)' % (table_name,
-                                              values_with_quotes)
+        sql = 'INSERT INTO {} ({}) VALUES ('.format(table_name, columns)
+        sql = sql.encode(db_encoding)
+        sql += ', '.join(values)
+        sql += ')'
         connection.query(sql)
     connection.close()

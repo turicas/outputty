@@ -17,12 +17,13 @@
 
 import unittest
 import datetime
-from textwrap import dedent
-import os
-from outputty import Table
-import MySQLdb
 import tempfile
 import sqlite3
+import os
+from textwrap import dedent
+from cStringIO import StringIO
+from outputty import Table
+import MySQLdb
 
 
 class TestTableMySQL(unittest.TestCase):
@@ -284,13 +285,43 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(other_table.types['ham'], str)
         self.assertEquals(other_table.types['python'], datetime.datetime)
 
+    def test_importing_from_csv_and_exporting_to_mysql_should_handle_types_correctly(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        csv_fp = StringIO()
+        csv_fp.write(dedent('''
+        int_col,float_col,str_col,date_col,datetime_col
+        1,1.2,abc,2012-04-01,2009-04-01 00:01:02
+        2,2.3,cba,2011-03-02,2010-03-02 01:02:03
+        3,3.4,bca,2010-02-03,2011-02-03 02:03:04
+        4,4.5,cab,2009-01-04,2012-01-04 03:04:05
+        '''))
+        csv_fp.seek(0)
+        table = Table()
+        table.read('csv', csv_fp)
+        table.write('mysql', self.connection_string)
+        self.assertEquals(table.types['int_col'], int)
+        self.assertEquals(table.types['float_col'], float)
+        self.assertEquals(table.types['str_col'], str)
+        self.assertEquals(table.types['date_col'], datetime.date)
+        self.assertEquals(table.types['datetime_col'], datetime.datetime)
+
+    def test_write_should_slugfy_column_names(self):
+        self.connection.query('DROP TABLE ' + self.table)
+        table = Table(headers=['col with  spaces', 'col-with-dashes'])
+        table.append(['testing', 123])
+        table.append(['testing again', 456])
+        table.write('mysql', self.connection_string)
+
+        other_table = Table()
+        other_table.read('mysql', self.connection_string)
+        self.assertEquals(other_table.headers, ['col_with_spaces',
+                                                'col_with_dashes'])
+
     #TODO:
-    # - write: use only one INSERT for all rows (before: check performance)
-    # - read: add 'ignore' parameter (to ignore columns)
-    # - write: 'slugfy' (with underscores) table and column names before
-    #   creating it
+    # - write: use only one INSERT for all rows (before: check performance) -
+    #   batch=True|False
+    # - read: add 'ignore' parameter (to ignore some columns)
     # - write: Raise ValueError if table._rows is not compatible with table
     #   structure (already created)
     # - read/write: Raise exception when cannot connect, wrong user/pass etc.
     # - read/write: Option to do not close the connection so we can re-use it
-    # - be lazy?
