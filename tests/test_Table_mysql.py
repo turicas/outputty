@@ -104,7 +104,7 @@ class TestTableMySQL(unittest.TestCase):
         self.assertEquals(type(float_value), float)
         self.assertEquals(type(date_value), datetime.date)
         self.assertEquals(type(datetime_value),datetime.datetime)
-        self.assertEquals(type(text_value), str)
+        self.assertEquals(type(text_value), unicode)
 
     def test_write_should_create_table_even_if_only_headers_present(self):
         self.connection.query('DROP TABLE ' + self.table)

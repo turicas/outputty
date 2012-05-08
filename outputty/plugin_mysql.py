@@ -89,6 +89,11 @@ def read(table, connection_string, limit=None, order_by=None, query=''):
     table.types = {name: MYSQLDB_TO_PYTHON[MYSQLDB_TYPE[type_]] \
                    for name, type_ in column_info}
     table._rows = [list(row) for row in cursor.fetchall()]
+    encoding = connection.character_set_name()
+    for row_index, row in enumerate(table):
+        for column_index, value in enumerate(row):
+            if type(value) is str:
+                table[row_index][column_index] = value.decode(encoding)
     cursor.close()
     connection.close()
 
