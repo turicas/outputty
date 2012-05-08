@@ -274,3 +274,39 @@ class TestTableCsv(unittest.TestCase):
         contents = my_table.write('csv')
         os.remove(temp_fp.name)
         self.assertEquals(contents, data)
+
+    def test_should_be_able_to_change_delimiters_on_write(self):
+        temp_fp = tempfile.NamedTemporaryFile()
+        temp_fp.close()
+        my_table = Table(headers=['ham', 'spam', 'eggs'])
+        my_table.append({'ham': 'ham spam ham', 'spam': 'spam eggs spam',
+                              'eggs': 'eggs ham eggs'})
+        my_table.write('csv', temp_fp.name, delimiter=';', quote_char="'",
+                       line_terminator='\r\n')
+        fp = open(temp_fp.name)
+        contents = fp.read()
+        fp.close()
+        os.remove(temp_fp.name)
+
+        self.assertEquals(contents, dedent('''\
+        'ham';'spam';'eggs'\r
+        'ham spam ham';'spam eggs spam';'eggs ham eggs'\r
+        '''))
+
+    def test_should_be_able_to_change_delimiters_on_read(self):
+        data = dedent('''
+        'spam';'eggs';'ham'\r
+        '42';'3.0';'2011-01-02'\r
+        '1';'3.14';'2012-01-11'\r
+        '21';'6.28';'2010-01-03'\r
+        ''').strip() + '\r\n'
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.write(data)
+        temp_fp.close()
+        my_table = Table()
+        my_table.read('csv', temp_fp.name, delimiter=';', quote_char="'",
+                      line_terminator='\r\n')
+        os.remove(temp_fp.name)
+        self.assertEquals(my_table[0], [42, 3.0, datetime.date(2011, 1, 2)])
+        self.assertEquals(my_table[1], [1, 3.14, datetime.date(2012, 1, 11)])
+        self.assertEquals(my_table[2], [21, 6.28, datetime.date(2010, 1, 3)])

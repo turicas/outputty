@@ -5,15 +5,20 @@ import csv
 from StringIO import StringIO
 
 
+DELIMITER = ','
+QUOTE_CHAR = '"'
+LINE_TERMINATOR = '\n'
+
 class MyCSV(csv.Dialect):
-    delimiter = ','
-    quotechar = '"'
     doublequote = True
     skipinitialspace = False
-    lineterminator = '\n'
     quoting = csv.QUOTE_ALL
 
-def read(table, file_name_or_pointer, convert_types=True):
+def read(table, file_name_or_pointer, convert_types=True, delimiter=DELIMITER,
+         quote_char=QUOTE_CHAR, line_terminator=LINE_TERMINATOR):
+    MyCSV.delimiter = delimiter
+    MyCSV.quotechar = quote_char
+    MyCSV.lineterminator = line_terminator
     table.convert_types = convert_types
     if isinstance(file_name_or_pointer, (str, unicode)):
         table.csv_filename = file_name_or_pointer
@@ -21,7 +26,7 @@ def read(table, file_name_or_pointer, convert_types=True):
     else:
         fp = file_name_or_pointer
     info = fp.read().decode(table.input_encoding).encode('utf8')
-    reader = csv.reader(info.split('\n'))
+    reader = csv.reader(info.split('\n'), dialect=MyCSV)
     table.data = [x for x in reader if x]
     if table.csv_filename:
         fp.close()
@@ -32,7 +37,11 @@ def read(table, file_name_or_pointer, convert_types=True):
         if table.convert_types:
             table.normalize_types()
 
-def write(table, filename_or_pointer=None):
+def write(table, filename_or_pointer=None, delimiter=DELIMITER,
+          quote_char=QUOTE_CHAR, line_terminator=LINE_TERMINATOR):
+    MyCSV.delimiter = delimiter
+    MyCSV.quotechar = quote_char
+    MyCSV.lineterminator = line_terminator
     table.decode()
     table.encode()
     if filename_or_pointer is not None:
