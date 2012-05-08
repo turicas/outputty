@@ -29,12 +29,15 @@ import re
 import types
 
 
+date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
+                            '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
+
 def _str_decode(element, codec):
     if isinstance(element, str):
         return element.decode(codec)
     else:
         return element
-
 
 def _unicode_encode(element, codec):
     if isinstance(element, unicode):
@@ -182,9 +185,6 @@ class Table(object):
 
     def _identify_type_of_data(self):
         columns = zip(*self._rows)
-        date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
-        datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
-                                    '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
         for i, header in enumerate(self.headers):
             column_types = [int, float, datetime.date, datetime.datetime, str]
             cant_be = set()
@@ -193,6 +193,11 @@ class Table(object):
             except IndexError:
                 self.types[header] = str
             else:
+                types = list(set([type(value) for value in column]) -
+                             set([type(None)]))
+                if len(types) == 1 and types[0] not in (str, unicode):
+                    self.types[header] = types[0]
+                    continue
                 for value in column:
                     if value == '':
                         value = None
