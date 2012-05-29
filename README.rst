@@ -173,6 +173,9 @@ Related Software
       amounts of data.
     - `csvstudio <http://code.google.com/p/csvstudio/>`_: Python tool to analyze
       csv files.
+    - `csvsimple <http://pypi.python.org/pypi/csvsimple>`_: a simple tool to
+      handle CSV data.
+    - `toolshed <http://pypi.python.org/pypi/toolshed>`_: less boiler-plate.
     - `buzhug <http://buzhug.sourceforge.net/>`_: a fast, pure-Python
       database engine.
 
