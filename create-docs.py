@@ -84,12 +84,14 @@ for example_filename in examples:
             fmt = '\n'.join(['    ' + x for x in output_lines.split('\n')])
             body.append(fmt)
         else:
-            output = output.replace("'", '')
-            body.append('')
-            body.append('The file `%s` will be created with this content::' % \
-                        output)
-            body.append('')
-            body.append(file_contents_indented(output))
+            output_files = output.split(',')
+            for output in output_files:
+                output = output.strip().replace("'", '').replace('"', '')
+                body.append('')
+                body.append('The file `%s` will be created with this content::' % \
+                            output)
+                body.append('')
+                body.append(file_contents_indented(output))
         have_output = True
     body = '\n'.join(body)
     example_list.append(title + '\n' + body + '\n')

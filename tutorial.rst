@@ -13,14 +13,14 @@ this code in `outputty on GitHub <https://github.com/turicas/outputty>`_.
 
 Enjoy! :-)
 
-Example 1: Basics of ``Table``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 01: Basics of ``Table``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A ``Table`` is simply a list of rows. These rows can be represented as
 ``dict``-like, ``list``-like or ``tuple``-like objects. Let's create one
 ``Table`` with some rows and print it to stdout.
 
-If you have this code, like in `examples/1_table.py`::
+If you have this code, like in `examples/01_table.py`::
         
     from outputty import Table
     my_table = Table(headers=['First Name', 'Last Name', 'Main Language'])
@@ -41,14 +41,17 @@ After executing it, you'll get this output::
     +------------+-----------+---------------+
     
 
-Example 2: Exporting to a CSV File
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 02: Exporting to a CSV File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using plugins we can import and export ``Table`` data to CSV (really, to and
 from a lot of formats). Let's create a simple table and export it to a CSV
 file.
+You can also create any kind of DSV (delimiter-separeted value) files, just
+passing ``delimiter``, ``quote_char`` and ``line_terminator`` to ``write`` (the
+same parameters apply to ``read``).
 
-If you have this code, like in `examples/2_table_to_csv.py`::
+If you have this code, like in `examples/02_table_to_csv.py`::
         
     from outputty import Table
     
@@ -57,6 +60,10 @@ If you have this code, like in `examples/2_table_to_csv.py`::
     my_table.append(('Flávio', 'Amieiro'))
     my_table.append(['Flávio', 'Coelho'])
     my_table.write('csv', 'my-data.csv')
+    
+    #Let's create a other kind of DSV:
+    my_table.write('csv', 'my-data.dsv', delimiter=';', quote_char="'",
+            line_terminator='\r\n')
 
 The file `my-data.csv` will be created with this content::
 
@@ -66,8 +73,16 @@ The file `my-data.csv` will be created with this content::
     "Flávio","Coelho"
 
 
-Example 3: Exporting to a Text File
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The file `my-data.dsv` will be created with this content::
+
+    'First name';'Last name'
+    'Álvaro';'Justen'
+    'Flávio';'Amieiro'
+    'Flávio';'Coelho'
+
+
+Example 03: Exporting to a Text File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We can also import data from a CSV file and export it to a text file (using
 plugins, again). The data written to the text file will be the same we saw
@@ -81,7 +96,7 @@ If you have the file ``nice-software.csv`` with these contents::
     3,fabric,http://fabfile.org/
 
 
-and do you have the code below, like in ``examples/3_table_to_text_file.py``::
+and do you have the code below, like in ``examples/03_table_to_text_file.py``::
         
     from outputty import Table
     
@@ -99,14 +114,14 @@ The file `nice-software.txt` will be created with this content::
     |  3 |  fabric |     http://fabfile.org/ |
     +----+---------+-------------------------+
 
-Example 4: Ordering `Table` Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 04: Ordering `Table` Data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can order your table's data with the method ``Table.order_by``.
 You need to specify a column in which the ordering will be based on and
 optionally specify if the ordering will be ascending (default) or descending.
 
-If you have this code, like in `examples/4_order_by.py`::
+If you have this code, like in `examples/04_order_by.py`::
         
     from outputty import Table
     
@@ -128,8 +143,8 @@ After executing it, you'll get this output::
     +------------+-----------+
     
 
-Example 5: Reading from CSV and Exporting to HTML
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 05: Reading from CSV and Exporting to HTML
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can export your data to HTML using the plugin HTML (that is shipped by
 default with ``outputty``). If you don't specify a filename, the HTML plugin
@@ -137,7 +152,7 @@ will return a string (encoded with ``output_encoding``, specified in
 ``Table.__init__``). If it receives the filename, the contents will be saved
 into it and it'll return nothing.
 
-If you have this code, like in `examples/5_table_to_html_file.py`::
+If you have this code, like in `examples/05_table_to_html_file.py`::
         
     from outputty import Table
     
@@ -174,14 +189,14 @@ The file `nice-software.html` will be created with this content::
       </tbody>
     </table>
 
-Example 6: Creating Histograms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 06: Creating Histograms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There is a plugin called ``histogram`` that is shipped by default with
 ``outputty`` - it can create histograms of your table's columns (using
 ``numpy``). The output will be the histogram represented as text.
 
-If you have this code, like in `examples/6_histogram.py`::
+If you have this code, like in `examples/06_histogram.py`::
         
     from numpy.random import normal
     from numpy.random import seed
@@ -225,8 +240,8 @@ After executing it, you'll get this output::
     2.13 :
     
 
-Example 7: Using table columns and rows
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 07: Using table columns and rows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can get an entire table column just getting the item ``column-name`` in
 your table object. You can also change and delete an entire column.
@@ -234,7 +249,7 @@ If the item you get is a string, a column is returned. If it is an integer, a
 row is returned (starting from 0). ``Table`` objects are iterable, so you can
 navigate through the rows with a simple ``for`` loop.
 
-If you have this code, like in `examples/7_table_columns.py`::
+If you have this code, like in `examples/07_table_columns.py`::
         
     from outputty import Table
     
@@ -281,8 +296,8 @@ After executing it, you'll get this output::
     +--------+-----+
     
 
-Example 8: Other `Table` methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 08: Other `Table` methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A ``Table`` is implemented as a list of rows with some methods to use plugins,
 ordering and do other things. ``Table`` have all operations/methods other
@@ -294,7 +309,7 @@ Read more:
 
 .. Note: all these methods support `tuple`, `list` or `dict` notations of row.
 
-If you have this code, like in `examples/8_table_methods.py`::
+If you have this code, like in `examples/08_table_methods.py`::
         
     from outputty import Table
     
@@ -398,15 +413,15 @@ After executing it, you'll get this output::
     +----------------+----------------+---------+
     
 
-Example 9: Appending a column
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 09: Appending a column
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can append a column in your ``Table`` object using the ``append_column``
 method or just setting an item (``my_table['new-column'] = ...``). You can
 pass a list of values or a function to generate the values based on row data.
 Let's see how it works - it's quite simple.
 
-If you have this code, like in `examples/9_append_column.py`::
+If you have this code, like in `examples/09_append_column.py`::
         
     from outputty import Table
     
@@ -437,6 +452,62 @@ After executing it, you'll get this output::
     |            P | Python |          1991 | Programming Language |  21 |
     |            U |   Unix |          1969 |     Operating System |  43 |
     +--------------+--------+---------------+----------------------+-----+
+    
+
+Example 10: Using MySQL plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's easy to import data from and export data to a MySQL table.
+``outputty`` automatically identify type of data and creates a table in MySQL
+for you with correct data types, so don't worry about converting everyting.
+Let's create a simple table, export it to MySQL and then import it again.
+Note: you need to change ``connection_string`` before run it.
+
+If you have this code, like in `examples/10_plugin_mysql.py`::
+        
+    from outputty import Table
+    from random import randint
+    
+    
+    # The connection string should be in the format:
+    #  'username:password@server[:port]/database/table_name'
+    connection_string = 'root:r00t@localhost/testing/test_table_' + \
+                        str(randint(0, 99999))
+    my_table = Table(headers=['ID', 'First name', 'Last name'])
+    my_table.append({'First name': 'Álvaro', 'Last name': 'Justen', 'ID': '123'})
+    my_table.append((456, 'Flávio', 'Amieiro'))
+    my_table.append(['789', 'Flávio', 'Coelho'])
+    my_table.write('mysql', connection_string)
+    print 'Table saved:'
+    print my_table
+    print 'The types identified are:', my_table.types
+    
+    other_table = Table()
+    other_table.read('mysql', connection_string)
+    print
+    print 'Table retrieved:'
+    print other_table
+
+After executing it, you'll get this output::
+
+    Table saved:
+    +-----+------------+-----------+
+    |  ID | First name | Last name |
+    +-----+------------+-----------+
+    | 123 |     Álvaro |    Justen |
+    | 456 |     Flávio |   Amieiro |
+    | 789 |     Flávio |    Coelho |
+    +-----+------------+-----------+
+    The types identified are: {u'Last name': <type 'str'>, u'First name': <type 'str'>, u'ID': <type 'int'>}
+    
+    Table retrieved:
+    +-----+------------+-----------+
+    |  ID | First_name | Last_name |
+    +-----+------------+-----------+
+    | 123 |     Álvaro |    Justen |
+    | 456 |     Flávio |   Amieiro |
+    | 789 |     Flávio |    Coelho |
+    +-----+------------+-----------+
     
 
 
