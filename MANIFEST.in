@@ -1,0 +1,4 @@
+include README.markdown
+include tutorial.markdown
+include AUTHORS.markdown
+include LICENSE

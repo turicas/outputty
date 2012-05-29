@@ -1,0 +1,68 @@
+
+outputty
+========
+
+`outputty` is a simple Python library that helps you importing, filtering and
+exporting data. It is composed by a main `Table` class and a lot of plugins
+that helps importing and exporting data to/from `Table` (in future we'll have
+filtering plugins). You can write your own plugin easily (see
+`outputty/plugin_*.py` for examples).
+
+Some examples of plugins are: CSV, text, HTML and histogram.
+
+
+Example
+-------
+
+Code time!
+
+::
+
+    >>> from outputty import Table
+    >>> my_table = Table(headers=['name', 'age']) # headers are the columns
+    >>> my_table.append(('Alvaro Justen', 24)) # a row as tuple
+    >>> my_table.append({'name': 'Other User', 'age': 99}) # a row as dict
+    >>> print my_table # a text representation of Table
+    +---------------+-----+
+    |      name     | age |
+    +---------------+-----+
+    | Alvaro Justen |  24 |
+    |    Other User |  99 |
+    +---------------+-----+
+
+    >>> print 'First row:', my_table[0] # Table is indexable
+    First row: [u'Alvaro Justen', 24]
+
+    >>> print 'Sum of ages:', sum(my_table['age']) # you can get columns too
+    Sum of ages: 123
+
+    >>> my_table.write('csv', 'my-table.csv') # CSV plugin will save its contents in a file
+    >>> # let's see what's in the file...
+    >>> print open('my-table.csv').read()
+    "name","age"
+    "Alvaro Justen","24"
+    "Other User","99"
+
+    >>> # let's use HTML plugin!
+    >>> print my_table.write('html') # without filename `write` will return a string
+    <table>
+      <thead>
+        <tr class="header">
+          <th>name</th>
+          <th>age</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="odd">
+          <td>Alvaro Justen</td>
+          <td>24</td>
+        </tr>
+        <tr class="even">
+          <td>Other User</td>
+          <td>99</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+The `Table` class have a lot of other features. To learn more (by examples), read `outputty tutorial <https://github.com/turicas/outputty/blob/master/tutorial.markdown>`_ and see `examples <https://github.com/turicas/outputty/tree/master/examples>`_. Enjoy! :-)
