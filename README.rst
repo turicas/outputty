@@ -12,19 +12,15 @@ examples). Some examples of plugins are: CSV, text, HTML and histogram.
 Installation
 ------------
 
-- `Download the package <https://github.com/turicas/outputty/tarball/master>`_
-- Extract it
-- Copy the directory ``outputty`` (inside the extracted folder) to some folter
-  you can do ``import outputty`` (it can be your system's ``site-packages`` or
-  even your project's path).
+As simple as executing::
 
-Sorry for that - it'll be available in PyPI soon.
+    pip install outputty
 
 
 Example
 -------
 
-Code time!
+Code time!::
 
     >>> from outputty import Table
     >>> my_table = Table(headers=['name', 'age']) # headers are the columns
