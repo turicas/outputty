@@ -15,13 +15,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""`outputty` is a simple Python library that helps you importing, filtering and
-exporting data. It is composed by a main `Table` class and a lot of plugins
-that helps importing and exporting data to/from `Table` (in future we'll have
-filtering plugins). You can write your own plugin easily (see
-`outputty/plugin_*.py` for examples).
+"""``outputty`` is a simple Python library that helps you importing, filtering
+and exporting data. It is composed by a main ``Table`` class and a lot of
+plugins that helps importing and exporting data to/from ``Table``.
 
-Some examples of plugins are: CSV, text, HTML and histogram.
+You can write your own plugin easily (see ``outputty/plugin_*.py`` for
+examples). Some examples of plugins are: CSV, text, HTML and histogram.
 """
 
 import datetime
@@ -182,9 +181,9 @@ class Table(object):
         return rows
 
     def _identify_type_of_data(self):
-        """Create `self.types`, a `dict` in which each key is a table header
-        (from `self.headers`) and value is a type in:
-        `(int, float, datetime.date, datetime.datetime, str)`.
+        """Create ``self.types``, a ``dict`` in which each key is a table
+        header (from ``self.headers``) and value is a type in:
+        ``(int, float, datetime.date, datetime.datetime, str)``.
 
         The types are identified trying to convert each column value to each
         type.
@@ -316,11 +315,11 @@ class Table(object):
 
     def extend(self, items):
         """Append a lot of items.
-        `items` should be a list of new rows, each row can be represented as
-        `list`, `tuple` or `dict`.
-        If one of the rows causes a `ValueError` (for example, because it has
+        ``items`` should be a list of new rows, each row can be represented as
+        ``list``, ``tuple`` or ``dict``.
+        If one of the rows causes a ``ValueError`` (for example, because it has
         more or less elements than it should), then nothing will be appended to
-        `Table`.
+        ``Table``.
         """
         new_items = []
         for item in items:
@@ -329,18 +328,18 @@ class Table(object):
             self.append(item)
 
     def __len__(self):
-        """Returns the number of rows. Same as `len(list)`."""
+        """Returns the number of rows. Same as ``len(list)``."""
         return len(self._rows)
 
     def count(self, row):
-        """Returns how many rows are equal to `row` in `Table`.
-        Same as `list.count`.
+        """Returns how many rows are equal to ``row`` in ``Table``.
+        Same as ``list.count``.
         """
         return self._rows.count(self._prepare_to_append(row))
 
     def index(self, x, i=None, j=None):
-        """Returns the index of row `x` in table (starting from zero).
-        Same as `list.index`.
+        """Returns the index of row ``x`` in table (starting from zero).
+        Same as ``list.index``.
         """
         x = self._prepare_to_append(x)
         if i is None and j is None:
@@ -351,35 +350,33 @@ class Table(object):
             return self._rows.index(x, i, j)
 
     def insert(self, index, row):
-        """Insert `row` in the position `index` on `Table`.
-        Same as `list.insert`.
-        `row` can be `list`, `tuple` or `dict`.
+        """Insert ``row`` in the position ``index``. Same as ``list.insert``.
+        ``row`` can be ``list``, ``tuple`` or ``dict``.
         """
         self._rows.insert(index, self._prepare_to_append(row))
 
     def pop(self, index=-1):
-        """Removes and returns row in position `index` on `Table`. `index`
-        defaults to -1.
-        Same as `list.pop`.
+        """Removes and returns row in position ``index``. ``index`` defaults
+        to -1. Same as ``list.pop``.
         """
         return self._rows.pop(index)
 
     def remove(self, row):
-        """Removes first occurrence of `row` on `Table`.
-        Raises `ValueError` if `row` is not found.
-        Same as `list.remove`.
+        """Removes first occurrence of ``row``. Raises ``ValueError`` if
+        ``row`` is not found. Same as ``list.remove``.
         """
         self._rows.remove(self._prepare_to_append(row))
 
     def reverse(self):
-        """Reverse the order of rows *in place* (does not return a new `Table`,
-        change the rows in this instance of `Table`).
-        Same as `list.reverse`.
+        """Reverse the order of rows *in place* (does not return a new
+        ``Table``, change the rows in this instance of ``Table``).
+        Same as ``list.reverse``.
         """
         self._rows.reverse()
 
     def append_column(self, name, values, position=None, row_as_dict=False):
-        """Append a column in the end of table"""
+        """Append a column at posision ``posision`` (defaults to end of
+        table)"""
         if (type(values) != types.FunctionType and \
             len(values) != len(self)) or \
            name in self.headers:

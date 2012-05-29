@@ -25,11 +25,10 @@ unittest:  clear-screen clean run-unittest
 clean:
 	find -regex '.*\.pyc' -exec rm {} \;
 	find -regex '.*~' -exec rm {} \;
-	rm -rf reg-settings.py*
-	rm -rf examples/my-data.csv
-	rm -rf examples/nice-software.html
-	rm -rf examples/nice-software.txt
+	rm -rf reg-settings.py
+	rm -rf examples/my-data.csv examples/nice-software.html examples/nice-software.txt
 	rm -rf readme.html tutorial.html
+	rm -rf MANIFEST dist
 
 before-push:	clean test create-docs html-docs
 
@@ -37,8 +36,8 @@ create-docs:
 	./create-docs.py
 
 html-docs:
-	markdown README.markdown > readme.html
-	markdown tutorial.markdown > tutorial.html
+	rst2html README.rst > readme.html
+	rst2html tutorial.rst > tutorial.html
 
 pack:
 	python setup.py sdist

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
-# title = Basics of `Table`
-#A `Table` is simply a list of rows. These rows can be represented as
-#`dict`-like, `list`-like or `tuple`-like objects. Let's create one `Table`
-#with some rows and print it to stdout.
+# title = Basics of ``Table``
+#A ``Table`` is simply a list of rows. These rows can be represented as
+#``dict``-like, ``list``-like or ``tuple``-like objects. Let's create one
+#``Table`` with some rows and print it to stdout.
 
 from outputty import Table
 my_table = Table(headers=['First Name', 'Last Name', 'Main Language'])

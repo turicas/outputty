@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 # title = Appending a column
-#You can append a column in your `Table` object using the `append_column`
-#method or just setting an item (`my_table['new-column'] = ...`). You can pass
-#a list of values or a function to generate the values based on row data.
+#You can append a column in your ``Table`` object using the ``append_column``
+#method or just setting an item (``my_table['new-column'] = ...``). You can
+#pass a list of values or a function to generate the values based on row data.
 #Let's see how it works - it's quite simple.
 
 from outputty import Table

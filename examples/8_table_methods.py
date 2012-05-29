@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 # title = Other `Table` methods
-#A `Table` is implemented as a list of rows with some methods to use plugins,
-#ordering and do other things. `Table` have all operations/methods other
+#A ``Table`` is implemented as a list of rows with some methods to use plugins,
+#ordering and do other things. ``Table`` have all operations/methods other
 #Python mutable sequence objects have so you can use slicing,
-#`Table.extend`, `Table.index`, `Table.count` and so on. The exception is
-#`sort` (`Table` have `order_by` instead).
+#``Table.extend``, ``Table.index``, ``Table.count`` and so on. The exception is
+#``sort`` (``Table`` have ``order_by`` instead).
 #Read more:
-#[mutable sequence operations](http://docs.python.org/library/stdtypes.html#mutable-sequence-types).
+#`mutable sequence operations <http://docs.python.org/library/stdtypes.html#mutable-sequence-types>`_.
 #
-#> Note: all these methods support `tuple`, `list` or `dict` notations of row.
+#.. Note: all these methods support `tuple`, `list` or `dict` notations of row.
 
 from outputty import Table
 
