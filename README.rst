@@ -17,6 +17,14 @@ As simple as executing::
     pip install outputty
 
 
+Note: as ``pip`` tries to compile everything and ``outputty`` depends on
+``MySQL-Python`` package (which needs compilation), you need to have
+libmysqlclient's headers, compilers and related stuff. To install it on
+Debian/Ubuntu, just execute::
+
+    apt-get install build-essential libmysqlclient-dev
+
+
 Example
 -------
 
