@@ -17,6 +17,14 @@ As simple as executing::
     pip install outputty
 
 
+Note: as ``pip`` tries to compile everything and ``outputty`` depends on
+``MySQL-Python`` package (which needs compilation), you need to have
+libmysqlclient's headers, compilers and related stuff. To install it on
+Debian/Ubuntu, just execute::
+
+    apt-get install build-essential libmysqlclient-dev
+
+
 Example
 -------
 
@@ -81,8 +89,8 @@ Yes, there are a lot of features to add (it's just the begining). If you
 want to contribute, please see our
 `outputty wishlist <https://github.com/turicas/outputty/blob/master/WISHLIST.rst>`_.
 
-You can also use the `outputty Issue Tracking
-System on GitHub <https://github.com/turicas/outputty/issues>` to report bugs.
+You can also use the `outputty Issue Tracking System on GitHub <https://github.com/turicas/outputty/issues>`_
+to report bugs.
 
 
 Contributing
@@ -90,23 +98,25 @@ Contributing
 
 If you want to contribute to this project, please:
 
-- Use `Test-driven
-  development <http://en.wikipedia.org/wiki/Test-driven_development>`_
-- Create your new feature in branch ``feature/name-of-the-new-feature``
-  (``git checkout -b feature/new-feature``). You should know how to use git - I
-  try to use `this git
-  flow <http://nvie.com/posts/a-successful-git-branching-model/>`_
-- Run **all tests** (``make test``) *before* pushing
-  - To run just one test file, execute: ``nosetests --with-coverage --cover-package outputty  tests/test_your-test-file.py``
-  - Try to have a test-coverage of 100%
-- ``make test`` will call nosetests with some plugin options - to install
-  it, execute: ``pip install nose coverage ipdbplugin yanc``
-  Create/update documentation (README/docstrings/man page)
-  - **Do NOT edit ``README.rst`` and ``tutorial.rst``.** Edit
-  ``README-template.rst`` or ``tutorial-template.rst`` instead and run
-  ``make create-docs`` to create the new ``README.rst`` and
-  ``tutorial.rst``. The tutorial will be created based on files in
-  ``examples`` folder.
+- Install dependencies for development running ``pip install -r requirements/development.txt``.
+- Execute ``make test`` to run all tests -- please run **all tests** *before*
+  pushing.
+
+  - To run just one test file execute:
+    ``nosetests --with-coverage --cover-package outputty  tests/test_your-test-file.py``
+  - Try to have a test-coverage of 100%.
+  - Use `Test-driven development <http://en.wikipedia.org/wiki/Test-driven_development>`_.
+
+- Use `nvie's gitflow <https://github.com/nvie/gitflow>`_ - to learn, read
+  `A Successful Git branching model <http://nvie.com/posts/a-successful-git-branching-model/>`_.
+
+- Create/update documentation (README/docstrings/man page)
+
+  - **Do NOT** edit ``README.rst`` and ``tutorial.rst``, edit
+    ``README-template.rst`` or ``tutorial-template.rst`` instead and run
+    ``make create-docs`` to create the new ``README.rst`` and
+    ``tutorial.rst`` (before committing). The tutorial will be created based on
+    files in ``examples`` folder.
 
 
 New Plugins
@@ -118,12 +128,15 @@ simple, please follow these steps:
 
 - Create a file named ``outputty/plugin_name.py``, where ``name`` is the name of
   your plugin.
+
 - Create ``read`` and/or ``write`` functions in this file. These functions receive
   the ``Table`` object and optional parameters.
+
   - ``read``: should read data from the resource specified in parameters and put
-  this data in ``Table`` (using ``Table.append`` or ``Table.extend``).
+    this data in ``Table`` (using ``Table.append`` or ``Table.extend``).
   - ``write``: should read data from ``Table`` (iterating over it, using slicing
-  etc.) and write this data to the resource specified in parameters.
+    etc.) and write this data to the resource specified in parameters.
+
 - Call your plugin executing ``my_table.write('name', optional_parameters...)``
   or ``my_table.read('name', optional_parameters...)`` (where ``name`` is your
   plugin's name) - when you execute it ``outputty`` will call
@@ -173,6 +186,9 @@ Related Software
       amounts of data.
     - `csvstudio <http://code.google.com/p/csvstudio/>`_: Python tool to analyze
       csv files.
+    - `csvsimple <http://pypi.python.org/pypi/csvsimple>`_: a simple tool to
+      handle CSV data.
+    - `toolshed <http://pypi.python.org/pypi/toolshed>`_: less boiler-plate.
     - `buzhug <http://buzhug.sourceforge.net/>`_: a fast, pure-Python
       database engine.
 

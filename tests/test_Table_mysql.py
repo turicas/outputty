@@ -47,6 +47,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def tearDown(self):
         self.connection.query('DROP DATABASE IF EXISTS ' + self.database)
+        self.connection.commit()
         self.connection.close()
 
     def test_should_identify_connection_parameters(self):
@@ -75,6 +76,7 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('INSERT INTO %s VALUES (123, "a")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (456, "b")' % self.table)
         self.connection.query('INSERT INTO %s VALUES (789, "c")' % self.table)
+        self.connection.commit()
         table = Table()
         table.read('mysql', self.connection_string)
         self.assertEquals(str(table), dedent('''
@@ -93,6 +95,7 @@ class TestTableMySQL(unittest.TestCase):
                                d DATETIME, e TEXT)' % self.table)
         self.connection.query('INSERT INTO %s VALUES (1, 3.14, "2011-11-11", \
                                "2011-11-11 11:11:11", "Python")' % self.table)
+        self.connection.commit()
         table = Table()
         table.read('mysql', self.connection_string)
         int_value = table[0][0]
@@ -108,6 +111,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_write_should_create_table_even_if_only_headers_present(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['spam', 'eggs'])
         table.write('mysql', self.connection_string)
         self.cursor.execute('SELECT * FROM ' + self.table)
@@ -123,6 +127,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_write_should_add_rows_correctly(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['spam', 'eggs'])
         table.append(['python', 'rules'])
         table.append(['free software', 'ownz'])
@@ -134,6 +139,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_write_should_create_the_table_with_correct_data_types(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
         table.append([2, 3.14, '2011-01-02', '2011-01-01 00:00:01', 'fgh'])
@@ -151,6 +157,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_None_should_be_saved_as_NULL_and_returned_as_None(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
         table.append([None, None, None, None, None])
@@ -162,6 +169,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_should_deal_correctly_with_quotes(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['eggs'])
         table.append(['spam"ham'])
         table.write('mysql', self.connection_string)
@@ -194,6 +202,7 @@ class TestTableMySQL(unittest.TestCase):
         self.connection.query('DROP TABLE ' + self.table)
         self.connection.query('CREATE TABLE %s (spam TEXT, eggs TEXT)' % \
                               self.table)
+        self.connection.commit()
         table = Table(headers=[u'spam', u'eggs'], input_encoding='utf16')
         table.append([u'Álvaro'.encode('utf16'),
                       u'álvaro'.encode('utf16')])
@@ -209,6 +218,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_should_insert_data_in_correct_order(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['name', 'age'])
         table.append(['Justen', 24])
         table.append(['Someone', 99])
@@ -223,6 +233,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_read_should_accept_limit(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['number'])
         numbers = range(1000)
         for i in numbers:
@@ -234,6 +245,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_read_should_accept_order_by(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['number'])
         numbers = range(1000)
         for i in numbers:
@@ -245,6 +257,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_read_should_accept_a_SQL_instead_of_table_name(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['number'])
         numbers = range(1000)
         for i in numbers:
@@ -260,6 +273,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_read_should_automatically_identify_data_types(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['spam', 'eggs', 'ham', 'monty', 'python'])
         numbers = range(1000)
         for i in numbers:
@@ -287,6 +301,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_importing_from_csv_and_exporting_to_mysql_should_handle_types_correctly(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         csv_fp = StringIO()
         csv_fp.write(dedent('''
         int_col,float_col,str_col,date_col,datetime_col
@@ -307,6 +322,7 @@ class TestTableMySQL(unittest.TestCase):
 
     def test_write_should_slugfy_column_names(self):
         self.connection.query('DROP TABLE ' + self.table)
+        self.connection.commit()
         table = Table(headers=['col with  spaces', 'col-with-dashes'])
         table.append(['testing', 123])
         table.append(['testing again', 456])
