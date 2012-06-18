@@ -135,4 +135,5 @@ def write(table, connection_string, encoding=None):
         sql += ', '.join(values)
         sql += ')'
         connection.query(sql)
+    connection.commit()
     connection.close()
