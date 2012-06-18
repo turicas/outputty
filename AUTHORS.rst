@@ -1,4 +1,5 @@
-This software is written and maintained by Álvaro Justen but received a lot of
+This software is written and maintained by
+`Álvaro Justen <https://github.com/turicas>`_ but received a lot of
 contributions. My sincerely thanks to:
 
 - `Fundação Getúlio Vargas <http://www.fgv.br/>`_ for letting me invest my time
