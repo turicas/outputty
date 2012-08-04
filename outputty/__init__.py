@@ -382,7 +382,7 @@ class Table(object):
         self._rows.reverse()
 
     def append_column(self, name, values, position=None, row_as_dict=False):
-        """Append a column at posision ``posision`` (defaults to end of
+        """Append a column at position ``position`` (defaults to end of
         table)"""
         if (type(values) != types.FunctionType and \
             len(values) != len(self)) or \
