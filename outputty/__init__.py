@@ -29,6 +29,7 @@ import types
 from collections import Counter
 
 
+__version__ = '0.3.2'
 date_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
 datetime_regex = re.compile('^[0-9]{4}-[0-9]{2}-[0-9]{2} '
                             '[0-9]{2}:[0-9]{2}:[0-9]{2}$')
