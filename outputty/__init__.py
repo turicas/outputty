@@ -57,7 +57,7 @@ def convert_to_datetime(value, input_encoding):
     if datetime_regex.match(unicode(value)) is None:
         raise ValueError("Can't be datetime")
     else:
-        info = value.split()
+        info = unicode(value).split()
         date = [int(x) for x in info[0].split('-')]
         rest = [int(x) for x in info[1].split(':')]
         return datetime.datetime(*(date + rest))
@@ -66,7 +66,7 @@ def convert_to_date(value, input_encoding):
     if date_regex.match(unicode(value)) is None:
         raise ValueError("Can't be date")
     else:
-        year, month, day = [int(x) for x in value.split('-')]
+        year, month, day = [int(x) for x in unicode(value).split('-')]
         return datetime.date(year, month, day)
 
 def convert_to_str(value, input_encoding):
@@ -81,7 +81,7 @@ def convert_to_str(value, input_encoding):
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
                  input_encoding='utf8', output_encoding='utf8',
-                 converters=None):
+                 converters=None, converter_sample=None):
         self.headers = headers if headers is not None else []
         for header in self.headers:
             if not isinstance(header, (str, unicode)):
@@ -99,6 +99,7 @@ class Table(object):
         self._rows = []
         self.types = {}
         self.plugins = {}
+        self.converter_sample = converter_sample
         self.converters = {
                 int: convert_to_int,
                 float: lambda value, encoding: float(value),
@@ -235,7 +236,10 @@ class Table(object):
         """
         converters = self.converters
         input_encoding = self.input_encoding
-        columns = zip(*self._rows) # TODO: add sampling
+        if self.converter_sample is not None:
+            columns = zip(*self._rows[:self.converter_sample])
+        else:
+            columns = zip(*self._rows)
         for i, header in enumerate(self.headers):
             column_types = [int, float, datetime.date, datetime.datetime, str]
             cant_be = set()
@@ -248,6 +252,9 @@ class Table(object):
                              set([type(None)]))
                 if len(types) == 1 and types[0] not in (str, unicode):
                     identified_type = types[0]
+                elif not [value for value in column if value]:
+                    # all rows with an empty field -> str (can't identify)
+                    identified_type = str
                 else:
                     for value in column:
                         if value == '' or value is None:

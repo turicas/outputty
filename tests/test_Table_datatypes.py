@@ -101,11 +101,12 @@ class TestTableDataTypes(unittest.TestCase):
         self.assertEquals(table.types['Python'], str)
 
     def test_normalize_types_should_convert_types_correctly(self):
-        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
-        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04',
-                           'asd'])
-        table.append([None, None, None, None, None])
-        table.append([None, None, None, None, 42])
+        table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python',
+                               'rules'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            ''])
+        table.append([None, None, None, None, None, ''])
+        table.append([None, None, None, None, 42, ''])
         table.normalize_types()
         self.assertEquals(table[0][0], 1)
         self.assertEquals(table[0][1], 2.71)
@@ -113,11 +114,16 @@ class TestTableDataTypes(unittest.TestCase):
         self.assertEquals(table[0][3],
                           datetime.datetime(2011, 1, 1, 2, 3, 4))
         self.assertEquals(table[0][4], 'asd')
+        self.assertEquals(table.types['rules'], str)
 
-    def test_running_identify_data_type_with_normalized_types_should_return_correct_results(self):
+    def test_identify_data_types_with_normalized_types_should_not_affect(self):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
-        table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
-        table.append(['', '', '', '', ''])
+        table.append([
+            1,
+            2.71,
+            datetime.date(2011, 01, 01),
+            datetime.datetime(2011, 01, 01, 0, 0, 0),
+            'asd'])
         table.normalize_types()
         table._identify_data_types()
         self.assertEquals(table.types['spam'], int)
@@ -166,11 +172,28 @@ class TestTableDataTypes(unittest.TestCase):
                 str: convert_to_str,}
         headers = ['spam', 'eggs', 'ham', 'Monty', 'Python']
         table = Table(headers=headers, converters=converters)
-        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04',
-                           'asd'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd'])
         table.normalize_types()
         self.assertEqual(table[0][0], 'int=1')
         self.assertEqual(table[0][1], 'float=2.71')
         self.assertEqual(table[0][2], 'date=2011-01-01')
         self.assertEqual(table[0][3], 'datetime=2011-01-01 02:03:04')
         self.assertEqual(table[0][4], 'str[3]')
+
+    def test_should_be_able_to_specify_converter_sample(self):
+        headers = ['spam', 'eggs', 'ham', 'Monty', 'Python']
+        table = Table(headers=headers, converter_sample=3)
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', ''])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', ''])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', ''])
+        table.append(['-', '-', '-', '-', 123])
+        table.append(['-', '-', '-', '-', ''])
+        table.append(['-', '-', '-', '-', ''])
+        table._identify_data_types()
+        expected_types = {
+                'spam': int,
+                'eggs': float,
+                'ham': datetime.date,
+                'Monty': datetime.datetime,
+                'Python': str,}
+        self.assertEqual(table.types, expected_types)
