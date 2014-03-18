@@ -15,15 +15,16 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 import datetime
-from outputty import Table
+import unittest
+
+from outputty import date_regex, datetime_regex, Table
 
 
 class TestTableDataTypes(unittest.TestCase):
     def test_should_indentify_type_str_when_only_headers_present(self):
         table = Table(headers=['eggs', 'ham'])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEqual(table.types['eggs'], str)
         self.assertEqual(table.types['ham'], str)
 
@@ -35,7 +36,7 @@ class TestTableDataTypes(unittest.TestCase):
         table.append(['spam spam', '2011-11-23'])
         table.append(['spam  ham', '2011-11-23 02:00:17'])
         table.append([u'álvaro'.encode('iso-8859-1'), '2011-11-23 02:00:17'])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEqual(table.types['eggs'], str)
         self.assertEqual(table.types['ham'], str)
 
@@ -43,7 +44,7 @@ class TestTableDataTypes(unittest.TestCase):
         table = Table(headers=['spam'])
         table.append([1])
         table.append([2])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEqual(table.types['spam'], int)
 
     def test_should_not_indentify_non_fractional_floats_as_int(self):
@@ -51,7 +52,7 @@ class TestTableDataTypes(unittest.TestCase):
         table.append([1.0])
         table.append([2.0])
         table.append([3.0])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEqual(table.types['ham'], float)
 
     def test_should_indentify_type_float_correctly(self):
@@ -60,28 +61,28 @@ class TestTableDataTypes(unittest.TestCase):
         table.append(["3.14"])
         table.append([""])
         table.append(["2.71"])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEqual(table.types['ham'], float)
 
     def test_should_indentify_type_date_correctly(self):
         table = Table(headers=['Python'])
         table.append(['2010-11-15'])
         table.append(['2011-11-20'])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEqual(table.types['Python'], datetime.date)
 
     def test_should_indentify_type_datetime_correctly(self):
         table = Table(headers=['Monty'])
         table.append(['2010-11-15 02:42:01'])
         table.append(['2011-11-20 21:05:59'])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEqual(table.types['Monty'], datetime.datetime)
 
     def test_None_should_not_affect_data_type(self):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
         table.append([None, None, None, None, None])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEquals(table.types['spam'], int)
         self.assertEquals(table.types['eggs'], float)
         self.assertEquals(table.types['ham'], datetime.date)
@@ -92,7 +93,7 @@ class TestTableDataTypes(unittest.TestCase):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
         table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
         table.append(['', '', '', '', ''])
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEquals(table.types['spam'], int)
         self.assertEquals(table.types['eggs'], float)
         self.assertEquals(table.types['ham'], datetime.date)
@@ -118,10 +119,58 @@ class TestTableDataTypes(unittest.TestCase):
         table.append([1, 2.71, '2011-01-01', '2011-01-01 00:00:00', 'asd'])
         table.append(['', '', '', '', ''])
         table.normalize_types()
-        table._identify_type_of_data()
+        table._identify_data_types()
         self.assertEquals(table.types['spam'], int)
         self.assertEquals(table.types['eggs'], float)
         self.assertEquals(table.types['ham'], datetime.date)
         self.assertEquals(table.types['Monty'], datetime.datetime)
         self.assertEquals(table.types['Python'], str)
 
+    def test_should_be_able_to_change_converters(self):
+
+        def convert_to_int(value, encoding):
+            converted = int(value)
+            if str(converted) != str(value):
+                raise ValueError('It is a float')
+            else:
+                return 'int={}'.format(converted)
+
+        def convert_to_float(value, encoding):
+            converted = float(value)
+            return 'float={}'.format(converted)
+
+        def convert_to_datetime(value, input_encoding):
+            if datetime_regex.match(unicode(value)) is None:
+                raise ValueError("Can't be datetime")
+            else:
+                return 'datetime={}'.format(value)
+
+        def convert_to_date(value, input_encoding):
+            if date_regex.match(unicode(value)) is None:
+                raise ValueError("Can't be date")
+            else:
+                return 'date={}'.format(value)
+
+        def convert_to_str(value, input_encoding):
+            if not isinstance(value, unicode):
+                if not isinstance(value, str):
+                    value = str(value)
+                value = value.decode(input_encoding)
+            return 'str[{}]'.format(len(value))
+
+        converters = {
+                int: convert_to_int,
+                float: convert_to_float,
+                datetime.date: convert_to_date,
+                datetime.datetime: convert_to_datetime,
+                str: convert_to_str,}
+        headers = ['spam', 'eggs', 'ham', 'Monty', 'Python']
+        table = Table(headers=headers, converters=converters)
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04',
+                           'asd'])
+        table.normalize_types()
+        self.assertEqual(table[0][0], 'int=1')
+        self.assertEqual(table[0][1], 'float=2.71')
+        self.assertEqual(table[0][2], 'date=2011-01-01')
+        self.assertEqual(table[0][3], 'datetime=2011-01-01 02:03:04')
+        self.assertEqual(table[0][4], 'str[3]')

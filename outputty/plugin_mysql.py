@@ -107,7 +107,7 @@ def write(table, connection_string, encoding=None):
     escape_string = connection.escape_string
 
     # Create table
-    table._identify_type_of_data()
+    table._identify_data_types()
     columns_and_types = []
     slug_headers = []
     for header in table.headers:

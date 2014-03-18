@@ -46,10 +46,42 @@ def _unicode_encode(element, codec):
     else:
         return element
 
+def convert_to_int(value, input_encoding):
+    converted = int(value)
+    if str(converted) != str(value):
+        raise ValueError('It is a float')
+    else:
+        return converted
+
+def convert_to_datetime(value, input_encoding):
+    if datetime_regex.match(unicode(value)) is None:
+        raise ValueError("Can't be datetime")
+    else:
+        info = value.split()
+        date = [int(x) for x in info[0].split('-')]
+        rest = [int(x) for x in info[1].split(':')]
+        return datetime.datetime(*(date + rest))
+
+def convert_to_date(value, input_encoding):
+    if date_regex.match(unicode(value)) is None:
+        raise ValueError("Can't be date")
+    else:
+        year, month, day = [int(x) for x in value.split('-')]
+        return datetime.date(year, month, day)
+
+def convert_to_str(value, input_encoding):
+    if isinstance(value, unicode):
+        return value
+    else:
+        if not isinstance(value, str):
+            value = str(value)
+        return value.decode(input_encoding)
+
 
 class Table(object):
     def __init__(self, headers=None, dash='-', pipe='|', plus='+',
-                 input_encoding='utf8', output_encoding='utf8'):
+                 input_encoding='utf8', output_encoding='utf8',
+                 converters=None):
         self.headers = headers if headers is not None else []
         for header in self.headers:
             if not isinstance(header, (str, unicode)):
@@ -67,6 +99,15 @@ class Table(object):
         self._rows = []
         self.types = {}
         self.plugins = {}
+        self.converters = {
+                int: convert_to_int,
+                float: lambda value, encoding: float(value),
+                datetime.date: convert_to_date,
+                datetime.datetime: convert_to_datetime,
+                str: convert_to_str,}
+        if converters is not None:
+            self.converters.update(converters)
+
 
     def __setitem__(self, item, value):
         if isinstance(item, (str, unicode)):
@@ -184,7 +225,7 @@ class Table(object):
             self.decode(encoding or self.output_encoding)
         return rows
 
-    def _identify_type_of_data(self):
+    def _identify_data_types(self):
         """Create ``self.types``, a ``dict`` in which each key is a table
         header (from ``self.headers``) and value is a type in:
         ``(int, float, datetime.date, datetime.datetime, str)``.
@@ -192,7 +233,9 @@ class Table(object):
         The types are identified trying to convert each column value to each
         type.
         """
-        columns = zip(*self._rows)
+        converters = self.converters
+        input_encoding = self.input_encoding
+        columns = zip(*self._rows) # TODO: add sampling
         for i, header in enumerate(self.headers):
             column_types = [int, float, datetime.date, datetime.datetime, str]
             cant_be = set()
@@ -204,60 +247,36 @@ class Table(object):
                 types = list(set([type(value) for value in column]) -
                              set([type(None)]))
                 if len(types) == 1 and types[0] not in (str, unicode):
-                    self.types[header] = types[0]
-                    continue
-                for value in column:
-                    if value == '':
-                        value = None
-                    try:
-                        converted = int(value)
-                        if str(converted) != str(value):
-                            raise ValueError('It is float')
-                    except ValueError:
-                        cant_be.add(int)
-                    except TypeError:
-                        pass  # None should pass
-                    try:
-                        converted = float(value)
-                    except ValueError:
-                        cant_be.add(float)
-                    except TypeError:
-                        pass  # None should pass
-                    if value is not None:
-                        if datetime_regex.match(unicode(value)) is None:
-                            cant_be.add(datetime.datetime)
-                        if date_regex.match(unicode(value)) is None:
-                            cant_be.add(datetime.date)
-                for removed_type in cant_be:
-                    column_types.remove(removed_type)
-                self.types[header] = column_types[0]
+                    identified_type = types[0]
+                else:
+                    for value in column:
+                        if value == '' or value is None:
+                            continue
+                        for type_ in column_types:
+                            try:
+                                converters[type_](value, input_encoding)
+                            except (ValueError, TypeError):
+                                cant_be.add(type_)
+
+                    for removed_type in cant_be:
+                        column_types.remove(removed_type)
+                    identified_type = column_types[0]
+                self.types[header] = identified_type
 
     def normalize_types(self):
-        self._identify_type_of_data()
+        self._identify_data_types()
         rows_converted = []
+        converters = self.converters
+        input_encoding = self.input_encoding
         for row in self._rows:
             row_data = []
             for index, value in enumerate(row):
-                type_ = self.types[self.headers[index]]
-                if value is None or value == '':
-                    row_data.append(None)
-                elif type_ == datetime.date:
-                    info = [int(x) for x in value.split('-')]
-                    row_data.append(datetime.date(*info))
-                elif type_ == datetime.datetime:
-                    info = value.split()
-                    date = [int(x) for x in info[0].split('-')]
-                    rest = [int(x) for x in info[1].split(':')]
-                    row_data.append(datetime.datetime(*(date + rest)))
-                elif type_ == str:
-                    if isinstance(value, unicode):
-                        row_data.append(value)
-                    else:
-                        if not isinstance(value, str):
-                            value = str(value)
-                        row_data.append(value.decode(self.input_encoding))
+                if value == '' or value is None:
+                    converted = None
                 else:
-                    row_data.append(type_(value))
+                    type_ = self.types[self.headers[index]]
+                    converted = converters[type_](value, input_encoding)
+                row_data.append(converted)
             rows_converted.append(row_data)
         self._rows = rows_converted
 
@@ -383,7 +402,7 @@ class Table(object):
         self._rows.reverse()
 
     def append_column(self, name, values, position=None, row_as_dict=False):
-        """Append a column at position ``position`` (defaults to end of
+        """Append a column at posision ``posision`` (defaults to end of
         table)"""
         if (type(values) != types.FunctionType and \
             len(values) != len(self)) or \

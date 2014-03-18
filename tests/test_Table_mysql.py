@@ -29,7 +29,7 @@ import MySQLdb
 class TestTableMySQL(unittest.TestCase):
     def setUp(self):
         self.username = 'root'
-        self.password = 'r00t'
+        self.password = 'root'
         self.hostname = 'localhost'
         self.database = 'outputty_test'
         self.table = 'temp_table'
