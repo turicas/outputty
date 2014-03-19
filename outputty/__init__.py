@@ -46,6 +46,15 @@ def _unicode_encode(element, codec):
     else:
         return element
 
+def convert_to_bool(value, input_encoding):
+    value = unicode(value).lower()
+    if value in ('y', 't', '1','true'):
+        return True
+    elif value in ('n', 'f', '0', 'false'):
+        return False
+    else:
+        raise ValueError("Can't be bool")
+
 def convert_to_int(value, input_encoding):
     converted = int(value)
     if str(converted) != str(value):
@@ -101,6 +110,7 @@ class Table(object):
         self.plugins = {}
         self.converter_sample = converter_sample
         self.converters = {
+                bool: convert_to_bool,
                 int: convert_to_int,
                 float: lambda value, encoding: float(value),
                 datetime.date: convert_to_date,
@@ -241,7 +251,8 @@ class Table(object):
         else:
             columns = zip(*self._rows)
         for i, header in enumerate(self.headers):
-            column_types = [int, float, datetime.date, datetime.datetime, str]
+            column_types = [int, float, bool, datetime.date, datetime.datetime,
+                            str]
             cant_be = set()
             try:
                 column = columns[i]

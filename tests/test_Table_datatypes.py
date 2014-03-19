@@ -102,19 +102,47 @@ class TestTableDataTypes(unittest.TestCase):
 
     def test_normalize_types_should_convert_types_correctly(self):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python',
-                               'rules'])
+                               'rules', 'rocks'])
         table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
-            ''])
-        table.append([None, None, None, None, None, ''])
-        table.append([None, None, None, None, 42, ''])
+            '', 'T'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'F'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 't'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'f'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'true'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'false'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'True'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'False'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'y'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'n'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'Y'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+            '', 'N'])
+        table.append([None, None, None, None, None, '', 1])
+        table.append([None, None, None, None, 42, '', 0])
+        table.append([None, None, None, None, None, '', ''])
         table.normalize_types()
-        self.assertEquals(table[0][0], 1)
-        self.assertEquals(table[0][1], 2.71)
-        self.assertEquals(table[0][2], datetime.date(2011, 1, 1))
-        self.assertEquals(table[0][3],
+        self.assertEqual(table[0][0], 1)
+        self.assertEqual(table[0][1], 2.71)
+        self.assertEqual(table[0][2], datetime.date(2011, 1, 1))
+        self.assertEqual(table[0][3],
                           datetime.datetime(2011, 1, 1, 2, 3, 4))
-        self.assertEquals(table[0][4], 'asd')
-        self.assertEquals(table.types['rules'], str)
+        self.assertEqual(table[0][4], 'asd')
+        self.assertEqual(table.types['rules'], str)
+        self.assertEqual(table.types['rocks'], bool)
+
+        expected_bools = [True, False, True, False, True, False, True, False,
+                True, False, True, False, True, False, None]
+        self.assertEqual(table['rocks'], expected_bools)
 
     def test_identify_data_types_with_normalized_types_should_not_affect(self):
         table = Table(headers=['spam', 'eggs', 'ham', 'Monty', 'Python'])
@@ -133,6 +161,13 @@ class TestTableDataTypes(unittest.TestCase):
         self.assertEquals(table.types['Python'], str)
 
     def test_should_be_able_to_change_converters(self):
+
+        def convert_to_bool(value, encoding):
+            possible_values = ('t', 'f', 'true', 'false', '0', '1', 'y', 'n')
+            if unicode(value).lower() in possible_values:
+                return 'bool={}'.format(value)
+            else:
+                raise ValueError("Can't be bool")
 
         def convert_to_int(value, encoding):
             converted = int(value)
@@ -167,18 +202,21 @@ class TestTableDataTypes(unittest.TestCase):
         converters = {
                 int: convert_to_int,
                 float: convert_to_float,
+                bool: convert_to_bool,
                 datetime.date: convert_to_date,
                 datetime.datetime: convert_to_datetime,
                 str: convert_to_str,}
-        headers = ['spam', 'eggs', 'ham', 'Monty', 'Python']
+        headers = ['spam', 'eggs', 'ham', 'Monty', 'Python', 'rules']
         table = Table(headers=headers, converters=converters)
-        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd'])
+        table.append(['1', '2.71', '2011-01-01', '2011-01-01 02:03:04', 'asd',
+                'True'])
         table.normalize_types()
         self.assertEqual(table[0][0], 'int=1')
         self.assertEqual(table[0][1], 'float=2.71')
         self.assertEqual(table[0][2], 'date=2011-01-01')
         self.assertEqual(table[0][3], 'datetime=2011-01-01 02:03:04')
         self.assertEqual(table[0][4], 'str[3]')
+        self.assertEqual(table[0][5], 'bool=True')
 
     def test_should_be_able_to_specify_converter_sample(self):
         headers = ['spam', 'eggs', 'ham', 'Monty', 'Python']
@@ -197,3 +235,6 @@ class TestTableDataTypes(unittest.TestCase):
                 'Monty': datetime.datetime,
                 'Python': str,}
         self.assertEqual(table.types, expected_types)
+
+    # TODO: add data type checkers AND converters. data type checkers should
+    # receive a set of the entire column
