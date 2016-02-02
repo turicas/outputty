@@ -1,6 +1,8 @@
 outputty
 ========
 
+WARNING: this library is not maintained anymore! Please see `rows <https://github.com/turicas/rows>`_, which is actively maintained and has all outputty's features.
+
 ``outputty`` is a simple Python library that helps you importing, filtering
 and exporting data. It is composed by a main ``Table`` class and a lot of
 plugins that helps importing and exporting data to/from ``Table``.
